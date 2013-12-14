@@ -9,8 +9,8 @@ body {
 	position: fixed;
 	top: 21em;
 	left: 1em;
-	bottom: 1em;
 	width: 18em;
+	overflow: auto;
 }
 
 #outline ol,#outline li {
@@ -34,14 +34,8 @@ body {
 	content: "\25bd";
 }
 
-#outline ol.leaf li:before {
-	content: "\25cb";
-}
-
-#outline li.leaf:before {
-	content: "\25cb";
-}
-
+#outline li.leaf:before,
+#outline ol.leaf li:before,
 #outline li.expanded.leaf:before {
 	content: "\25cb";
 }

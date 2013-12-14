@@ -112,7 +112,7 @@ document.getElementById("outline").addEventListener("click", (function(event){ "
 window["$"].reoutline("content", "outline");
 
 window["$"].JSONP("https://api.twitch.tv/kraken/streams/ferretbomb", function(response) {
-        console.log(response);
+        console.log(response["streams"]);
 });
 
 });
