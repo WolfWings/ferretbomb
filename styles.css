@@ -5,12 +5,13 @@ body {
 	padding-top: 21em;
 }
 
-#outline {
+nav {
 	position: fixed;
-	top: 21em;
-	left: 1em;
-	width: 18em;
+	top: 20em;
+	left: 0em;
+	width: 20em;
 	overflow: auto;
+	padding: 1em;
 }
 
 #outline ol,#outline li {
