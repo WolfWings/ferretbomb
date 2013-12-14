@@ -107,7 +107,7 @@ document.getElementById("outline").addEventListener("click", (function(event){ "
 		tag.className += " expanded";
 	}
 	return true;
-}));
+}), false);
 
 $.reoutline("content", "outline");
 
