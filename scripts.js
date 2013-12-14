@@ -3,11 +3,19 @@
 // @output_file_name scripts-min.js
 // ==/ClosureCompiler==
 
-(function(){
+(function(){ window["$"] = {
 
-window["$"] = {
+streamonline: false
+,updatestreamonline: (function(status){ "use strict";
+	window["$"].streamonline = status;
+})
 
-JSONP: (function(){ 'use strict';
+,streampreview: undefined
+,updatestreampreview: (function(preview){ "use strict";
+	window["$"].streampreview = preview;
+})
+
+,JSONP: (function(){ "use strict";
 	var counter = 0;
 
 	var memoryleakcap = function() {
@@ -87,9 +95,30 @@ JSONP: (function(){ 'use strict';
 	document.getElementById(outline).innerHTML = headings.join("<li");
 })
 
-};
+,updatebanner: (function() { "use strict";
+	window["$"].JSONP("https://api.twitch.tv/kraken/channels/ferretbomb", function(response) {
+		if (window["$"].streampreview === undefined) {
+			window["$"].updatestreampreview(response["video_banner"]);
+		}
+	});
+})
 
-}());
+,checkstream: (function() { "use strict";
+	window["$"].JSONP("https://api.twitch.tv/kraken/streams/ferretbomb", function(response) {
+		if (response["stream"] === null) {
+			setTimeout(window["$"].updatebanner, 0);
+			setTimeout(window["$"].checkstream, 60000);
+			window["$"].updatestreamonline(false);
+			return;
+		}
+		window["$"].updatestreamonline(true);
+		window["$"].updatestreampreview(response["stream"]["preview"]["large"]);
+		setTimeout(window["$"].checkstream, 600000);
+		return;
+	});
+})
+
+}; }());
 
 window["init"] = (function() { "use strict";
 
@@ -109,10 +138,8 @@ document.getElementById("outline").addEventListener("click", (function(event){ "
 	return true;
 }), false);
 
-window["$"].reoutline("content", "outline");
+$.reoutline("content", "outline");
 
-window["$"].JSONP("https://api.twitch.tv/kraken/streams/ferretbomb", function(response) {
-        console.log(response["streams"]);
-});
+setTimeout(window["$"].checkstream, 0);
 
 });
