@@ -3,7 +3,9 @@
 // @output_file_name scripts-min.js
 // ==/ClosureCompiler==
 
-(function(){ window["$"] = {
+(function(){
+
+window["$"] = {
 
 streamonline: false
 ,updatestreamonline: (function(status){ "use strict";
@@ -118,28 +120,58 @@ streamonline: false
 	});
 })
 
-}; }());
+,class: {
+	has: (function(tag, theClass) { "use strict";
+		var re = new RegExp("(?:^|\s)" + theClass + "(?!\S)");
+		return re.test(tag.className);
+	})
+	,add: (function(tag, theClass) { "use strict";
+		tag.className += " " + theClass;
+	})
+	,remove: (function(tag, theClass) { "use strict";
+		var re = new RegExp("(?:^|\s)" + theClass + "(?!\S)", "g");
+		tag.className = tag.className.replace(re, "");
+	})
+	,toggle: (function(tag, theClass) { "use strict";
+		if ($.class.has(tag, theClass)) {
+			$.class.remove(tag, theClass);
+		} else {
+			$.class.add(tag, theClass);
+		}
+	})
+}
 
-window["init"] = (function() { "use strict";
+, events: {
+	add: (function(object, event, callback){ "use strict";
+		if (object.attachEvent) {
+			object.attachEvent("on" + event, callback);
+		} else {
+			object.addEventListener(event, callback, false);
+		}
+	})
+}
 
-document.getElementById("outline").addEventListener("click", (function(event){ "use strict";
-	var tag = event.toElement;
-	while (tag && !/^[Ll][Ii]$/.test(tag.tagName)) {
-		tag = tag.parentNode;
-	}
-	if (tag.className.match(/(?:^|\s)leaf(?!\S)/)) {
-		return true;
-	}
-	if (tag.className.match(/(?:^|\s)expanded(?!\S)/)) {
-		tag.className = tag.className.replace( /(?:^|\s)expanded(?!\S)/g , '' );
-	} else {
-		tag.className += " expanded";
-	}
-	return true;
-}), false);
+,"inits": {
+	"article": (function() { "use strict";
+		var outline = document.getElementById("outline");
+		var outlineToggleExpanded = (function(event){ "use strict";
+			var tag = event.toElement;
+			while (tag && !/^[Ll][Ii]$/.test(tag.tagName)) {
+				tag = tag.parentNode;
+			}
+			if ($.class.has(tag, "leaf")) {
+				return true;
+			}
+			$.class.toggle(tag, "expanded");
+			return true;
+		});
+		$.events.add(outline, "click", outlineToggleExpanded);
+		$.reoutline("content", "outline");
+	})
+}
 
-$.reoutline("content", "outline");
+};
 
 setTimeout($.checkstream, 0);
 
-});
+}());
