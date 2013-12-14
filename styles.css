@@ -1,0 +1,73 @@
+body {
+	margin: 0px;
+	padding: 1em;
+	padding-left: 21em;
+	padding-top: 21em;
+}
+
+#outline {
+	position: fixed;
+	top: 21em;
+	left: 1em;
+	bottom: 1em;
+	width: 18em;
+}
+
+#outline ol,#outline li {
+	margin: 0;
+	list-style: none;
+}
+
+#outline ol {
+	padding-left: 0;
+}
+
+#outline ol ol {
+	padding-left: 1em;
+}
+
+#outline ol li:before {
+	content: "\25b7";
+}
+
+#outline ol li.expanded:before {
+	content: "\25bd";
+}
+
+#outline ol.leaf li:before {
+	content: "\25cb";
+}
+
+#outline li.leaf:before {
+	content: "\25cb";
+}
+
+#outline li.expanded.leaf:before {
+	content: "\25cb";
+}
+
+#outline ol > li > ol {
+	display: none;
+}
+
+#outline ol > li.expanded > ol {
+	display: list-item;
+}
+
+#content img {
+	clear: both;
+}
+
+#content img.inline {
+	display: inline-block;
+}
+
+#content img.right {
+	clear: right;
+	float: right;
+}
+
+#content img.left {
+	clear: left;
+	float: left;
+}
