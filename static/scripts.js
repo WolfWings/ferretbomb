@@ -34,7 +34,7 @@ streamonline: false
 	return function(url, callback) {
 		var uniqueName = 'callback_json' + (++counter);
 
-		var script = document.createElement('script');
+		var script = $.tags.create('script');
 		script.src = url + (url.toString().indexOf('?') === -1 ? '?' : '&') + 'callback=' + uniqueName;
 		script.async = true;
 
@@ -48,7 +48,7 @@ streamonline: false
 
 		script.onload = script.onreadystatechange = memoryleakcap;
 
-		document.getElementsByTagName('head')[0].appendChild(script);
+		$.tags.find.tagname('head')[0].appendChild(script);
 
 		return uniqueName;
 	};
@@ -58,7 +58,7 @@ streamonline: false
 	var headings = "";
 	var depth = 0;
 	var lastAnchor = undefined;
-	for (var tag = document.getElementById(content).firstChild; tag; tag = tag.nextSibling) {
+	for (var tag = $.tags.find.id(content).firstChild; tag; tag = tag.nextSibling) {
 		if (/^[aA]$/.test(tag.nodeName) && (tag.getAttribute("name").length > 1)) {
 			lastAnchor = tag.getAttribute("name");
 			continue;
@@ -94,7 +94,7 @@ streamonline: false
 			headings[index] = " class=\"leaf\"" + headings[index];
 		}
 	}
-	document.getElementById(outline).innerHTML = headings.join("<li");
+	$.tags.find.id(outline).innerHTML = headings.join("<li");
 })
 
 ,updatebanner: (function() { "use strict";
@@ -123,10 +123,10 @@ streamonline: false
 ,class: {
 	has: (function(tag, theClass) { "use strict";
 		var re = new RegExp("(?:^|\s)" + theClass + "(?!\S)");
-		return re.test(tag.className);
+		return re.test(tag["className"]);
 	})
 	,add: (function(tag, theClass) { "use strict";
-		tag.className += " " + theClass;
+		tag["className"] += " " + theClass;
 	})
 	,remove: (function(tag, theClass) { "use strict";
 		var re = new RegExp("(?:^|\s)" + theClass + "(?!\S)", "g");
@@ -141,19 +141,37 @@ streamonline: false
 	})
 }
 
-, events: {
+,events: {
 	add: (function(object, event, callback){ "use strict";
 		if (object.attachEvent) {
-			object.attachEvent("on" + event, callback);
+			object["attachEvent"]("on" + event, callback);
 		} else {
-			object.addEventListener(event, callback, false);
+			object["addEventListener"](event, callback, false);
 		}
+		return object;
 	})
+}
+
+,tags: {
+	create: (function(tagname){ "use strict";
+		return document["createElement"](tagname);
+	})
+	,find: {
+		tagname: (function(tagname){ "use strict";
+			return document["getElementsByTagName"](tagname);
+		})
+		,id: (function(id){ "use strict";
+			return document["getElementById"](id);
+		})
+	}
 }
 
 ,"inits": {
 	"article": (function() { "use strict";
-		var outline = document.getElementById("outline");
+		var header = $.tags.find.tagname('header')[0];
+		var outline = $.tags.create('div');
+		outline.setAttribute('id', 'outline');
+		header.appendChild(outline);
 		var outlineToggleExpanded = (function(event){ "use strict";
 			var tag = event.toElement;
 			while (tag && !/^[Ll][Ii]$/.test(tag.tagName)) {

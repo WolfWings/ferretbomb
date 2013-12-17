@@ -1,3 +1,8 @@
+@font-face {
+	font-family: "Space Age";
+	src: local("SpaceAge"), url(space_age.ttf), url(space_age.otf);
+}
+
 body {
 	margin: 0px;
 	padding: 1em;
@@ -7,7 +12,7 @@ body {
 	color: #FFF;
 }
 
-nav {
+header {
 	position: fixed;
 	top: 20em;
 	left: 0em;
@@ -67,4 +72,52 @@ nav {
 #content img.left {
 	clear: left;
 	float: left;
+}
+
+nav {
+	display: block;
+	position: fixed;
+	top: 0em;
+	left: 0em;
+	right: 0em;
+	height: 20em;
+	padding: 1em;
+	padding-left: 21em;
+	font-family: "Space Age", sans-serif;
+}
+
+nav ul {
+	font-size: 200%;
+}
+
+nav ul#navmenu {
+	top: 0;
+	left: 0;
+	right: 0;
+	height: 2em;
+	margin: 0;
+	padding: 0;
+	list-style-type: none;
+	position: relative;
+	display: block;
+	background: #000;
+}
+nav ul#navmenu li {
+	display: block;
+	float: left;
+	margin: 0;
+	padding: 0;
+	background: #000;
+}
+nav ul#navmenu li a {
+	display: block;
+	float: left;
+	color: #900;
+	padding: 0.375em 1em;
+	text-decoration: none;
+	border-top: 0.25em solid black;
+}
+nav ul#navmenu li a:hover {
+	color: #f77;
+	border-top-color: white;
 }
