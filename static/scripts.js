@@ -122,17 +122,19 @@ streamonline: false
 
 ,class: {
 	has: (function(tag, theClass) { "use strict";
-		var re = new RegExp("(?:^|\s)" + theClass + "(?!\S)");
+		var re = new RegExp("(?:^|\\s)" + theClass + "(?!\\S)");
+		console.log(re);
 		return re.test(tag["className"]);
 	})
 	,add: (function(tag, theClass) { "use strict";
 		tag["className"] += " " + theClass;
 	})
 	,remove: (function(tag, theClass) { "use strict";
-		var re = new RegExp("(?:^|\s)" + theClass + "(?!\S)", "g");
-		tag.className = tag.className.replace(re, "");
+		var re = new RegExp("(?:^|\\s)" + theClass + "(?!\\S)", "g");
+		tag["className"] = tag.className.replace(re, "");
 	})
 	,toggle: (function(tag, theClass) { "use strict";
+		console.log(tag.className, theClass);
 		if ($.class.has(tag, theClass)) {
 			$.class.remove(tag, theClass);
 		} else {
@@ -141,8 +143,8 @@ streamonline: false
 	})
 }
 
-,events: {
-	add: (function(object, event, callback){ "use strict";
+,"events": {
+	"add": (function(object, event, callback){ "use strict";
 		if (object.attachEvent) {
 			object["attachEvent"]("on" + event, callback);
 		} else {

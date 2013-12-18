@@ -4,21 +4,38 @@
 }
 
 body {
-	margin: 0px;
-	padding: 1em;
-	padding-left: 21em;
-	padding-top: 21em;
-	background: url(webtreats_crimson_red_pattern_16.jpg);
+	text-align: justify;
+	padding: 3em 0 0 20em;
+	background: url(webtreats_crimson_red_pattern_16.jpeg);
 	color: #FFF;
+}
+
+a {
+	color: #FF0;
+}
+
+a:visited {
+	color: #996;
+}
+
+a:hover {
+	color #F00;
+}
+
+a:active {
+	color #FFF;
 }
 
 header {
 	position: fixed;
-	top: 20em;
+	top: 3em;
 	left: 0em;
-	width: 20em;
+	bottom: 0px;
+	width: 18em;
 	overflow: auto;
+	margin: 0;
 	padding: 1em;
+	background: url(webtreats_crimson_red_pattern_26.jpeg);
 }
 
 #outline ol,#outline li {
@@ -56,45 +73,24 @@ header {
 	display: list-item;
 }
 
-#content img {
-	clear: both;
-}
-
-#content img.inline {
-	display: inline-block;
-}
-
-#content img.right {
-	clear: right;
-	float: right;
-}
-
-#content img.left {
-	clear: left;
-	float: left;
-}
-
 nav {
+	background: #000;
 	display: block;
 	position: fixed;
 	top: 0em;
 	left: 0em;
 	right: 0em;
-	height: 20em;
-	padding: 1em;
-	padding-left: 21em;
-	font-family: "Space Age", sans-serif;
-}
-
-nav ul {
-	font-size: 200%;
+	height: 3em;
+	padding: 0 0 0 21em;
 }
 
 nav ul#navmenu {
+	font-family: "Space Age", sans-serif;
+	font-size: 200%;
 	top: 0;
 	left: 0;
 	right: 0;
-	height: 2em;
+	height: 1em;
 	margin: 0;
 	padding: 0;
 	list-style-type: none;
@@ -113,11 +109,30 @@ nav ul#navmenu li a {
 	display: block;
 	float: left;
 	color: #900;
-	padding: 0.375em 1em;
+	padding: 0;
 	text-decoration: none;
-	border-top: 0.25em solid black;
+	border-style: solid;
+	border-color: transparent;
+	border-width: 0.25em 1em 0 1em;
 }
 nav ul#navmenu li a:hover {
 	color: #f77;
 	border-top-color: white;
+}
+
+#content li {
+	clear: both;
+}
+
+#content a {
+	margin-right: auto;
+}
+
+#content a img {
+	max-width: 200px;
+	max-height: 200px;
+	margin-left: auto;
+	margin-right: auto;
+	height: auto;
+	clear: both;
 }
