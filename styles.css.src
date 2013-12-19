@@ -108,7 +108,7 @@ nav ul#navmenu li {
 	margin: 0;
 	padding: 0;
 	background: transparent;
-	margin-right: -1em;
+	margin-left: -1em;
 }
 nav ul#navmenu li a {
 	display: block;
