@@ -123,7 +123,6 @@ streamonline: false
 ,classes: {
 	has: (function(tag, theClass) { "use strict";
 		var re = new RegExp("(?:^|\\s)" + theClass + "(?!\\S)");
-		console.log(re);
 		return re.test(tag["className"]);
 	})
 	,add: (function(tag, theClass) { "use strict";
@@ -134,7 +133,6 @@ streamonline: false
 		tag["className"] = tag.className.replace(re, "");
 	})
 	,toggle: (function(tag, theClass) { "use strict";
-		console.log(tag.className, theClass);
 		if ($.classes.has(tag, theClass)) {
 			$.classes.remove(tag, theClass);
 		} else {
@@ -168,11 +166,7 @@ streamonline: false
 	}
 }
 
-,"init": (function(type) { "use strict";
-	$.events.add(window, "load", $.inits[type]);
-})
-
-,inits: {
+,"init": {
 	"article": (function() { "use strict";
 		var header = $.tags.find.tagname('header')[0];
 		var outline = $.tags.create('div');

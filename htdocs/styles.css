@@ -3,6 +3,10 @@
 	src: local("SpaceAge"), url(/resources/space_age.ttf), url(/resources/space_age.otf);
 }
 
+a[name] {
+	display: block; position: relative; top: -3em; visibility: hidden;
+}
+
 body {
 	text-align: justify;
 	padding: 3em 0 0 20em;
