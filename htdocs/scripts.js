@@ -120,7 +120,7 @@ streamonline: false
 	});
 })
 
-,class: {
+,classes: {
 	has: (function(tag, theClass) { "use strict";
 		var re = new RegExp("(?:^|\\s)" + theClass + "(?!\\S)");
 		console.log(re);
@@ -135,10 +135,10 @@ streamonline: false
 	})
 	,toggle: (function(tag, theClass) { "use strict";
 		console.log(tag.className, theClass);
-		if ($.class.has(tag, theClass)) {
-			$.class.remove(tag, theClass);
+		if ($.classes.has(tag, theClass)) {
+			$.classes.remove(tag, theClass);
 		} else {
-			$.class.add(tag, theClass);
+			$.classes.add(tag, theClass);
 		}
 	})
 }
@@ -179,10 +179,10 @@ streamonline: false
 			while (tag && !/^[Ll][Ii]$/.test(tag.tagName)) {
 				tag = tag.parentNode;
 			}
-			if ($.class.has(tag, "leaf")) {
+			if ($.classes.has(tag, "leaf")) {
 				return true;
 			}
-			$.class.toggle(tag, "expanded");
+			$.classes.toggle(tag, "expanded");
 			return true;
 		});
 		$.events.add(outline, "click", outlineToggleExpanded);
