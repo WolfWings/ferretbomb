@@ -14,7 +14,7 @@ streamonline: false
 
 ,streampreview: undefined
 ,updatestreampreview: (function(preview){ "use strict";
-	$.streampreview. = preview;
+	$.streampreview = preview;
 })
 
 ,JSONP: (function(){ "use strict";
