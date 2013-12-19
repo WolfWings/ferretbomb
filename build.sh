@@ -5,10 +5,10 @@ curl -s \
 	-d output_format=text \
 	--data-urlencode "js_code@scripts.js.src" \
 	http://closure-compiler.appspot.com/compile \
-	-o scripts.js
+	-o htdocs/scripts.js
 
 curl -s \
-	-X POST
+	-X POST \
 	--data-urlencode "input@styles.css.src" \
-	http://cssminifier.com/raw
-	-o styles.css
+	http://cssminifier.com/raw \
+	-o htdocs/styles.css
