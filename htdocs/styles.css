@@ -1,12 +1,12 @@
 @font-face {
 	font-family: "Space Age";
-	src: local("SpaceAge"), url(space_age.ttf), url(space_age.otf);
+	src: local("SpaceAge"), url(/resources/space_age.ttf), url(/resources/space_age.otf);
 }
 
 body {
 	text-align: justify;
 	padding: 3em 0 0 20em;
-	background: url(webtreats_crimson_red_pattern_16.jpeg);
+	background: url(/resources/webtreats_crimson_red_pattern_16.jpeg);
 	color: #FFF;
 }
 
@@ -35,7 +35,7 @@ header {
 	overflow: auto;
 	margin: 0;
 	padding: 1em;
-	background: url(webtreats_crimson_red_pattern_26.jpeg);
+	background: url(/resources/webtreats_crimson_red_pattern_26.jpeg);
 }
 
 #outline ol,#outline li {
