@@ -14,7 +14,7 @@ streamonline: false
 
 ,streampreview: undefined
 ,updatestreampreview: (function(preview){ "use strict";
-	$.streampreview = preview;
+	$.streampreview. = preview;
 })
 
 ,JSONP: (function(){ "use strict";
@@ -143,8 +143,8 @@ streamonline: false
 	})
 }
 
-,"events": {
-	"add": (function(object, event, callback){ "use strict";
+,events: {
+	add: (function(object, event, callback){ "use strict";
 		if (object.attachEvent) {
 			object["attachEvent"]("on" + event, callback);
 		} else {
@@ -168,7 +168,11 @@ streamonline: false
 	}
 }
 
-,"inits": {
+,"init": (function(type) { "use strict";
+	$.events.add(window, "load", $.inits[type]);
+})
+
+,inits: {
 	"article": (function() { "use strict";
 		var header = $.tags.find.tagname('header')[0];
 		var outline = $.tags.create('div');
