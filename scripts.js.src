@@ -3,7 +3,7 @@
 // @output_file_name scripts-min.js
 // ==/ClosureCompiler==
 
-(function(){
+(function(){ "use strict";
 
 window["$"] = {
 
@@ -31,7 +31,7 @@ streamonline: false
 		} catch(ignore) {}
 	};
 
-	return function(url, callback) {
+	return function(url, callback) { "use strict";
 		var uniqueName = 'callback_json' + (++counter);
 
 		var script = $.tags.create('script');
@@ -127,10 +127,12 @@ streamonline: false
 	})
 	,add: (function(tag, theClass) { "use strict";
 		tag["className"] += " " + theClass;
+		return tag;
 	})
 	,remove: (function(tag, theClass) { "use strict";
 		var re = new RegExp("(?:^|\\s)" + theClass + "(?!\\S)", "g");
-		tag["className"] = tag.className.replace(re, "");
+		tag["className"] = tag["className"].replace(re, "");
+		return tag;
 	})
 	,toggle: (function(tag, theClass) { "use strict";
 		if ($.classes.has(tag, theClass)) {
@@ -138,12 +140,13 @@ streamonline: false
 		} else {
 			$.classes.add(tag, theClass);
 		}
+		return tag;
 	})
 }
 
 ,events: {
 	add: (function(object, event, callback){ "use strict";
-		if (object.attachEvent) {
+		if (object["attachEvent"]) {
 			object["attachEvent"]("on" + event, callback);
 		} else {
 			object["addEventListener"](event, callback, false);
