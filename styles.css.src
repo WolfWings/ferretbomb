@@ -107,7 +107,8 @@ nav ul#navmenu li {
 	float: left;
 	margin: 0;
 	padding: 0;
-	background: #000;
+	background: transparent;
+	margin-right: -1em;
 }
 nav ul#navmenu li a {
 	display: block;
