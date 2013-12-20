@@ -38,19 +38,22 @@ header {
 	position: fixed;
 	top: 2em;
 	left: 0em;
-	bottom: 0px;
+	bottom: 12em;
 	width: 10em;
 	overflow: auto;
+	background: #181818;
 	margin: 0;
 	padding: 0;
 }
 
 #outline {
-	background: #181818;
 	padding: 0.5em;
 }
 
 #tail {
+	position: fixed;
+	left: 0px;
+	bottom: 2em;
 	width: 10em;
 	height: 10em;
 	background: #181818;
