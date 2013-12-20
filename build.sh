@@ -1,14 +1,21 @@
 #!/bin/bash
+
+cp header1.html htdocs/header.html
+
+curl -s \
+	-X POST \
+	--data-urlencode "input@styles.css.src" \
+	http://cssminifier.com/raw \
+	>> htdocs/header.html
+
+cat header2.html >> htdocs/header.html
+
 curl -s \
 	-d compilation_level=ADVANCED_OPTIMIZATIONS \
 	-d output_info=compiled_code \
 	-d output_format=text \
 	--data-urlencode "js_code@scripts.js.src" \
 	http://closure-compiler.appspot.com/compile \
-	-o htdocs/scripts.js
+	>> htdocs/header.html
 
-curl -s \
-	-X POST \
-	--data-urlencode "input@styles.css.src" \
-	http://cssminifier.com/raw \
-	-o htdocs/styles.css
+cat header3.html >> htdocs/header.html
