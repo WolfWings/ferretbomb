@@ -2,6 +2,8 @@
 
 cp header1.html htdocs/header.html
 
+echo Minifying CSS...
+
 curl -s \
 	-X POST \
 	--data-urlencode "input@styles.css.src" \
@@ -9,6 +11,8 @@ curl -s \
 	>> htdocs/header.html
 
 cat header2.html >> htdocs/header.html
+
+echo Minifying JavaScript...
 
 curl -s \
 	-d compilation_level=ADVANCED_OPTIMIZATIONS \

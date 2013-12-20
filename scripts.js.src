@@ -175,6 +175,9 @@ streamonline: false
 		var outline = $.tags.create('div');
 		outline.setAttribute('id', 'outline');
 		header.appendChild(outline);
+		var tail = $.tags.create('div');
+		tail.setAttribute('id', 'tail');
+		header.appendChild(tail);
 		var outlineToggleExpanded = (function(event){ "use strict";
 			var tag = event.toElement;
 			while (tag && !/^[Ll][Ii]$/.test(tag.tagName)) {

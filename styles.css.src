@@ -1,6 +1,6 @@
 @font-face {
 	font-family: "Space Age";
-	src: local("SpaceAge"), url(/resources/space_age.ttf), url(/resources/space_age.otf);
+	src: local("SpaceAge"), url(/resources/space_age.otf), url(/resources/space_age.ttf), url(/resources/space_age.eot);
 }
 
 a[name] {
@@ -41,6 +41,18 @@ header {
 	background: #181818;
 }
 
+#tail {
+	margin-top: -3.5em;
+	margin-left: -0.5em;
+	width: 11em;
+	height: 4em;
+	border: solid #202020;
+	border-width: 0 2px 2px 0;
+	border-radius: 0 0 4em 0;
+	-moz-border-radius: 0 0 11em 0;
+	-webkit-border-radius: 0 0 11em 0;
+}
+
 #outline ol,#outline li {
 	margin: 0;
 	list-style: none;
@@ -58,6 +70,18 @@ header {
 	width: 0.5em;
 	margin-right: 0.25em;
 	content: "\25b8";
+}
+
+#outline ol li:before {
+	color: #900;
+}
+
+#outline ol li:hover:before {
+	color: #f66;
+}
+
+#outline ol li:active:before {
+	color: #fff;
 }
 
 #outline ol li.expanded:before {
@@ -146,7 +170,11 @@ nav ul#navmenu li a {
 	text-decoration: none;
 }
 nav ul#navmenu li a:hover {
-	color: #f77;
+	color: #f66;
+}
+
+nav ul#navmenu li a:active {
+	color: #fff;
 }
 
 #content li {
