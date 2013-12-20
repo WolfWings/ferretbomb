@@ -14,7 +14,7 @@ h1 {
 body {
 	text-align: justify;
 	margin: 0 0 0 0.5em;
-	padding: 2em 0 0 11em;
+	padding: 2em 0 0 10em;
 	background: #202020;
 	color: #ddd;
 }
@@ -42,20 +42,21 @@ header {
 	width: 10em;
 	overflow: auto;
 	margin: 0;
-	padding: 0.5em;
+	padding: 0;
+}
+
+#outline {
 	background: #181818;
+	padding: 0.5em;
 }
 
 #tail {
-	margin-top: -3.5em;
-	margin-left: -0.5em;
-	width: 11em;
-	height: 4em;
-	border: solid #202020;
-	border-width: 0 2px 2px 0;
-	border-radius: 0 0 4em 0;
-	-moz-border-radius: 0 0 11em 0;
-	-webkit-border-radius: 0 0 11em 0;
+	width: 10em;
+	height: 5em;
+	background: #181818;
+	border-radius: 0 0 5em 0;
+	-moz-border-radius: 0 0 5em 0;
+	-webkit-border-radius: 0 0 5em 0;
 }
 
 #outline ol,#outline li {
@@ -141,11 +142,11 @@ nav {
 	background: #000;
 	display: block;
 	position: fixed;
-	top: 0em;
-	left: 0em;
-	right: 0em;
+	top: 0;
+	left: 0;
+	right: 0;
 	height: 2em;
-	padding: 0 0 0 11em;
+	padding: 0 0 0 10em;
 	vertical-align: middle;
 }
 
