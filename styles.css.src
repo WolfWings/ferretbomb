@@ -52,11 +52,11 @@ header {
 
 #tail {
 	width: 10em;
-	height: 5em;
+	height: 10em;
 	background: #181818;
-	border-radius: 0 0 5em 0;
-	-moz-border-radius: 0 0 5em 0;
-	-webkit-border-radius: 0 0 5em 0;
+	border-radius: 0 0 10em 0;
+	-moz-border-radius: 0 0 10em 0;
+	-webkit-border-radius: 0 0 10em 0;
 }
 
 #outline ol,#outline li {
