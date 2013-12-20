@@ -9,21 +9,21 @@ a[name] {
 
 body {
 	text-align: justify;
-	padding: 3em 0 0 20em;
-	background: url(/resources/webtreats_crimson_red_pattern_16.jpeg);
+	padding: 3em 0 0 15em;
+	background: #202020;
 	color: #FFF;
 }
 
 a {
-	color: #FF0;
+	color: #900;
 }
 
 a:visited {
-	color: #996;
+	color: #933;
 }
 
 a:hover {
-	color #F00;
+	color #F66;
 }
 
 a:active {
@@ -35,11 +35,11 @@ header {
 	top: 3em;
 	left: 0em;
 	bottom: 0px;
-	width: 18em;
+	width: 13em;
 	overflow: auto;
 	margin: 0;
 	padding: 1em;
-	background: url(/resources/webtreats_crimson_red_pattern_26.jpeg);
+	background: #181818;
 }
 
 #outline ol,#outline li {
@@ -56,24 +56,42 @@ header {
 }
 
 #outline ol li:before {
-	content: "\25b7";
+	content: "\25b8";
 }
 
 #outline ol li.expanded:before {
-	content: "\25bd";
+	content: "\25be";
 }
 
-#outline li.leaf:before,
-#outline ol.leaf li:before,
+#outline li.leaf:before {
+	content: "\25cf";
+}
+
+#outline ol.leaf li:before {
+	content: "\25cf";
+}
+
 #outline li.expanded.leaf:before {
-	content: "\25cb";
+	content: "\25cf";
 }
 
 #outline ol > li > ol {
 	display: none;
 }
 
+#outline > ol > li.expanded:before {
+	content: "";
+}
+
 #outline ol > li.expanded > ol {
+	display: list-item;
+}
+
+#outline > ol > li:before {
+	content: "";
+}
+
+#outline > ol > li > ol {
 	display: list-item;
 }
 
@@ -85,7 +103,8 @@ nav {
 	left: 0em;
 	right: 0em;
 	height: 3em;
-	padding: 0 0 0 21em;
+	padding: 0 0 0 15em;
+	margin-left: 1em;
 }
 
 nav ul#navmenu {
