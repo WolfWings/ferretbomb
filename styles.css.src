@@ -14,20 +14,18 @@ body {
 	color: #FFF;
 }
 
-a {
-	color: #900;
-}
-
+a,
 a:visited {
-	color: #933;
+	color: #900;
+	text-decoration: none;
 }
 
 a:hover {
-	color #F66;
+	color: #F66;
 }
 
 a:active {
-	color #FFF;
+	color: #FFF;
 }
 
 header {
