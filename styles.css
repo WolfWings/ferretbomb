@@ -46,10 +46,6 @@ header {
 	padding: 0;
 }
 
-#outline {
-	padding: 0.5em;
-}
-
 #tail {
 	position: fixed;
 	left: 0px;
@@ -60,6 +56,10 @@ header {
 	border-radius: 0 0 10em 0;
 	-moz-border-radius: 0 0 10em 0;
 	-webkit-border-radius: 0 0 10em 0;
+}
+
+#outline {
+	padding: 0.5em;
 }
 
 #outline ol,#outline li {
@@ -79,9 +79,6 @@ header {
 	width: 0.5em;
 	margin-right: 0.25em;
 	content: "\25b8";
-}
-
-#outline ol li:before {
 	color: #900;
 }
 
@@ -153,7 +150,7 @@ nav {
 	vertical-align: middle;
 }
 
-nav ul#navmenu {
+#navmenu {
 	font-family: "Space Age", sans-serif;
 	font-size: 200%;
 	top: 0;
@@ -167,14 +164,14 @@ nav ul#navmenu {
 	display: block;
 }
 
-nav ul#navmenu li {
+#navmenu li {
 	display: block;
 	float: left;
 	margin: 0;
 	padding: 0;
 }
 
-nav ul#navmenu li a {
+#navmenu li a {
 	display: block;
 	float: left;
 	color: #900;
@@ -182,11 +179,11 @@ nav ul#navmenu li a {
 	text-decoration: none;
 }
 
-nav ul#navmenu li a:hover {
+#navmenu li a:hover {
 	color: #f66;
 }
 
-nav ul#navmenu li a:active {
+#navmenu li a:active {
 	color: #fff;
 }
 
@@ -209,17 +206,17 @@ nav ul#navmenu li a:active {
 
 footer {
 	position: fixed;
-	float: left;
-	left: 50%;
+	right: 0;
 	bottom: 0;
+	float: right;
 	height: 3em;
 }
 
 footer #footer {
 	background: rgba(0,0,0,0.5);
-	float: left;
+	float: right;
 	position: relative;
-	left: -50%;
+	right: 0;
 	height: 2em;
 	padding: 0.5em;
 	border-radius: 3em 3em 0 0;

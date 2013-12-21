@@ -1,8 +1,3 @@
-// ==ClosureCompiler==
-// @compilation_level ADVANCED_OPTIMIZATIONS
-// @output_file_name scripts-min.js
-// ==/ClosureCompiler==
-
 (function(){ "use strict";
 
 window["$"] = {
