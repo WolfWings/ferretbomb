@@ -19,18 +19,24 @@ body {
 	color: #ddd;
 }
 
-a,
-a:visited {
-	color: #900;
+a {
 	text-decoration: none;
 }
 
-a:hover {
-	color: #F66;
+a,
+a:visited,
+#outline ol li:before {
+	color: #900;
 }
 
-a:active {
-	color: #FFF;
+a:hover,
+#outline ol li:hover:before {
+	color: #f66;
+}
+
+a:active,
+#outline ol li:active:before {
+	color: #fff;
 }
 
 header {
@@ -62,7 +68,8 @@ header {
 	padding: 0.5em;
 }
 
-#outline ol,#outline li {
+#outline ol,
+#outline li {
 	margin: 0;
 	list-style: none;
 }
@@ -79,15 +86,6 @@ header {
 	width: 0.5em;
 	margin-right: 0.25em;
 	content: "\25b8";
-	color: #900;
-}
-
-#outline ol li:hover:before {
-	color: #f66;
-}
-
-#outline ol li:active:before {
-	color: #fff;
 }
 
 #outline ol li.expanded:before {
@@ -96,18 +94,8 @@ header {
 	content: "\25be";
 }
 
-#outline li.leaf:before {
-	width: 0.5em;
-	margin-right: 0.25em;
-	content: "\25cf";
-}
-
-#outline ol.leaf li:before {
-	width: 0.5em;
-	margin-right: 0.25em;
-	content: "\25cf";
-}
-
+#outline li.leaf:before,
+#outline ol.leaf li:before,
 #outline li.expanded.leaf:before {
 	width: 0.5em;
 	margin-right: 0.25em;
@@ -118,24 +106,16 @@ header {
 	display: none;
 }
 
-#outline > ol > li.expanded:before {
-	width: 0;
-	margin-right: 0;
-	content: "";
-}
-
-#outline ol > li.expanded > ol {
+#outline ol > li.expanded > ol,
+#outline > ol > li > ol {
 	display: list-item;
 }
 
+#outline > ol > li.expanded:before,
 #outline > ol > li:before {
 	width: 0;
 	margin-right: 0;
 	content: "";
-}
-
-#outline > ol > li > ol {
-	display: list-item;
 }
 
 nav {
@@ -174,9 +154,7 @@ nav {
 #navmenu li a {
 	display: block;
 	float: left;
-	color: #900;
 	padding: 0 0.5em;
-	text-decoration: none;
 }
 
 #navmenu li a:hover {
@@ -208,17 +186,10 @@ footer {
 	position: fixed;
 	right: 0;
 	bottom: 0;
-	float: right;
-	height: 3em;
-}
-
-footer #footer {
-	background: rgba(0,0,0,0.5);
-	float: right;
-	position: relative;
-	right: 0;
 	height: 2em;
+	float: right;
 	padding: 0.5em;
 	border-radius: 3em 3em 0 0;
 	text-align: center;
+	background: rgba(0,0,0,0.5);
 }
