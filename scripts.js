@@ -116,17 +116,18 @@ streamonline: false
 })
 
 ,classes: {
-	has: (function(tag, theClass) { "use strict";
-		var re = new RegExp("(?:^|\\s)" + theClass + "(?!\\S)");
-		return re.test(tag["className"]);
+	match: (function(theClass){ "use strict";
+		return new RegExp("(?:^|\\s)" + theClass + "(?!\\S)", "g");
+	})
+	,has: (function(tag, theClass) { "use strict";
+		return $.classes.match(theClass).test(tag["className"]);
 	})
 	,add: (function(tag, theClass) { "use strict";
 		tag["className"] += " " + theClass;
 		return tag;
 	})
 	,remove: (function(tag, theClass) { "use strict";
-		var re = new RegExp("(?:^|\\s)" + theClass + "(?!\\S)", "g");
-		tag["className"] = tag["className"].replace(re, "");
+		tag["className"] = tag["className"].replace($.classes.match(theClass), "");
 		return tag;
 	})
 	,toggle: (function(tag, theClass) { "use strict";
@@ -186,6 +187,36 @@ streamonline: false
 		});
 		$.events.add(outline, "click", outlineToggleExpanded);
 		$.reoutline("content", "outline");
+	})
+
+	,"stream": (function() { "use strict";
+		var stream = $.tags.find.tagname('stream')[0];
+		var embed = $.tags.create('object');
+		var attribs = {
+			'type': 'application/x-shockwave-flash'
+			,'height': '100%'
+			,'width': '100%'
+			,'id': 'live_embed_player_flash'
+			,'data': 'http://www.twitch.tv/widgets/live_embed_player.swf?channel=ferretbomb'
+			,'bgcolor': '#000000'
+		};
+		var params = {
+			'allowFullScreen': 'true'
+			,'allowScriptAccess': 'true'
+			,'allowNetworking': 'all'
+			,'movie': 'http://www.twitch.tv/widgets/live_embed_player.sfw'
+			,'flashvars': 'hostname=www.twitch.tv&channel=ferretbomb&auto_play=true&start_volume=100'
+		};
+		for (var attrib in attribs) {
+			embed.setAttribute(attrib, attribs[attrib]);
+		}
+		for (var param in params) {
+			var tag = $.tags.create('param');
+			tag.setAttribute('name', param);
+			tag.setAttribute('value', params[param]);
+			embed.appendChild(tag);
+		}
+		stream.appendChild(embed);
 	})
 }
 
