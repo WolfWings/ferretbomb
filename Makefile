@@ -5,7 +5,7 @@ CSS_TARGETS   = styles.css
 CSS_MINIFIED  = $(CSS_TARGETS:.css=.min.css)
 
 CLOSURE       = closure-compiler
-CLOSURE_FLAGS = --compilation_level ADVANCED_OPTIMIZATIONS
+CLOSURE_FLAGS = --compilation_level ADVANCED_OPTIMIZATIONS --language_in=ECMASCRIPT5_STRICT
 
 all: js css header
 
