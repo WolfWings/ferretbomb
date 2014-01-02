@@ -1,28 +1,23 @@
 JS_TARGETS    = scripts.js
-JS_MINIFIED   = $(JS_TARGETS:.js=.min.js)
+JS_MINIFIED   = $(addsuffix .min,$(addprefix htdocs/,$(JS_TARGETS)))
 
 CSS_TARGETS   = styles.css
-CSS_MINIFIED  = $(CSS_TARGETS:.css=.min.css)
+CSS_MINIFIED  = $(addsuffix .min,$(addprefix htdocs/,$(CSS_TARGETS)))
 
 CLOSURE       = closure-compiler
 CLOSURE_FLAGS = --compilation_level ADVANCED_OPTIMIZATIONS --language_in=ECMASCRIPT5_STRICT
 
-all: js css header
+all: js css
 
 clean:
-	$(RM) htdocs/header.html $(JS_MINIFIED) $(CSS_MINIFIED)
+	$(RM) $(JS_MINIFIED) $(CSS_MINIFIED)
 
 js: $(JS_MINIFIED)
 
 css: $(CSS_MINIFIED)
 
-header: htdocs/header.html
-
-htdocs/header.html: $(JS_MINIFIED) $(CSS_MINIFIED) header1.html header2.html header3.html
-	cat header1.html $(CSS_MINIFIED) header2.html $(JS_MINIFIED) header3.html >$@
-
-%.min.css: %.css
+%.css.min: ../%.css
 	curl -s -X POST --data-urlencode input@$< http://cssminifier.com/raw > $@
 
-%.min.js: %.js
+%.js.min: ../%.js
 	$(CLOSURE) $(CLOSURE_FLAGS) --js=$< --js_output_file=$@
