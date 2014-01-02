@@ -47,7 +47,7 @@ API_URL: (function(prefix, suffix){ "use strict";
 
 		script.onload = script.onreadystatechange = memoryleakcap;
 
-		$.tags_find_tagname('head')[0].appendChild(script);
+		$.tags_append_child($.tags_find_tagname('head')[0], script);
 
 		return uniqueName;
 	};
@@ -60,8 +60,8 @@ API_URL: (function(prefix, suffix){ "use strict";
 	for (var tag = $.tags_find_id(content).firstChild;
 	     tag;
 	     tag = tag.nextSibling) {
-		if (/^[aA]$/.test(tag.nodeName) && (tag.getAttribute('name').length > 1)) {
-			lastAnchor = tag.getAttribute('name');
+		if (/^[aA]$/.test(tag.nodeName) && ($.tags_attribute_get(tag, 'name').length > 1)) {
+			lastAnchor = $.tags_attribute_get(tag, 'name');
 			continue;
 		}
 		var isheader = /^[Hh]([1-6])$/.exec(tag.nodeName);
@@ -166,11 +166,14 @@ API_URL: (function(prefix, suffix){ "use strict";
 ,tags_find_id: (function(id){ "use strict";
 	return document['getElementById'](id);
 })
+,tags_attribute_get: (function(tag, attribute){ "use strict";
+	return tag['getAttribute'](attribute);
+})
 ,tags_attribute_set: (function(tag, attribute, value){ "use strict";
-	tag.setAttribute(attribute, value);
+	tag['setAttribute'](attribute, value);
 })
 ,tags_append_child: (function(parent, child){ "use strict";
-	parent.appendChild(child);
+	parent['appendChild'](child);
 })
 
 ,"init": {
@@ -187,11 +190,10 @@ API_URL: (function(prefix, suffix){ "use strict";
 			for (var tag = 0;
 			     tag < tags['length'];
 			     tag++) {
-				console.log(tags[tag]);
 				$.classes_remove(tags[tag], 'expanded');
 			};
 			for (var tag = event.toElement;
-			     tag && tag.getAttribute('id') !== 'outline';
+			     tag && $.tags_attribute_get(tag, 'id') !== 'outline';
 			     tag = tag.parentNode) {
 				$.classes_add(tag, 'expanded');
 			}
@@ -212,6 +214,9 @@ API_URL: (function(prefix, suffix){ "use strict";
 			,'data': 'http://www.twitch.tv/widgets/live_embed_player.swf?channel=ferretbomb'
 			,'bgcolor': '#000000'
 		};
+		for (var attrib in attribs) {
+			$.tags_attribute_set(embed, attrib, attribs[attrib]);
+		}
 		var params = {
 			'allowFullScreen': 'true'
 			,'allowScriptAccess': 'true'
@@ -219,9 +224,6 @@ API_URL: (function(prefix, suffix){ "use strict";
 			,'movie': 'http://www.twitch.tv/widgets/live_embed_player.swf'
 			,'flashvars': 'hostname=www.twitch.tv&channel=ferretbomb&auto_play=true&start_volume=100'
 		};
-		for (var attrib in attribs) {
-			$.tags_attribute_set(embed, attrib, attribs[attrib]);
-		}
 		for (var param in params) {
 			var tag = $.tags_create('param');
 			$.tags_attribute_set(tag, 'name', param);
