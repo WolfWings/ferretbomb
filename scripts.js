@@ -57,7 +57,9 @@ API_URL: (function(prefix, suffix){ "use strict";
 	var headings = '';
 	var depth = 0;
 	var lastAnchor = undefined;
-	for (var tag = $.tags_find_id(content).firstChild; tag; tag = tag.nextSibling) {
+	for (var tag = $.tags_find_id(content).firstChild;
+	     tag;
+	     tag = tag.nextSibling) {
 		if (/^[aA]$/.test(tag.nodeName) && (tag.getAttribute('name').length > 1)) {
 			lastAnchor = tag.getAttribute('name');
 			continue;
@@ -82,13 +84,17 @@ API_URL: (function(prefix, suffix){ "use strict";
 	}
 	headings += new Array(depth + 1).join('</li></ol>');
 	headings = headings.split('<ol');
-	for (var index = 1; index < headings.length; index++) {
+	for (var index = 1;
+	     index < headings.length;
+	     index++) {
 		if (headings[index].indexOf('</ol>') !== -1) {
 			headings[index] = ' class="leaf"' + headings[index];
 		}
 	}
 	headings = headings.join('<ol').split('<li');
-	for (var index = 1; index < headings.length; index++) {
+	for (var index = 1;
+	     index < headings.length;
+	     index++) {
 		if (headings[index].indexOf('<ol') === -1) {
 			headings[index] = ' class="leaf"' + headings[index];
 		}
@@ -177,14 +183,15 @@ API_URL: (function(prefix, suffix){ "use strict";
 		$.tags_attribute_set(tail, 'id', 'tail');
 		$.tags_append_child(header, tail);
 		var outlineToggleExpanded = (function(event){ "use strict";
-			var tag = event.toElement;
-			while (tag && !/^[Ll][Ii]$/.test(tag.tagName)) {
-				tag = tag.parentNode;
+			var tags = document['querySelectorAll']('#outline li.expanded');
+			for (var tag in tags) {
+				$.classes_remove(tags[tag], 'expanded');
+			};
+			for (var tag = event.toElement;
+			     tag && tag.getAttribute('id') !== 'outline';
+			     tag = tag.parentNode) {
+				$.classes_add(tag, 'expanded');
 			}
-			if ($.classes_has(tag, 'leaf')) {
-				return true;
-			}
-			$.classes_toggle(tag, 'expanded');
 			return true;
 		});
 		$.events_add(outline, 'click', outlineToggleExpanded);
