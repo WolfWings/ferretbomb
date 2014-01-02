@@ -183,8 +183,11 @@ API_URL: (function(prefix, suffix){ "use strict";
 		$.tags_attribute_set(tail, 'id', 'tail');
 		$.tags_append_child(header, tail);
 		var outlineToggleExpanded = (function(event){ "use strict";
-			var tags = document['querySelectorAll']('#outline li.expanded');
-			for (var tag in tags) {
+			var tags = document['querySelectorAll']('.expanded');
+			for (var tag = 0;
+			     tag < tags['length'];
+			     tag++) {
+				console.log(tags[tag]);
 				$.classes_remove(tags[tag], 'expanded');
 			};
 			for (var tag = event.toElement;
