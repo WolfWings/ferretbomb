@@ -56,14 +56,9 @@ API_URL: (function(prefix, suffix){ "use strict";
 ,reoutline: (function(content, outline) { "use strict";
 	var headings = '';
 	var depth = 0;
-	var lastAnchor = undefined;
 	for (var tag = $.tags_find_id(content).firstChild;
 	     tag;
 	     tag = tag.nextSibling) {
-		if (/^[aA]$/.test(tag.nodeName) && ($.tags_attribute_get(tag, 'name').length > 1)) {
-			lastAnchor = $.tags_attribute_get(tag, 'name');
-			continue;
-		}
 		var isheader = /^[Hh]([1-6])$/.exec(tag.nodeName);
 		if (isheader === null) {
 			continue;
@@ -75,11 +70,10 @@ API_URL: (function(prefix, suffix){ "use strict";
 			headings += new Array(Math.abs(depth - newdepth) + 1).join((depth < newdepth) ? '<ol><li>' : '</li></ol></li><li>');
 			depth = newdepth;
 		}
-		if (lastAnchor === undefined) {
-			headings += tag.innerHTML;
+		if ($.tags_attribute_has(tag, 'id')) {
+			headings += '<a href="#' + $.tags_attribute_get(tag, 'id') + '">' + tag.innerHTML + '</a>';
 		} else {
-			headings += '<a href="#' + lastAnchor + '">' + tag.innerHTML + '</a>';
-			lastAnchor = undefined;
+			headings += tag.innerHTML;
 		}
 	}
 	headings += new Array(depth + 1).join('</li></ol>');
@@ -165,6 +159,9 @@ API_URL: (function(prefix, suffix){ "use strict";
 })
 ,tags_find_id: (function(id){ "use strict";
 	return document['getElementById'](id);
+})
+,tags_attribute_has: (function(tag, attribute){ "use strict";
+	return tag['hasAttribute'](attribute);
 })
 ,tags_attribute_get: (function(tag, attribute){ "use strict";
 	return tag['getAttribute'](attribute);

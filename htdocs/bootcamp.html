@@ -1,5 +1,4 @@
-<a name="sywtstream"></a>
-<h1>So You Want to Livestream!</h1>
+<h1 id="sywtstream">So You Want to Livestream!</h1>
 <p>Welcome! You're most likely here because either you're just getting started with livestreaming and don't know what to do, or want a refresher on the basic steps to get a livestream started. This page will help you to get up to speed quickly and fairly painlessly.</p>
 <ol>Here's a quick rundown of the steps to get a working livestream with baseline settings:
 	<li><a href="#sysspec">Find your system specs</a>.</li>
@@ -10,37 +9,30 @@
 	<li><a href="#setscene">Set up a scene</a>.</li>
 	<li><a href="#golive">GO LIVE!</a></li>
 </ol>
-<a name="sysspec"></a>
-<h2>Get Your System Specs</h2>
+<h2 id="sysspec">Get Your System Specs</h2>
 <p>Many already know these, and can probably skip this step. If you do not, hold down the Windows logo key, and hit the 'break' key on your keyboard. It's usually at the top right, near the Print Screen button. This will open the System menu (if you do not have the Break key, as on a laptop, click Start->Control Panel->System). Your CPU (Processor), installed memory (RAM), and system type (32 or 64-bit operating system) will be listed here. These will be useful for the 'settings' step, and determine if you will use the 32 or 64-bit version of your streaming software.</p>
-<a name="downobs"><h2>Download Streaming Software</h2></a>
+<h2 id="downobs">Download Streaming Software</h2>
 <p><a href="http://obsproject.com">OBS</a> is my program of choice, as it is open-source (and free!). <a href="http://www.xsplit.com">XSplit</a> is another option, but requires a paid license to use many features. OBS is also lighter on the CPU in almost every case, and does NOT require the use of external capture programs for acceptable performance (such as DXtory with XSplit). It's a little harder to configure scenes, but just as powerful in the end. This bootcamp will only deal with OBS, as in my opinion it is the better software.</p>
 
-<a name="testspd"></a>
-<h2>Test your <i>Constant</i> Upload Throughput</h2>
+<h2 id="testspd">Test your <i>Constant</i> Upload Throughput</h2>
 <p>Speedtest only tests dead-file transfers, which can normally run FAR below your 'rated' speed, and briefly peak well above it, so long as the overall speed averages out. Livestreaming cannot take advantage of these spikes though, leaving you to only use the baseline throughput.</p>
 <p>To test most effectively, run a 6MB test at <a href="http://testmy.net/upload">http://testmy.net/upload</a>. Be sure to select a server near the Twitch server you will be using (one user from the Netherlands tested to the Texas server, and received a terrible result for semi-obvious reasons), or near you if you do not know which Twitch server is closest.</p>
 
-<a name="getbase"></a>
-<h2>Get Baseline Settings</h2>
+<h2 id="getbase">Get Baseline Settings</h2>
 <p>Go to <a href="http://obsproject.com/estimator">http://obsproject.com/estimator</a> and plug in the values above. Be aware, 2mbps from the testmy test equals 2000kbps. Multiply it by 1000. The rest should be able to be plugged in normally. I would STRONGLY recommend against using a Buffer value smaller than your Bitrate value, regardless of what the Estimator tells you. Make them equal, unless you have certain specific network issues (which are outside the scope of this bootcamp, but I might address later).</p>
 
-<a name="getkey"></a>
-<h2>Get Your Streaming Key</h2>
+<h2 id="getkey">Get Your Streaming Key</h2>
 <p>We'll deal with Twitch here, as it's the only service that I use. Go to <a href="http://www.twitch.tv/broadcast">http://www.twitch.tv/broadcast</a> and ensure that you are signed in. Click the 'Show Key' button. Copy this key into Notepad, making sure you do not add any leading or trailing spaces (which will invalidate the key). KEEP THIS KEY SECRET. Do not show it to ANYONE. If someone gets this key, they can stream to your channel from then on, no password or username needed. Including content which can get your account BANNED, or even subjected to legal action (streaming porn, copyrighted content, child porn, etc). It all comes back to YOU. So keep it secret. Keep it safe.</p>
 <p>Put it into OBS under the Settings->Broadcast Settings->Play Path/Stream Key textbox, after selecting Live Stream mode from the dropdown box at the top. You'll also want to go through these menus, plugging in the rest of the options that the Estimator gave you.</p>
 
-<a name="setscene"></a>
-<h2>Set Up a Scene</h2>
+<h2 id="setscene">Set Up a Scene</h2>
 <p>Start up OBS. Right-click in the empty 'scenes' list, and select 'add scene'. Give the new scene a name you'll recognize (Intro, Fullscreen Camera, Main Game, AFK, etc). Now right-click on the empty Sources list. Add a source. BE AWARE! Monitor Capture under Windows 7 is VERY BAD AND SLOW. Do NOT use it if you can avoid it; use Window or Game capture. Now click the Preview Stream button.</p>
 <p>Notice the 'Edit Scene' button. This lets you click on elements in the preview window and drag them around, or resize them. You can also click on the elements in the Sources list, if one is underneath another and difficult to click on.</p>
 
-<a name="global_webcam"></a>
-<h3>(OPTIONAL) Set up a webcam as a Global Source</h3>
+<h3 id="global_webcam">(OPTIONAL) Set up a webcam as a Global Source</h3>
 <p>Webcams should be set up as Global Sources, not per-Scene Video Capture Devices. If you set them up per-scene, it will cause scene transitions to freeze and JUMP between, as OBS has to wait for the cam to shut down, then power up again on each switch. A global source is ALWAYS running (even if it's not displayed), meaning you get smooth transitions. Just make sure your cam is not set up in any Scene, then click the 'Global Sources' button (right below Edit Scene). Click 'Add', then 'Add Video Capture Device'. Choose your cam, and the options (I would STRONGLY recommend setting Audio Input Device to DISABLE). Now when you right-click in a scene to add a new source, you can 'Add Global Source' and pick your webcam.</p>
 <p>The down side to using a Global Source is that it can only have one configuration; you can't run a smaller resolution for in-game camera where it's less-needed, and a high-res for a full-screen cam. You also can't run one without chromakey, or different lighting level setups. Doing so goes beyond this bootcamp's scope anyway though.</p>
 
-<a name="golive"></a>
-<h2>GO LIVE!</h2>
+<h2 id="golive">GO LIVE!</h2>
 <p>Click the 'stop preview' button, then the 'Start Streaming' button after ensuring that you're clothed, and anything you don't want to share with the world is off-camera and not a part of the capture setup. Congrats, it should connect and start streaming video to Twitch. Now it's up to you!</p>
 <script type="text/javascript">function init(){$.init.article();};</script>

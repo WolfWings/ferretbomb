@@ -52,6 +52,19 @@ header {
 	padding: 0;
 }
 
+table.image {
+	float: left;
+	border-collapse: collapse;
+}
+
+table.image td,table.image th {
+	padding: 0;
+}
+
+table.image caption {
+	caption-side: bottom;
+}
+
 #tail {
 	position: fixed;
 	left: 0px;
@@ -165,21 +178,36 @@ nav {
 	color: #fff;
 }
 
+#content li + li {
+	border-top: 1px solid black;
+}
+
 #content li {
+	list-style: none;
 	clear: both;
 }
 
-#content a {
-	margin-right: auto;
+#content li table {
+	min-width: 16em;
+	max-width: 16em;
+	max-height: 16em;
 }
 
-#content a img {
-	max-width: 200px;
-	max-height: 200px;
-	margin-left: auto;
-	margin-right: auto;
-	height: auto;
-	clear: both;
+#content li table td {
+	text-align: center;
+}
+
+#content li a img {
+	max-width: 16em;
+	max-height: 2em;
+	-webkit-transition: all 0.5s linear;
+	-moz-transition: all 0.5s linear;
+	-o-transition: all 0.5s linear;
+	transition: all 0.5s linear;
+}
+
+#content li a:hover img {
+	max-height: 9em;
 }
 
 footer {
