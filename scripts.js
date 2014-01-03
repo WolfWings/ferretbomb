@@ -8,7 +8,15 @@ API_URL: (function(prefix, suffix){ "use strict";
 
 ,streamonline: false
 ,updatestreamonline: (function(status){ "use strict";
+	console.log(status);
 	$.streamonline = status;
+	var operation = $.classes_remove;
+	if (status) {
+		operation = $.classes_add;
+	}
+	var tag = $.tags_find_id('onair');
+	console.log(tag);
+	operation(tag, 'online');
 })
 
 ,streampreview: undefined

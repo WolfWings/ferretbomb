@@ -178,6 +178,37 @@ nav {
 	color: #fff;
 }
 
+#navmenu li#onair {
+	float: right;
+}
+
+#navmenu li#onair a,
+#navmenu li#onair a:visited {
+	color: #555;
+}
+
+#navmenu li#onair a:hover {
+	color: #aaa;
+}
+
+#navmenu li#onair a:active {
+	color: #fff;
+}
+
+#navmenu li#onair.online a,
+#navmenu li#onair.online a:visited {
+	color: #0f0;
+	text-shadow: 0 0 0.5em #fff, 0 0 1em #fff, 0 0 1.5em #fff, 0 0 2em #f0f, 0 0 4em #f00;
+}
+
+#navmenu li#onair.online a:hover {
+	color: #ff5;
+}
+
+#navmenu li#onair.online a:active {
+	color: #fff;
+}
+
 #content li + li {
 	border-top: 1px solid black;
 }
