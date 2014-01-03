@@ -141,6 +141,7 @@ nav {
 	height: 2em;
 	padding: 0 0 0 10em;
 	vertical-align: middle;
+	z-index: 10;
 }
 
 #navmenu {
@@ -239,6 +240,28 @@ nav {
 
 #content li a:hover img {
 	max-height: 9em;
+}
+
+#content #stream {
+	top: 2em;
+	left: 10em;
+	right: 20em;
+	position: absolute;
+}
+
+#content #stream:before {
+	content: "";
+	display: block;
+	padding-top: 56.25%;
+	padding-bottom: 2em;
+}
+
+#content #stream #live_embed_player_flash {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
 }
 
 footer {

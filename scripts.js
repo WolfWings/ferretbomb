@@ -8,14 +8,12 @@ API_URL: (function(prefix, suffix){ "use strict";
 
 ,streamonline: false
 ,updatestreamonline: (function(status){ "use strict";
-	console.log(status);
 	$.streamonline = status;
 	var operation = $.classes_remove;
 	if (status) {
 		operation = $.classes_add;
 	}
 	var tag = $.tags_find_id('onair');
-	console.log(tag);
 	operation(tag, 'online');
 })
 
@@ -209,10 +207,15 @@ API_URL: (function(prefix, suffix){ "use strict";
 	})
 
 	,"stream": (function() { "use strict";
-		var stream = $.tags_find_tagname('stream')[0];
+		var header = $.tags_find_tagname('header')[0];
+		var tail = $.tags_create('div');
+		$.tags_attribute_set(tail, 'id', 'tail');
+		$.tags_append_child(header, tail);
+		var stream = $.tags_find_id('stream');
 		var embed = $.tags_create('object');
 		var attribs = {
 			'type': 'application/x-shockwave-flash'
+			,'wmode': 'opaque'
 			,'height': '100%'
 			,'width': '100%'
 			,'id': 'live_embed_player_flash'
@@ -226,6 +229,7 @@ API_URL: (function(prefix, suffix){ "use strict";
 			'allowFullScreen': 'true'
 			,'allowScriptAccess': 'true'
 			,'allowNetworking': 'all'
+			,'wmode': 'opaque'
 			,'movie': 'http://www.twitch.tv/widgets/live_embed_player.swf'
 			,'flashvars': 'hostname=www.twitch.tv&channel=ferretbomb&auto_play=true&start_volume=100'
 		};
