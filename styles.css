@@ -253,15 +253,15 @@ nav {
 	color: #fff;
 }
 
-#content li + li {
+ul.notecards li + li {
 	margin-top: 0.5em;
 }
 
-#content ul {
+ul.notecards {
 	padding-left: 1.5em;
 }
 
-#content li {
+ul.notecards li {
 	padding: 0.5em 1.75em;
 	background-color: #2c2c2c;
 	border-radius: 1em;
@@ -273,16 +273,16 @@ nav {
 	overflow: hidden;
 }
 
-#content li table {
+ul.notecards li table {
 	width: 10em;
 	max-height: 10em;
 }
 
-#content li table td {
+ul.notecards li table td {
 	text-align: center;
 }
 
-#content li a img {
+ul.notecards li a img {
 	max-width: 10em;
 	max-height: 7.5em;
 }
