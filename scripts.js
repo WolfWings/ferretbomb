@@ -168,9 +168,6 @@ API_URL: (function(prefix, suffix){ "use strict";
 		var outline = $.tags_create('div');
 		$.tags_attribute_set(outline, 'id', 'outline');
 		$.tags_append_child(header, outline);
-		var tail = $.tags_create('div');
-		$.tags_attribute_set(tail, 'id', 'tail');
-		$.tags_append_child(header, tail);
 		var outlineToggleExpanded = (function(event){ "use strict";
 			var tags = document['querySelectorAll']('.expanded');
 			for (var tag = 0;
@@ -191,10 +188,6 @@ API_URL: (function(prefix, suffix){ "use strict";
 
 	,"stream": (function() { "use strict";
 		$.classes_remove($.tags_find_id('onair'), 'enabled');
-		var header = $.tags_find_tagname('header')[0];
-		var tail = $.tags_create('div');
-		$.tags_attribute_set(tail, 'id', 'tail');
-		$.tags_append_child(header, tail);
 		var stream = $.tags_find_id('stream');
 		var embed = $.tags_create('object');
 		var attribs = {
