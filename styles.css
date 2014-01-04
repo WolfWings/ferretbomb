@@ -187,27 +187,57 @@ nav {
 	float: right;
 }
 
+#navmenu li#onair.enabled a {
+	transition: all 0.5s linear 0s;
+}
+
 #navmenu li#onair a,
 #navmenu li#onair a:visited {
-	color: #555;
+	color: #500;
 }
 
 #navmenu li#onair a:hover {
-	color: #aaa;
+	color: #a00;
 }
 
 #navmenu li#onair a:active {
-	color: #fff;
+	color: #a50;
+}
+
+@-webkit-keyframes pulseglow {
+	from {
+		color: #f50;
+		text-shadow: 1px 0 1px #a00, -1px 0 1px #a00, 0 1px 1px #a00, 0 -1px 1px #a00;
+	}
+	to {
+		color: #fff;
+		text-shadow: 1px 0 0.5em #f50, -1px 0 0.5em #f50, 0 1px 0.5em #f50, 0 -1px 0.5em #f50;
+	}
+}
+
+@keyframes pulseglow {
+	from {
+		color: #f50;
+		text-shadow: 1px 0 1px #a00, -1px 0 1px #a00, 0 1px 1px #a00, 0 -1px 1px #a00;
+	}
+	to {
+		color: #fff;
+		text-shadow: 1px 0 0.5em #f50, -1px 0 0.5em #f50, 0 1px 0.5em #f50, 0 -1px 0.5em #f50;
+	}
+}
+
+#navmenu li#onair.online.enabled a {
+	-webkit-animation: pulseglow 4s cubic-bezier(0.75,1.5,0.25,-0.5) 0.5s infinite alternate;
+	animation: pulseglow 4s cubic-bezier(0.75,1.5,0.25,-0.5) 0.5s infinite alternate;
 }
 
 #navmenu li#onair.online a,
 #navmenu li#onair.online a:visited {
-	color: #0f0;
-	text-shadow: 0 0 0.5em #fff, 0 0 1em #fff, 0 0 1.5em #fff, 0 0 2em #f0f, 0 0 4em #f00;
+	color: #f50;
 }
 
 #navmenu li#onair.online a:hover {
-	color: #ff5;
+	color: #fa5;
 }
 
 #navmenu li#onair.online a:active {
@@ -234,18 +264,6 @@ nav {
 
 #content li a img {
 	max-width: 10em;
-	max-height: 2em;
-	-webkit-transition: all 0.25s ease-in-out;
-	-moz-transition: all 0.25s ease-in-out;
-	-o-transition: all 0.25s ease-in-out;
-	transition: all 0.25s ease-in-out;
-	-webkit-transition-delay: 2s;
-	-moz-transition-delay: 2s;
-	-o-transition-delay: 2s;
-	transition-delay: 2s;
-}
-
-#content li a:hover img {
 	max-height: 7.5em;
 }
 

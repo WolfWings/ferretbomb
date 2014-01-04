@@ -6,20 +6,13 @@ API_URL: (function(prefix, suffix){ "use strict";
 	return "https://api.twitch.tv/kraken/" + prefix + "/ferretbomb" + suffix;
 })
 
-,streamonline: false
 ,updatestreamonline: (function(status){ "use strict";
-	$.streamonline = status;
 	var operation = $.classes_remove;
 	if (status) {
 		operation = $.classes_add;
 	}
 	var tag = $.tags_find_id('onair');
 	operation(tag, 'online');
-})
-
-,streampreview: undefined
-,updatestreampreview: (function(preview){ "use strict";
-	$.streampreview = preview;
 })
 
 ,JSONP: (function(){ "use strict";
@@ -102,24 +95,14 @@ API_URL: (function(prefix, suffix){ "use strict";
 	$.tags_find_id(outline).innerHTML = headings.join('<li');
 })
 
-,updatebanner: (function() { "use strict";
-	$.JSONP($.API_URL('channels', ''), function(response) {
-		if ($.streampreview === undefined) {
-			$.updatestreampreview(response['video_banner']);
-		}
-	});
-})
-
 ,checkstream: (function() { "use strict";
 	$.JSONP($.API_URL('streams', ''), function(response) {
 		if (response['stream'] === null) {
-			setTimeout($.updatebanner, 0);
 			setTimeout($.checkstream, 60000);
 			$.updatestreamonline(false);
 			return;
 		}
 		$.updatestreamonline(true);
-		$.updatestreampreview(response['stream']['preview']['large']);
 		setTimeout($.checkstream, 600000);
 		return;
 	});
@@ -207,6 +190,7 @@ API_URL: (function(prefix, suffix){ "use strict";
 	})
 
 	,"stream": (function() { "use strict";
+		$.classes_remove($.tags_find_id('onair'), 'enabled');
 		var header = $.tags_find_tagname('header')[0];
 		var tail = $.tags_create('div');
 		$.tags_attribute_set(tail, 'id', 'tail');

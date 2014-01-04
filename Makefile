@@ -12,6 +12,11 @@ all: js css
 clean:
 	$(RM) $(JS_MINIFIED) $(CSS_MINIFIED)
 
+debug:
+	cp $(JS_TARGETS) $(JS_MINIFIED)
+	cp $(CSS_TARGETS) $(CSS_MINIFIED)
+	rsync -r htdocs/ /web/ferretbomb/dev
+
 js: $(JS_MINIFIED)
 
 css: $(CSS_MINIFIED)
