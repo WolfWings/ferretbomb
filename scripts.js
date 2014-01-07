@@ -162,6 +162,13 @@ API_URL: (function(prefix, suffix){ "use strict";
 	parent['appendChild'](child);
 })
 
+,banner_init: (function(){ "use strict";
+	var banners = ['coalition','tattoo_cursive'];
+	var banner = banners[Math.floor(Math.random() * banners.length)];
+	$.tags_find_id('logo')['style']['backgroundImage'] =
+		'url(/headers/' + banner + '.png)';
+})
+
 ,"init": {
 	"article": (function() { "use strict";
 		var header = $.tags_find_tagname('header')[0];
@@ -188,40 +195,13 @@ API_URL: (function(prefix, suffix){ "use strict";
 
 	,"stream": (function() { "use strict";
 		$.classes_remove($.tags_find_id('onair'), 'enabled');
-		var stream = $.tags_find_id('stream');
-		var embed = $.tags_create('object');
-		var attribs = {
-			'type': 'application/x-shockwave-flash'
-			,'wmode': 'opaque'
-			,'height': '100%'
-			,'width': '100%'
-			,'id': 'live_embed_player_flash'
-			,'data': 'http://www.twitch.tv/widgets/live_embed_player.swf?channel=ferretbomb'
-			,'bgcolor': '#000000'
-		};
-		for (var attrib in attribs) {
-			$.tags_attribute_set(embed, attrib, attribs[attrib]);
-		}
-		var params = {
-			'allowFullScreen': 'true'
-			,'allowScriptAccess': 'true'
-			,'allowNetworking': 'all'
-			,'wmode': 'opaque'
-			,'movie': 'http://www.twitch.tv/widgets/live_embed_player.swf'
-			,'flashvars': 'hostname=www.twitch.tv&channel=ferretbomb&auto_play=true&start_volume=100'
-		};
-		for (var param in params) {
-			var tag = $.tags_create('param');
-			$.tags_attribute_set(tag, 'name', param);
-			$.tags_attribute_set(tag, 'value', params[param]);
-			$.tags_append_child(embed, tag);
-		}
-		$.tags_append_child(stream, embed);
 	})
 }
 
 };
 
-setTimeout($.checkstream, 0);
+setTimeout($.checkstream, 1000);
+
+$.banner_init();
 
 }());

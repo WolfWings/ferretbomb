@@ -1,2 +1,26 @@
-<div id="stream"></div>
+<div id="stream">
+	<object
+		type="application/x-shockwave-flash"
+		wmode="opaque"
+		height="100%"
+		width="100%"
+		id="stream_embed"
+		data="http://www.twitch.tv/widgets/live_embed_player.swf?channel=ferretbomb"
+		bgcolor="#000">
+		<param name="allowFullScreen" value="true"></param>
+		<param name="allowScriptAccess" value="true"></param>
+		<param name="allowNetworking" value="true"></param>
+		<param name="wmode" value="opaque"></param>
+		<param name="movie" value="http://www.twitch.tv/widgets/live_embed_player.swf"></param>
+		<param name="flashvars" value="hostname=www.twitch.tv&channel=ferretbomb&auto_play=true&start_volume=100"></param>
+	</object>
+</div><div id="chat">
+<iframe
+	id="chat_embed"
+	frameborder="0"
+	scrolling="no"
+	src="http://twitch.tv/chat/embed?channel=ferretbomb&popout_chat=true"
+	width="100%"
+	height="100%">
+</iframe></div>
 <script type="text/javascript">function init(){$.init.stream();};</script>

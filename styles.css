@@ -1,22 +1,52 @@
-body {
-	text-align: justify;
-	margin: 0 0 0 0.5em;
-	padding: 2em 1em 3em 10em;
-	background: #202020;
-	color: #ddd;
-}
-
 @font-face {
 	font-family: "Space Age";
 	src: local("SpaceAge"), url(/resources/space_age.otf), url(/resources/space_age.ttf), url(/resources/space_age.eot);
 }
 
-a[name] {
-	display: block; position: relative; top: -2em; visibility: hidden;
+@-webkit-keyframes pulseglow {
+	from {
+		color: red;
+		text-shadow: 1px 0 1px #a00, -1px 0 1px #a00, 0 1px 1px #a00, 0 -1px 1px #a00;
+	}
+	50% {
+		color: red;
+		text-shadow: 1px 0 1px #a00, -1px 0 1px #a00, 0 1px 1px #a00, 0 -1px 1px #a00;
+	}
+	to {
+		color: #500;
+		text-shadow: 1px 0 1px black, -1px 0 1px black, 0 1px 1px black, 0 -1px 1px black;
+	}
 }
 
-h1 {
-	margin-top: 0;
+@keyframes pulseglow {
+	from {
+		color: red;
+		text-shadow: 1px 0 1px #a00, -1px 0 1px #a00, 0 1px 1px #a00, 0 -1px 1px #a00;
+	}
+	50% {
+		color: red;
+		text-shadow: 1px 0 1px #a00, -1px 0 1px #a00, 0 1px 1px #a00, 0 -1px 1px #a00;
+	}
+	to {
+		color: #500;
+		text-shadow: 1px 0 1px black, -1px 0 1px black, 0 1px 1px black, 0 -1px 1px black;
+	}
+}
+
+body {
+	text-align: justify;
+	margin: 0 0 0 0.5em;
+	padding: 2em 1em 3em 10em;
+	margin-top: 128px;
+	background: #202020;
+	color: #ddd;
+	min-width: 32em;
+	min-height: 18em;
+}
+
+h1[id],h2[id],h3[id],h4[id],h5[id],h6[id] {
+	padding-top: 2em;
+	margin-top: -2em;	
 }
 
 h1,h2,h3,h4,h5,h6 {
@@ -40,7 +70,7 @@ a:hover,
 
 a:active,
 #outline ol li:active:before {
-	color: #fff;
+	color: white;
 }
 
 header {
@@ -48,12 +78,13 @@ header {
 	position: fixed;
 	top: 2em;
 	left: 0em;
-	bottom: 13em;
+	bottom: 10em;
 	width: 10em;
 	overflow: auto;
 	background: #181818;
 	margin: 0;
 	padding: 0;
+	margin-top: 128px;
 }
 
 table.image {
@@ -69,16 +100,45 @@ table.image caption {
 	caption-side: bottom;
 }
 
+#logo:before {
+	content: "";
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 191px;
+	height: 160px;
+	background: url(fbomb.png);
+}
+
+#logo {
+	position: fixed;
+	top: 0;
+	left: 191px;
+	right: 0;
+	height: 128px;
+	background-repeat: no-repeat;
+}
+
 #tail {
 	position: fixed;
-	left: 0px;
-	bottom: 3em;
+	left: 0;
+	bottom: 0;
 	width: 10em;
 	height: 10em;
 	background: #181818;
 	border-radius: 0 0 10em 0;
 	-moz-border-radius: 0 0 10em 0;
 	-webkit-border-radius: 0 0 10em 0;
+	z-index: -1;
+}
+
+#tail img {
+	width: 10em;
+	height: 10em;
+	position: absolute;
+	top: 0;
+	left: 0;
+	opacity: 0.333;
 }
 
 #outline {
@@ -99,51 +159,60 @@ table.image caption {
 	padding-left: 0.75em;
 }
 
-#outline ol li:before {
-	width: 0.5em;
-	margin-right: 0.25em;
-	content: "\25b8";
+#outline ol ol li:before {
+	content: "";
+	float: left;
+	width: 0;
+	height: 0;
+	margin: 0.25em;
+	border: 0.25em solid transparent;
+	border-left-color: #900;
+	-webkit-transition: -webkit-transform 0.5s;
+	-moz-transition: -moz-transform 0.5s;
+	-o-transition: -o-transform 0.5s;
+	transition: transform 0.5s;
 }
 
-#outline ol li.expanded:before {
-	width: 0.5em;
-	margin-right: 0.25em;
-	content: "\25be";
+#outline ol ol li.expanded:before {
+	-webkit-transform: rotate(90deg);
+	-moz-transform: rotate(90deg);
+	-o-transform: rotate(90deg);
+	transform: rotate(90deg);
 }
 
-#outline li.leaf:before,
 #outline ol.leaf li:before,
+#outline li.leaf:before,
 #outline li.expanded.leaf:before {
-	width: 0.5em;
-	margin-right: 0.25em;
-	content: "\25cf";
+	content: "";
+	float: left;
+	width: 0;
+	height: 0;
+	margin: 0.25em;
+	border-radius: 0.25em;
+	border: 0.25em solid #900;
 }
 
 #outline ol > li > ol {
-	display: none;
+	overflow: hidden;
+	height: 0;
 }
 
 #outline ol > li.expanded > ol,
 #outline > ol > li > ol {
-	display: list-item;
-}
-
-#outline > ol > li.expanded:before,
-#outline > ol > li:before {
-	width: 0;
-	margin-right: 0;
-	content: "";
+	height: auto;
 }
 
 nav {
-	background: #000;
+	overflow: hidden;
+	background: black;
 	display: block;
 	position: fixed;
 	top: 0;
 	left: 0;
 	right: 0;
-	height: 2em;
+	min-height: 2em;
 	padding: 0 0 0 10em;
+	padding-top: 128px;
 	vertical-align: middle;
 	z-index: 10;
 }
@@ -153,8 +222,7 @@ nav {
 	font-size: 200%;
 	top: 0;
 	left: 0;
-	right: 0;
-	height: 1em;
+	width: 100%;
 	margin: 0;
 	padding: 0;
 	list-style-type: none;
@@ -180,7 +248,7 @@ nav {
 }
 
 #navmenu li a:active {
-	color: #fff;
+	color: white;
 }
 
 #navmenu li#onair {
@@ -204,36 +272,6 @@ nav {
 	color: #a55;
 }
 
-@-webkit-keyframes pulseglow {
-	from {
-		color: #f00;
-		text-shadow: 1px 0 1px #a00, -1px 0 1px #a00, 0 1px 1px #a00, 0 -1px 1px #a00;
-	}
-	50% {
-		color: #f00;
-		text-shadow: 1px 0 1px #a00, -1px 0 1px #a00, 0 1px 1px #a00, 0 -1px 1px #a00;
-	}
-	to {
-		color: #500;
-		text-shadow: 1px 0 1px #000, -1px 0 1px #000, 0 1px 1px #000, 0 -1px 1px #000;
-	}
-}
-
-@keyframes pulseglow {
-	from {
-		color: #f00;
-		text-shadow: 1px 0 1px #a00, -1px 0 1px #a00, 0 1px 1px #a00, 0 -1px 1px #a00;
-	}
-	50% {
-		color: #f00;
-		text-shadow: 1px 0 1px #a00, -1px 0 1px #a00, 0 1px 1px #a00, 0 -1px 1px #a00;
-	}
-	to {
-		color: #500;
-		text-shadow: 1px 0 1px #000, -1px 0 1px #000, 0 1px 1px #000, 0 -1px 1px #000;
-	}
-}
-
 #navmenu li#onair.online.enabled a {
 	-webkit-animation: pulseglow 4s linear 0.5s infinite alternate;
 	animation: pulseglow 4s linear 0.5s infinite alternate;
@@ -241,7 +279,7 @@ nav {
 
 #navmenu li#onair.online a,
 #navmenu li#onair.online a:visited {
-	color: #f00;
+	color: red;
 	text-shadow: 1px 0 1px #a00, -1px 0 1px #a00, 0 1px 1px #a00, 0 -1px 1px #a00;
 }
 
@@ -250,7 +288,7 @@ nav {
 }
 
 #navmenu li#onair.online a:active {
-	color: #fff;
+	color: white;
 }
 
 ul.notecards li + li {
@@ -287,6 +325,14 @@ ul.notecards li a img {
 	max-height: 7.5em;
 }
 
+#content #chat {
+	top: 2em;
+	right: 0;
+	width: 20em;
+	bottom: 3em;
+	position: absolute;
+}
+
 #content #stream {
 	top: 2em;
 	left: 10em;
@@ -301,7 +347,7 @@ ul.notecards li a img {
 	padding-bottom: 2em;
 }
 
-#content #stream #live_embed_player_flash {
+#content #stream #stream_embed {
 	position: absolute;
 	top: 0;
 	left: 0;
@@ -318,5 +364,5 @@ footer {
 	padding: 0.5em;
 	border-radius: 3em 0 0 0;
 	text-align: right;
-	background: #000;
+	background: black;
 }
