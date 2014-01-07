@@ -78,7 +78,7 @@ header {
 	position: fixed;
 	top: 96px;
 	left: 0;
-	bottom: 10em;
+	bottom: 13em;
 	width: 10em;
 	overflow: auto;
 	background: #181818;
@@ -124,7 +124,7 @@ table.image caption {
 #tail {
 	position: fixed;
 	left: 0;
-	bottom: 0;
+	bottom: 3em;
 	width: 10em;
 	height: 10em;
 	background: #181818;
