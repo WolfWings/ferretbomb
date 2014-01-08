@@ -11,7 +11,6 @@ API_URL: (function(prefix, suffix){ "use strict";
 	if (status) {
 		operation = $.classes_add;
 	}
-//	var tag = $.tags_find_id('onair');
 	var tag = $.tags_find('#onair')[0];
 	operation(tag, 'online');
 })
@@ -61,7 +60,6 @@ API_URL: (function(prefix, suffix){ "use strict";
 
 		script.onload = script.onreadystatechange = memoryleakcap;
 
-//		$.tags_append_child($.tags_find_tagname('head')[0], script);
 		$.tags_append_child($.tags_find('head')[0], script);
 
 		return uniqueName;
@@ -71,7 +69,6 @@ API_URL: (function(prefix, suffix){ "use strict";
 ,reoutline: (function(content, outline) { "use strict";
 	var headings = '';
 	var depth = 0;
-//	for (var tag = $.tags_find_id(content).firstChild;
 	for (var tag = $.tags_find("#" + content)[0].firstChild;
 	     tag;
 	     tag = tag.nextSibling) {
@@ -109,8 +106,7 @@ API_URL: (function(prefix, suffix){ "use strict";
 			headings[index] = ' class="leaf"' + headings[index];
 		}
 	}
-//	$.tags_find_id(outline).innerHTML = headings.join('<li');
-	$.tags_find("#" + outline)[0].innerHTML = headings.join('<li');
+	outline.innerHTML = headings.join('<li');
 })
 
 ,checkstream: (function() { "use strict";
@@ -164,12 +160,6 @@ API_URL: (function(prefix, suffix){ "use strict";
 ,tags_find: (function(selector){ "use strict";
 	return document['querySelectorAll'](selector);
 })
-,tags_find_tagname: (function(tagname){ "use strict";
-	return document['getElementsByTagName'](tagname);
-})
-,tags_find_id: (function(id){ "use strict";
-	return document['getElementById'](id);
-})
 ,tags_attribute_has: (function(tag, attribute){ "use strict";
 	return tag['hasAttribute'](attribute);
 })
@@ -186,8 +176,6 @@ API_URL: (function(prefix, suffix){ "use strict";
 ,banner_init: (function(){ "use strict";
 	$.JSON('/resources/banners/index.json', (function(banners){
 		var banner = banners[Math.floor(Math.random() * banners.length)];
-//		$.tags_find_id('logo')['style']['backgroundImage'] =
-//			'url(/resources/banners/' + banner + ')';
 		$.tags_find('#logo')[0]['style']['backgroundImage'] =
 			'url(/resources/banners/' + banner + ')';
 	}));
@@ -195,13 +183,13 @@ API_URL: (function(prefix, suffix){ "use strict";
 
 ,"init": {
 	"article": (function() { "use strict";
-//		var header = $.tags_find_tagname('header')[0];
 		var header = $.tags_find('header')[0];
 		var outline = $.tags_create('div');
 		$.tags_attribute_set(outline, 'id', 'outline');
 		$.tags_append_child(header, outline);
-		var outlineToggleExpanded = (function(event){ "use strict";
+		$.events_add(outline, 'click', (function(event){ "use strict";
 			var tags = $.tags_find('.expanded');
+			console.log(tags);
 			for (var tag = 0;
 			     tag < tags['length'];
 			     tag++) {
@@ -213,13 +201,11 @@ API_URL: (function(prefix, suffix){ "use strict";
 				$.classes_add(tag, 'expanded');
 			}
 			return true;
-		});
-		$.events_add(outline, 'click', outlineToggleExpanded);
-		$.reoutline('content', 'outline');
+		}));
+		$.reoutline('content', outline);
 	})
 
 	,"stream": (function() { "use strict";
-//		$.classes_remove($.tags_find_id('onair'), 'enabled');
 		$.classes_remove($.tags_find('#onair')[0], 'enabled');
 	})
 }
