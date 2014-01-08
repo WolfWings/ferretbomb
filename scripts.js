@@ -162,11 +162,27 @@ API_URL: (function(prefix, suffix){ "use strict";
 	parent['appendChild'](child);
 })
 
+,JSON: (function(url, callback){ "use strict";
+	var trigger = (function(){ "use strict";
+		if (this.readyState != 4) { return; }
+		callback(JSON.parse(this.responseText));
+	});
+	var xhr = (function(){
+		try { return new XMLHttpRequest(); } catch(ignore) {}
+		try { return new ActiveXObject('Mxsml2.XMLHTTP'); } catch(ignore) {}
+		return null;
+	}());
+	xhr.open('GET', url, true);
+	xhr.onreadystatechange = trigger;
+	xhr.send(null);
+})
+
 ,banner_init: (function(){ "use strict";
-	var banners = ['coalition','tattoo_cursive'];
-	var banner = banners[Math.floor(Math.random() * banners.length)];
-	$.tags_find_id('logo')['style']['backgroundImage'] =
-		'url(/headers/' + banner + '.png)';
+	$.JSON('/headers/index.json', (function(banners){
+		var banner = banners[Math.floor(Math.random() * banners.length)];
+		$.tags_find_id('logo')['style']['backgroundImage'] =
+			'url(/headers/' + banner + '.png)';
+	}));
 })
 
 ,"init": {
