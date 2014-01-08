@@ -188,6 +188,14 @@ API_URL: (function(prefix, suffix){ "use strict";
 		$.tags_attribute_set(outline, 'id', 'outline');
 		$.tags_append_child(header, outline);
 		$.events_add(outline, 'click', (function(event){ "use strict";
+			for (var tag = event.toElement;
+			     tag && $.tags_attribute_get(tag, 'id') !== 'outline';
+			     tag = tag.parentNode) {
+				if ($.classes_has(tag, 'leaf')
+				 || $.classes_has(tag, 'expanded')) {
+					return;
+				}
+			}
 			var tags = $.tags_find('.expanded');
 			console.log(tags);
 			for (var tag = 0;
