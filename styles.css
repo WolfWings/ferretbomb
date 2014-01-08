@@ -1,6 +1,6 @@
 @font-face {
 	font-family: "Space Age";
-	src: local("SpaceAge"), url(/resources/space_age.otf), url(/resources/space_age.ttf), url(/resources/space_age.eot);
+	src: local("SpaceAge"), url(/resources/fonts/space_age.otf), url(/resources/fonts/space_age.ttf), url(/resources/fonts/space_age.eot);
 }
 
 @-webkit-keyframes pulseglow {
@@ -124,7 +124,7 @@ table.image img {
 
 #bomb {
 	position: fixed;
-	content: url(fbomb.png);
+	content: url(/resources/fbomb.png);
 	top: -16px;
 	left: -31px;
 	width: 191px;
