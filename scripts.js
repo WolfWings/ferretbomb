@@ -224,4 +224,6 @@ setTimeout($.checkstream, 1000);
 
 $.banner_init();
 
+init();
+
 }());

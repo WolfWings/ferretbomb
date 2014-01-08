@@ -7,7 +7,7 @@ CSS_MINIFIED  = $(addprefix htdocs/resources/,$(CSS_TARGETS))
 CLOSURE       = closure-compiler
 CLOSURE_FLAGS = --compilation_level ADVANCED_OPTIMIZATIONS --language_in=ECMASCRIPT5_STRICT
 
-all: js css
+all: js css header
 
 clean:
 	$(RM) $(JS_MINIFIED) $(CSS_MINIFIED)
@@ -20,6 +20,11 @@ debug:
 js: $(JS_MINIFIED)
 
 css: $(CSS_MINIFIED)
+
+header: htdocs/header.html
+
+htdocs/header.html: header1.html header2.html $(CSS_MINIFIED)
+	cat header1.html $(CSS_MINIFIED) header2.html > $@
 
 htdocs/resources/%.css: %.css
 	curl -s -X POST --data-urlencode input@$< http://cssminifier.com/raw > $@
