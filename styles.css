@@ -123,11 +123,12 @@ table.image img {
 
 #bomb {
 	position: fixed;
-	content: url(/resources/fbomb.png);
-	top: -16px;
-	left: -31px;
-	width: 191px;
-	height: 160px;
+	background: url(/resources/fbomb.png) -31px -16px no-repeat;
+	content: "";
+	top: 0;
+	left: 0;
+	width: 160px;
+	height: 144px;
 	z-index: 5;
 }
 
