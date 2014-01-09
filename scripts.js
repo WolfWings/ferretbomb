@@ -193,7 +193,7 @@ API_URL: (function(prefix, suffix){ "use strict";
 			     tag = tag.parentNode) {
 				if ($.classes_has(tag, 'leaf')
 				 || $.classes_has(tag, 'expanded')) {
-					return;
+					return true;
 				}
 			}
 			var tags = $.tags_find('.expanded');
@@ -208,7 +208,8 @@ API_URL: (function(prefix, suffix){ "use strict";
 			     tag = tag.parentNode) {
 				$.classes_add(tag, 'expanded');
 			}
-			return true;
+			event['stopPropegation']();
+			return false;
 		}));
 		$.reoutline('content', outline);
 	})
