@@ -58,18 +58,15 @@ a {
 }
 
 a,
-a:visited,
-#outline ol li:before {
+a:visited {
 	color: #900;
 }
 
-a:hover,
-#outline ol li:hover:before {
+a:hover {
 	color: #f66;
 }
 
-a:active,
-#outline ol li:active:before {
+a:active {
 	color: white;
 }
 

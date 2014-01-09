@@ -181,7 +181,7 @@ API_URL: (function(prefix, suffix){ "use strict";
 	}));
 })
 
-,"init": {
+,inits: {
 	"article": (function() { "use strict";
 		var header = $.tags_find('header')[0];
 		var outline = $.tags_create('div');
@@ -224,6 +224,6 @@ setTimeout($.checkstream, 1000);
 
 $.banner_init();
 
-init();
+$.inits[init]();
 
 }());
