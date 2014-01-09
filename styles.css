@@ -119,6 +119,7 @@ table.image img {
 	height: 96px;
 	background-repeat: no-repeat;
 	z-index: 10;
+	pointer-events: none;
 }
 
 #bomb {
@@ -130,6 +131,7 @@ table.image img {
 	width: 160px;
 	height: 144px;
 	z-index: 5;
+	pointer-events: none;
 }
 
 #tail {
@@ -142,15 +144,8 @@ table.image img {
 	border-radius: 0 0 10em 0;
 	-moz-border-radius: 0 0 10em 0;
 	-webkit-border-radius: 0 0 10em 0;
-}
-
-#tail img {
-	width: 10em;
-	height: 10em;
-	position: absolute;
-	top: 0;
-	left: 0;
-	opacity: 0.333;
+	z-index: 5;
+	pointer-events: none;
 }
 
 #outline {
@@ -216,11 +211,10 @@ table.image img {
 
 nav {
 	overflow: hidden;
-	border-top: 80px solid #181818;
 	background: black;
 	display: block;
 	position: fixed;
-	top: 0;
+	top: 80px;
 	left: 0;
 	right: 0;
 	min-height: 2em;
