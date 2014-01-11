@@ -114,6 +114,21 @@ table.image img {
 	pointer-events: none;
 }
 
+#schedule {
+	text-align: right;
+	position: fixed;
+	top: 0;
+	right: 0;
+	float: right;
+	font-family: sans-serif;
+	padding: 0.5em;
+	padding-bottom: 0;
+	background: #101010;
+	border-radius: 0 0 0 3em;
+	border-bottom: 1px solid #181818;
+	border-left: 1px solid #181818;
+}
+
 #outline {
 	padding: 0.5em;
 }
