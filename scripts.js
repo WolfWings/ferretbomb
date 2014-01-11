@@ -6,15 +6,6 @@ API_URL: (function(prefix, suffix){ "use strict";
 	return "https://api.twitch.tv/kraken/" + prefix + "/ferretbomb" + suffix;
 })
 
-,updatestreamonline: (function(status){ "use strict";
-	var operation = $.classes_remove;
-	if (status) {
-		operation = $.classes_add;
-	}
-	var tag = $.tags_find('#onair')[0];
-	operation(tag, 'online');
-})
-
 ,JSON: (function(url, callback){ "use strict";
 	var xhr = (function(){
 		try { return new XMLHttpRequest(); } catch(ignore) {}
@@ -111,16 +102,36 @@ API_URL: (function(prefix, suffix){ "use strict";
 
 ,checkstream: (function() { "use strict";
 	$.JSONP($.API_URL('streams', ''), function(response) {
-		if (response['stream'] === null) {
-			setTimeout($.checkstream, 60000);
-			$.updatestreamonline(false);
-			return;
+		var tag = $.tags_find('#onair')[0];
+		var operation = $.classes_remove;
+		var delay = 60000;
+		var title = '';
+
+		if (response['stream'] !== null) {
+			operation = $.classes_add;
+			delay = 600000;
+			title = response['stream']['channel']['status']
+			      + '\n' + response['stream']['channel']['game'];
 		}
-		$.updatestreamonline(true);
-		setTimeout($.checkstream, 600000);
-		return;
+
+		setTimeout($.checkstream, delay);
+		$.tags_attribute_set(tag, 'title', title);
+		operation(tag, 'online');
 	});
 })
+
+,banner_init: (function(){ "use strict";
+	$.JSON('/resources/banners/index.json', (function(banners){
+		var banner = banners[Math.floor(Math.random() * banners.length)];
+		$.tags_find('#banner')[0]['style']['backgroundImage'] =
+			'url(/resources/banners/' + banner + ')';
+	}));
+})
+
+/* Functions reformatted to allow more compact representations by Closure Compiler.
+ *
+ * Yes, it's UGLY as sin to any normal coder. Saves quite a bit of space. =O.o=
+ */
 
 ,classes_match: (function(theClass){ "use strict";
 	return new RegExp('(?:^|\\s)' + theClass + '(?!\\S)', 'g');
@@ -173,14 +184,6 @@ API_URL: (function(prefix, suffix){ "use strict";
 	parent['appendChild'](child);
 })
 
-,banner_init: (function(){ "use strict";
-	$.JSON('/resources/banners/index.json', (function(banners){
-		var banner = banners[Math.floor(Math.random() * banners.length)];
-		$.tags_find('#logo')[0]['style']['backgroundImage'] =
-			'url(/resources/banners/' + banner + ')';
-	}));
-})
-
 ,inits: {
 	"article": (function() { "use strict";
 		var header = $.tags_find('header')[0];
@@ -221,7 +224,7 @@ API_URL: (function(prefix, suffix){ "use strict";
 
 };
 
-setTimeout($.checkstream, 1000);
+setTimeout($.checkstream, 0);
 
 $.banner_init();
 
