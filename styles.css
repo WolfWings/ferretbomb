@@ -305,7 +305,7 @@ ul.notecards li + li {
 	width: 20em;
 	bottom: 3em;
 	margin-top: 80px;
-	position: absolute;
+	position: fixed;
 }
 
 #content #stream {
