@@ -330,6 +330,34 @@ ul.notecards li + li {
 	bottom: 0;
 }
 
+.infopanels {
+	display: block;
+	position: absolute;
+	font-size: 12px;
+}
+
+.infopanels .column {
+	display: inline-block;
+	padding: 0;
+	margin: 0;
+	float: left;
+}
+
+.brick ul {
+	padding-left: 15px;
+}
+
+.brick {
+	display: block;
+	width: 320px;
+	padding: 5px;
+	margin: 5px;
+}
+
+.brick h1 {
+	text-align: center;
+}
+
 footer {
 	position: fixed;
 	right: 0;
@@ -370,32 +398,4 @@ footer {
 		color: #500;
 		text-shadow: 1px 0 1px black, -1px 0 1px black, 0 1px 1px black, 0 -1px 1px black;
 	}
-}
-
-.infopanels {
-	display: block;
-	position: relative;
-	font-size: 12px;
-}
-
-.infopanels .column {
-	display: inline-block;
-	padding: 0;
-	margin: 0;
-	float: left;
-}
-
-.brick ul {
-	padding-left: 15px;
-}
-
-.brick {
-	display: block;
-	width: 320px;
-	padding: 5px;
-	margin: 5px;
-}
-
-.brick h1 {
-	text-align: center;
 }
