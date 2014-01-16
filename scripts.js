@@ -57,49 +57,6 @@ API_URL: (function(prefix, suffix){ "use strict";
 	};
 }())
 
-,reoutline: (function(content, outline) { "use strict";
-	var headings = '';
-	var depth = 0;
-	for (var tag = $.tags_find("#" + content)[0].firstChild;
-	     tag;
-	     tag = tag.nextSibling) {
-		var isheader = /^[Hh]([1-6])$/.exec(tag.nodeName);
-		if (isheader === null) {
-			continue;
-		}
-		var newdepth = parseInt(isheader[1], 10);
-		if (depth === newdepth) {
-			headings += '</li><li>';
-		} else {
-			headings += new Array(Math.abs(depth - newdepth) + 1).join((depth < newdepth) ? '<ol><li>' : '</li></ol></li><li>');
-			depth = newdepth;
-		}
-		if ($.tags_attribute_has(tag, 'id')) {
-			headings += '<a href="#' + $.tags_attribute_get(tag, 'id') + '">' + tag.innerHTML + '</a>';
-		} else {
-			headings += tag.innerHTML;
-		}
-	}
-	headings += new Array(depth + 1).join('</li></ol>');
-	headings = headings.split('<ol');
-	for (var index = 1;
-	     index < headings.length;
-	     index++) {
-		if (headings[index].indexOf('</ol>') !== -1) {
-			headings[index] = ' class="leaf"' + headings[index];
-		}
-	}
-	headings = headings.join('<ol').split('<li');
-	for (var index = 1;
-	     index < headings.length;
-	     index++) {
-		if (headings[index].indexOf('<ol') === -1) {
-			headings[index] = ' class="leaf"' + headings[index];
-		}
-	}
-	outline.innerHTML = headings.join('<li');
-})
-
 ,checkstream: (function() { "use strict";
 	$.JSONP($.API_URL('streams', ''), function(response) {
 		var tag = $.tags_find('#onair')[0];
@@ -162,7 +119,7 @@ API_URL: (function(prefix, suffix){ "use strict";
 	} else {
 		object['addEventListener'](event, callback, false);
 	}
-	return object;
+	return callback;
 })
 
 ,tags_create: (function(tagname){ "use strict";
@@ -200,7 +157,6 @@ API_URL: (function(prefix, suffix){ "use strict";
 				}
 			}
 			var tags = $.tags_find('.expanded');
-			console.log(tags);
 			for (var tag = 0;
 			     tag < tags['length'];
 			     tag++) {
@@ -214,11 +170,103 @@ API_URL: (function(prefix, suffix){ "use strict";
 			event['stopPropegation']();
 			return false;
 		}));
-		$.reoutline('content', outline);
+
+		(function(outline) { "use strict";
+			var headings = '';
+			var depth = 0;
+			for (var tag = $.tags_find("#content")[0].firstChild;
+			     tag;
+			     tag = tag.nextSibling) {
+				var isheader = /^[Hh]([1-6])$/.exec(tag.nodeName);
+				if (isheader === null) {
+					continue;
+				}
+				var newdepth = parseInt(isheader[1], 10);
+				if (depth === newdepth) {
+					headings += '</li><li>';
+				} else {
+					headings += new Array(Math.abs(depth - newdepth) + 1).join((depth < newdepth) ? '<ol><li>' : '</li></ol></li><li>');
+					depth = newdepth;
+				}
+				if ($.tags_attribute_has(tag, 'id')) {
+					headings += '<a href="#' + $.tags_attribute_get(tag, 'id') + '">' + tag.innerHTML + '</a>';
+				} else {
+					headings += tag.innerHTML;
+				}
+			}
+			headings += new Array(depth + 1).join('</li></ol>');
+			headings = headings.split('<ol');
+			for (var index = 1;
+			     index < headings.length;
+			     index++) {
+				if (headings[index].indexOf('</ol>') !== -1) {
+					headings[index] = ' class="leaf"' + headings[index];
+				}
+			}
+			headings = headings.join('<ol').split('<li');
+			for (var index = 1;
+			     index < headings.length;
+			     index++) {
+				if (headings[index].indexOf('<ol') === -1) {
+					headings[index] = ' class="leaf"' + headings[index];
+				}
+			}
+			outline.innerHTML = headings.join('<li');
+		})(outline);
 	})
 
 	,"stream": (function() { "use strict";
 		$.classes_remove($.tags_find('#onair')[0], 'enabled');
+
+		var bricks = document.querySelectorAll('.brick');
+		var infopanels = document.querySelectorAll('.infopanels')[0];
+
+		$.events_add(window, 'resize', (function() { "use strict";
+			var oldcolumns = $.tags_find('.column');
+			var total = Math.floor(infopanels['scrollWidth'] / bricks[0]['scrollWidth']);
+
+			/* Skip old-column logic if there aren't any columns. */
+			if (oldcolumns.length > 0) {
+				/* Skip re-flow if not needed. */
+				if (oldcolumns.length === total) {
+					return;
+				}
+				/* First move all the bricks out of their columns. */
+				for (var i = 0; i < bricks.length; i++) {
+					$.tags_append_child(infopanels, bricks[i]);
+				}
+				/* Now delete all the columns to avoid leaking memory. */
+				for (var i = 0; i < oldcolumns.length; i++) {
+					oldcolumns[i].parentNode.removeChild(oldcolumns[i]);
+				}
+			}
+
+			/* If there isn't at least 2 columns, nothing to do! */
+			if (total < 2) {
+				return;
+			}
+
+			/* First, create all the columns needed. */
+			var columns = new Array();
+			for (var i = 0; i < total; i++) {
+				var tag = $.tags_create('div');
+				columns.push(tag);
+				$.classes_add(tag, 'column');
+				$.tags_append_child(infopanels, tag);
+			}
+			/* Flow mechanic is simple: Append each brick to vertically-shortest column. */
+			for (var i = 0; i < bricks.length; i++) {
+				var column = 0;
+				var height = columns[column].scrollHeight;
+				for (var j = 1; j < columns.length; j++) {
+					if (columns[j]['scrollHeight'] < height) {
+						height = columns[j]['scrollHeight'];
+						column = j;
+					}
+				}
+				$.tags_append_child(columns[column], bricks[i]);
+			}
+		}))();
 	})
 }
 

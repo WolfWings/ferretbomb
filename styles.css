@@ -372,3 +372,30 @@ footer {
 	}
 }
 
+.infopanels {
+	display: block;
+	position: relative;
+	font-size: 12px;
+}
+
+.infopanels .column {
+	display: inline-block;
+	padding: 0;
+	margin: 0;
+	float: left;
+}
+
+.brick ul {
+	padding-left: 15px;
+}
+
+.brick {
+	display: block;
+	width: 320px;
+	padding: 5px;
+	margin: 5px;
+}
+
+.brick h1 {
+	text-align: center;
+}
