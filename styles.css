@@ -331,9 +331,18 @@ ul.notecards li + li {
 }
 
 .infopanels {
+	left: 10em;
+	right: 20em;
+	top: 80px;
+	margin-top: 4em;
 	display: block;
 	position: absolute;
-	font-size: 12px;
+}
+
+.infopanels:before {
+	content: "";
+	display: block;
+	padding-top: 56.25%;
 }
 
 .infopanels .column {
@@ -352,6 +361,7 @@ ul.notecards li + li {
 	width: 320px;
 	padding: 5px;
 	margin: 5px;
+	font-size: 12px;
 }
 
 .brick h1 {

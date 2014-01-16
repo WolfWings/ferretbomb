@@ -218,6 +218,50 @@ API_URL: (function(prefix, suffix){ "use strict";
 	,"stream": (function() { "use strict";
 		$.classes_remove($.tags_find('#onair')[0], 'enabled');
 
+		(function() { "use strict";
+			var chat = $.tags_find('#chat')[0];
+			var tag = $.tags_create('iframe');
+			tag.id = 'chat_embed';
+			tag.frameborder = 0;
+			tag.scrolling = 'no';
+			tag.width = '100%';
+			tag.height = '100%';
+			tag.src = 'http://twitch.tv/chat/embed?channel=ferretbomb&popout_chat=true';
+			$.tags_append_child(chat, tag);
+		})();
+
+		(function() { "use strict";
+			var stream = $.tags_find('#stream')[0];
+			var embed = $.tags_create('object');
+			var attribs = {
+				'type': 'application/x-shockwave-flash'
+				,'wmode': 'opaque'
+				,'width': '100%'
+				,'height': '100%'
+				,'id': 'stream_embed'
+				,'bgcolor': '#000'
+				,'data': 'http://www.twitch.tv/widgets/live_embed_player.swf?channel=ferretbomb'
+			};
+			for (var attrib in attribs) {
+				$.tags_attribute_set(embed, attrib, attribs[attrib]);
+			}
+			var params = {
+				'allowFullScreen': 'true'
+				,'allowScriptAccess': 'true'
+				,'allowNetworking': 'true'
+				,'wmode': 'opaque'
+				,'movie': 'http://www.twitch.tv/widgets/live_embed_player.swf'
+				,'flashvars': 'hostname=www.twitch.tv&channel=ferretbomb&auto_play=true&start_volume=50'
+			};
+			for (var param in params) {
+				var tag = $.tags_create('param');
+				$.tags_attribute_set(tag, 'name', param);
+				$.tags_attribute_set(tag, 'value', params[param]);
+				$.tags_append_child(embed, tag);
+			}
+			$.tags_append_child(stream, embed);
+		})();
+
 		var bricks = document.querySelectorAll('.brick');
 		var infopanels = document.querySelectorAll('.infopanels')[0];
 
@@ -227,6 +271,8 @@ API_URL: (function(prefix, suffix){ "use strict";
 
 			/* Skip old-column logic if there aren't any columns. */
 			if (oldcolumns.length > 0) {
+				console.log("Purging old content flows...for reals!");
+
 				/* Skip re-flow if not needed. */
 				if (oldcolumns.length === total) {
 					return;
@@ -254,6 +300,7 @@ API_URL: (function(prefix, suffix){ "use strict";
 				$.classes_add(tag, 'column');
 				$.tags_append_child(infopanels, tag);
 			}
+
 			/* Flow mechanic is simple: Append each brick to vertically-shortest column. */
 			for (var i = 0; i < bricks.length; i++) {
 				var column = 0;
@@ -264,6 +311,9 @@ API_URL: (function(prefix, suffix){ "use strict";
 						column = j;
 					}
 				}
+
+				console.log("Appending brick to column " + column, bricks[i]);
+
 				$.tags_append_child(columns[column], bricks[i]);
 			}
 		}))();
