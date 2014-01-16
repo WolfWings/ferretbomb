@@ -271,8 +271,6 @@ API_URL: (function(prefix, suffix){ "use strict";
 
 			/* Skip old-column logic if there aren't any columns. */
 			if (oldcolumns.length > 0) {
-				console.log("Purging old content flows...for reals!");
-
 				/* Skip re-flow if not needed. */
 				if (oldcolumns.length === total) {
 					return;
@@ -311,8 +309,6 @@ API_URL: (function(prefix, suffix){ "use strict";
 						column = j;
 					}
 				}
-
-				console.log("Appending brick to column " + column, bricks[i]);
 
 				$.tags_append_child(columns[column], bricks[i]);
 			}
