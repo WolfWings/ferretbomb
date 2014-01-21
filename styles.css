@@ -115,18 +115,30 @@ table.image img {
 }
 
 #schedule {
-	text-align: right;
+	line-height: 82.5%;
 	position: fixed;
 	top: 0;
 	right: 0;
 	float: right;
-	font-family: sans-serif;
-	padding: 0.5em;
-	padding-bottom: 0;
-	background: #101010;
-	border-radius: 0 0 0 3em;
-	border-bottom: 1px solid #181818;
-	border-left: 1px solid #181818;
+	font-family: Impact, Charcoal, sans-serif;
+	padding: 0;
+	z-index: 2;
+	color: #500;
+	background: #000;
+	padding-left: 0.5em;
+	padding-bottom: 0.5em;
+	border-radius: 0 0 0 2em;
+}
+
+#schedule td {
+	font-family: "Lucida Console", Monaco, monospace;
+	font-weight: bold;
+}
+
+#schedule th {
+	font-size: 200%;
+	text-align: right;
+	font-weight: normal;
 }
 
 #outline {
@@ -177,6 +189,8 @@ table.image img {
 	height: 0;
 	margin: 0.25em;
 	border-radius: 0.25em;
+	-moz-border-radius: 0.25em;
+	-webkit-border-radius: 0.25em;
 	border: 0.25em solid #900;
 }
 
@@ -195,7 +209,8 @@ nav {
 	background: black;
 	display: block;
 	position: fixed;
-	top: 80px;
+	border-top: 80px solid #202020;
+	top: 0;
 	left: 0;
 	right: 0;
 	min-height: 2em;
@@ -376,6 +391,8 @@ footer {
 	float: right;
 	padding: 0.5em;
 	border-radius: 3em 0 0 0;
+	-moz-border-radius: 3em 0 0 0;
+	-webkit-border-radius: 3em 0 0 0;
 	text-align: right;
 	background: black;
 }
