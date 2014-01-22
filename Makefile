@@ -15,9 +15,7 @@ all: js css header
 clean:
 	$(RM) $(JS_MINIFIED) $(CSS_MINIFIED)
 
-debug:
-	cp $(JS_TARGETS) $(JS_MINIFIED)
-	cp $(CSS_TARGETS) $(CSS_MINIFIED)
+debug: js css header
 	rsync -r htdocs/ /web/ferretbomb/dev
 
 js: $(JS_MINIFIED)
