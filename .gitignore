@@ -1,2 +1,3 @@
 logs/
-htdocs/neon_lights.*
+htdocs/resources/styles.css
+htdocs/resources/scripts.js

@@ -1,11 +1,14 @@
-JS_TARGETS    = scripts.js
-JS_MINIFIED   = $(addprefix htdocs/resources/,$(JS_TARGETS))
+JS_TARGETS   = scripts.js
+JS_MINIFIED  = $(addprefix htdocs/resources/,$(JS_TARGETS))
 
-CSS_TARGETS   = styles.css
-CSS_MINIFIED  = $(addprefix htdocs/resources/,$(CSS_TARGETS))
+CSS_TARGETS  = styles.css
+CSS_MINIFIED = $(addprefix htdocs/resources/,$(CSS_TARGETS))
 
-CLOSURE       = closure-compiler
-CLOSURE_FLAGS = --compilation_level ADVANCED_OPTIMIZATIONS --language_in=ECMASCRIPT5_STRICT
+JS           = closure-compiler
+JS_FLAGS     = --compilation_level ADVANCED_OPTIMIZATIONS --language_in=ECMASCRIPT5_STRICT
+
+CSS          = csso
+CSS_FLAGS    = 
 
 all: js css header
 
@@ -27,7 +30,7 @@ htdocs/header.html: header1.html header2.html $(CSS_MINIFIED)
 	cat header1.html $(CSS_MINIFIED) header2.html > $@
 
 htdocs/resources/%.css: %.css
-	curl -s -X POST --data-urlencode input@$< http://cssminifier.com/raw > $@
+	$(CSS) $(CSS_FLAGS) -i $< -o $@
 
 htdocs/resources/%.js: %.js
-	$(CLOSURE) $(CLOSURE_FLAGS) --js=$< --js_output_file=$@
+	$(JS) $(JS_FLAGS) --js=$< --js_output_file=$@

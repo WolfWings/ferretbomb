@@ -262,8 +262,8 @@ API_URL: (function(prefix, suffix){ "use strict";
 			$.tags_append_child(stream, embed);
 		})();
 
-		var bricks = document.querySelectorAll('.brick');
-		var infopanels = document.querySelectorAll('.infopanels')[0];
+		var bricks = $.tags_find('.brick');
+		var infopanels = $.tags_find('.infopanels')[0];
 
 		$.events_add(window, 'resize', (function() { "use strict";
 			var oldcolumns = $.tags_find('.column');
