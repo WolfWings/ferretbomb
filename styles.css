@@ -275,8 +275,10 @@ nav {
 	float: right;
 }
 
-#navmenu li#onair a {
+#navmenu li#onair a th,
+#navmenu li#onair a td {
 	transition: all 0.5s linear 0s;
+	-o-transition: all 0.5s linear 0s;
 	-moz-transition: all 0.5s linear 0s;
 	-webkit-transition: all 0.5s linear 0s;
 }
@@ -324,6 +326,18 @@ nav {
 	color: white;
 }
 
+#navmenu li#onair a td,
+#navmenu li#onair a:visited td {
+	color: #f00;
+}
+
+#navmenu li#onair a:hover td {
+	color: #faa;
+}
+
+#navmenu li#onair a:active td {
+	color: white;
+}
 
 #navmenu li#onair.online a th,
 #navmenu li#onair.online a:visited td {
@@ -338,21 +352,7 @@ nav {
 	color: #a55;
 }
 
-#navmenu li#onair a td,
-#navmenu li#onair a:visited td {
-	color: #f00;
-	text-shadow: 1px 0 1px #a00, -1px 0 1px #a00, 0 1px 1px #a00, 0 -1px 1px #a00;
-}
-
-#navmenu li#onair a:hover td {
-	color: #faa;
-}
-
-#navmenu li#onair a:active td {
-	color: white;
-}
-
-#navmenu li#onair.online a th .enabled {
+#navmenu li#onair.online a th.enabled {
 	-webkit-animation: pulseglow 4s linear 0.5s infinite alternate;
 	animation: pulseglow 4s linear 0.5s infinite alternate;
 }
