@@ -115,31 +115,39 @@ table.image img {
 }
 
 #schedule {
-	line-height: 82.5%;
 	position: fixed;
-	top: 0;
+	margin: 0;
+	padding: 0;
+	padding-left: 0.5em;
+	margin-top: 2em;
+	top: 80px;
 	right: 0;
 	float: right;
 	font-family: Impact, Charcoal, sans-serif;
-	padding: 0;
 	z-index: 2;
 	color: #500;
 	background: #000;
-	padding-left: 0.5em;
-	padding-bottom: 0.5em;
-	border-radius: 0 0 0 2em;
+	border-radius: 0 0 0 1em;
 }
 
 #schedule td {
-	font-size: 90%;
+	padding: 0;
+	margin: 0;
+	line-height: 75%;
+	font-size: 75%;
 	font-family: "Lucida Console", Monaco, monospace;
 	font-weight: bold;
+	vertical-align: middle;
 }
 
 #schedule th {
-	font-size: 200%;
+	padding: 0;
+	margin: 0;
+	font-size: 150%;
+	line-height: 82.5%;
 	text-align: right;
 	font-weight: normal;
+	vertical-align: middle;
 }
 
 #outline {
