@@ -131,6 +131,7 @@ table.image img {
 }
 
 #schedule td {
+	font-size: 90%;
 	font-family: "Lucida Console", Monaco, monospace;
 	font-weight: bold;
 }
@@ -395,6 +396,10 @@ footer {
 	-webkit-border-radius: 3em 0 0 0;
 	text-align: right;
 	background: black;
+}
+
+.halfsize {
+	font-size: 50%;
 }
 
 @-webkit-keyframes pulseglow {
