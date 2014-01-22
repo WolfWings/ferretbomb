@@ -52,12 +52,20 @@ header {
 	padding: 64px 0 0 0;
 }
 
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+
+table th,table td{
+	padding: 0;
+}
+
 table.image {
 	margin: 1em 1.25em 1em -0.25em;
 	max-width: 10em;
 	max-height: 10em;
 	float: left;
-	border-collapse: collapse;
 }
 
 table.image td {
@@ -267,40 +275,86 @@ nav {
 	float: right;
 }
 
-#navmenu li#onair.enabled a {
+#navmenu li#onair a {
 	transition: all 0.5s linear 0s;
+	-moz-transition: all 0.5s linear 0s;
+	-webkit-transition: all 0.5s linear 0s;
 }
 
-#navmenu li#onair a,
-#navmenu li#onair a:visited {
+#navmenu li#onair th {
+	line-height: 80%;
+	font-weight: normal;
+	vertical-align: top;
+	height: 1em;
+}
+
+#navmenu li#onair td {
+	height: 1.25em;
+	line-height: 100%;
+	text-align: center;
+	font-size: 40%;
+	padding-left: 0.5em;
+	font-family: "Lucida Console", Monaco, monospaced;
+}
+
+#navmenu li#onair a th,
+#navmenu li#onair a:visited th {
 	color: #500;
 }
 
-#navmenu li#onair a:hover {
+#navmenu li#onair a:hover th {
 	color: #a00;
 }
 
-#navmenu li#onair a:active {
+#navmenu li#onair a:active th {
 	color: #a55;
 }
 
-#navmenu li#onair.online.enabled a {
-	-webkit-animation: pulseglow 4s linear 0.5s infinite alternate;
-	animation: pulseglow 4s linear 0.5s infinite alternate;
-}
-
-#navmenu li#onair.online a,
-#navmenu li#onair.online a:visited {
-	color: red;
+#navmenu li#onair.online a th,
+#navmenu li#onair.online a:visited th {
+	color: #f00;
 	text-shadow: 1px 0 1px #a00, -1px 0 1px #a00, 0 1px 1px #a00, 0 -1px 1px #a00;
 }
 
-#navmenu li#onair.online a:hover {
+#navmenu li#onair.online a:hover th {
 	color: #f55;
 }
 
-#navmenu li#onair.online a:active {
+#navmenu li#onair.online a:active th {
 	color: white;
+}
+
+
+#navmenu li#onair.online a th,
+#navmenu li#onair.online a:visited td {
+	color: #500;
+}
+
+#navmenu li#onair.online a:hover td {
+	color: #a00;
+}
+
+#navmenu li#onair.online a:active td {
+	color: #a55;
+}
+
+#navmenu li#onair a td,
+#navmenu li#onair a:visited td {
+	color: #f00;
+	text-shadow: 1px 0 1px #a00, -1px 0 1px #a00, 0 1px 1px #a00, 0 -1px 1px #a00;
+}
+
+#navmenu li#onair a:hover td {
+	color: #faa;
+}
+
+#navmenu li#onair a:active td {
+	color: white;
+}
+
+#navmenu li#onair.online a th .enabled {
+	-webkit-animation: pulseglow 4s linear 0.5s infinite alternate;
+	animation: pulseglow 4s linear 0.5s infinite alternate;
 }
 
 ul.notecards {
