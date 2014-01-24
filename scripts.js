@@ -291,12 +291,11 @@ API_URL: (function(prefix, suffix){ "use strict";
 			}
 
 			/* First, create all the columns needed. */
-			var columns = new Array();
+			var columns = new Array(total);
 			for (var i = 0; i < total; i++) {
-				var tag = $.tags_create('div');
-				columns.push(tag);
-				$.classes_add(tag, 'column');
-				$.tags_append_child(infopanels, tag);
+				columns[i] = $.tags_create('div');
+				$.classes_add(columns[i], 'column');
+				$.tags_append_child(infopanels, columns[i]);
 			}
 
 			/* Flow mechanic is simple: Append each brick to vertically-shortest column. */
