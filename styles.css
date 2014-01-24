@@ -359,6 +359,7 @@ ul.notecards li + li {
 	bottom: 3em;
 	margin-top: 80px;
 	position: fixed;
+	background: #fff;
 }
 
 #content #stream {
@@ -367,6 +368,7 @@ ul.notecards li + li {
 	right: 20em;
 	margin-top: 80px;
 	position: absolute;
+	background: #fff;
 }
 
 #content #stream:before {
