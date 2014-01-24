@@ -98,7 +98,7 @@ table.image img {
 
 #logo {
 	position: fixed;
-	background: url(/resources/fbomb.png) -31px -16px no-repeat;
+	background: url(/resources/sprites.png) -31px -16px no-repeat;
 	content: "";
 	top: 0;
 	left: 0;
@@ -115,9 +115,9 @@ table.image img {
 	width: 10em;
 	height: 10em;
 	background: #181818;
-	border-radius: 0 0 10em 0;
-	-moz-border-radius: 0 0 10em 0;
-	-webkit-border-radius: 0 0 10em 0;
+	border-radius: 0 0 100% 0;
+	-moz-border-radius: 0 0 100% 0;
+	-webkit-border-radius: 0 0 100% 0;
 	z-index: 5;
 	pointer-events: none;
 }
@@ -228,12 +228,8 @@ nav {
 	padding: 0 0.5em;
 }
 
-#navmenu li#onair table {
-	margin-right: 8px;
-}
-
 #navmenu li#onair a {
-	padding-right: 0;
+	padding-right: 0.5em;
 }
 
 #navmenu li a:hover {
@@ -246,88 +242,81 @@ nav {
 
 #navmenu li#onair {
 	float: right;
+	position: relative;
 }
 
-#navmenu li#onair a th,
-#navmenu li#onair a td {
+#navmenu li#onair a {
 	transition: all 0.5s linear 0s;
 	-o-transition: all 0.5s linear 0s;
 	-moz-transition: all 0.5s linear 0s;
 	-webkit-transition: all 0.5s linear 0s;
 }
 
-#navmenu li#onair th {
-	vertical-align: top;
+#navmenu li#onair .schedule {
+	position: relative;
+	top: -1px;
+	display: inline-block;
 	line-height: 80%;
-	font-weight: normal;
-	height: 1em;
-}
-
-#navmenu li#onair td {
-	vertical-align: middle;
-	padding-top: 2px;
-	height: 50%;
-	line-height: 80%;
-	text-align: center;
 	font-size: 33%;
-	padding-left: 0.5em;
-	font-family: "Lucida Console", Monaco, monospaced;
+	padding-left: 0;
+	font-family: "Lucida Console", Monaco, monospace;
+	word-spacing: 0.2em;
 }
 
-#navmenu li#onair a th,
-#navmenu li#onair a:visited th {
+#navmenu li#onair a,
+#navmenu li#onair a:visited {
 	color: #500;
 }
 
-#navmenu li#onair a:hover th {
+#navmenu li#onair a:hover {
 	color: #a00;
 }
 
-#navmenu li#onair a:active th {
+#navmenu li#onair a:active {
 	color: #a55;
 }
 
-#navmenu li#onair.online a th,
-#navmenu li#onair.online a:visited th {
+#navmenu li#onair.online a,
+#navmenu li#onair.online a:visited {
 	color: #f00;
 	text-shadow: 1px 0 1px #a00, -1px 0 1px #a00, 0 1px 1px #a00, 0 -1px 1px #a00;
 }
 
-#navmenu li#onair.online a:hover th {
+#navmenu li#onair.online a:hover {
 	color: #f55;
 }
 
-#navmenu li#onair.online a:active th {
+#navmenu li#onair.online a:active {
 	color: white;
 }
 
-#navmenu li#onair a td,
-#navmenu li#onair a:visited td {
+#navmenu li#onair a .schedule,
+#navmenu li#onair a:visited .schedule {
 	color: #f00;
 }
 
-#navmenu li#onair a:hover td {
+#navmenu li#onair a:hover .schedule {
 	color: #f00;
 }
 
-#navmenu li#onair a:active td {
+#navmenu li#onair a:active .schedule {
 	color: #f00;
 }
 
-#navmenu li#onair.online a th,
-#navmenu li#onair.online a:visited td {
+#navmenu li#onair.online a .schedule,
+#navmenu li#onair.online a:visited .schedule {
 	color: #500;
 }
 
-#navmenu li#onair.online a:hover td {
+#navmenu li#onair.online a:hover .schedule {
 	color: #500;
 }
 
-#navmenu li#onair.online a:active td {
+#navmenu li#onair.online a:active .schedule {
 	color: #500;
 }
 
-#navmenu li#onair.online a th.enabled {
+#navmenu li#onair.online a .pulsing {
 	-webkit-animation: pulseglow 4s linear 0.5s infinite alternate;
 	animation: pulseglow 4s linear 0.5s infinite alternate;
 }
@@ -436,6 +425,7 @@ footer {
 	float: right;
 	padding-left: 1.5em;
 	padding-top: 0.25em;
+	padding-right: 0.5em;
 	border-radius: 2em 0 0 0;
 	-moz-border-radius: 2em 0 0 0;
 	-webkit-border-radius: 2em 0 0 0;
@@ -452,35 +442,23 @@ footer {
 }
 
 .socialmedia {
-	position: relative;
-	padding-left: 32px;
-	font-size: 24px;
-	font-family: Impact, Charcoal, sans-serif;
-}
-
-.socialmedia:after {
-	content: "";
-	position: absolute;
-	top: 2px;
-	left: 0;
+	line-height: 36px;
+	display: inline-block;
 	width: 29px;
 	height: 24px;
+	margin-right: 3px;
 }
 
-.socialmedia#steam:after {
-	background: url("/resources/socialmedia.png") no-repeat 0 0;
+.socialmedia#steam {
+	background: url("/resources/sprites.png") no-repeat 0 -162px;
 }
 
-.socialmedia#twitter:after {
-	background: url("/resources/socialmedia.png") no-repeat -31px 0;
+.socialmedia#twitter {
+	background: url("/resources/sprites.png") no-repeat -31px -162px;
 }
 
-.socialmedia#youtube:after {
-	background: url("/resources/socialmedia.png") no-repeat -62px 0;
-}
-
-.halfsize {
-	font-size: 50%;
+.socialmedia#youtube {
+	background: url("/resources/sprites.png") no-repeat -62px -162px;
 }
 
 @-webkit-keyframes pulseglow {

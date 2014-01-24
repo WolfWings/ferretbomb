@@ -62,7 +62,7 @@ API_URL: (function(prefix, suffix){ "use strict";
 		var tag = $.tags_find('#onair')[0];
 		var operation = $.classes_remove;
 		var delay = 60000;
-		var title = '';
+		var title = 'Live every night, starting at\nroughly 2200 PST/0600 GMT';
 
 		if (response['stream'] !== null) {
 			operation = $.classes_add;
@@ -216,7 +216,7 @@ API_URL: (function(prefix, suffix){ "use strict";
 	})
 
 	,"stream": (function() { "use strict";
-		$.classes_remove($.tags_find('#onair')[0], 'enabled');
+		$.classes_remove($.tags_find('#onair')[0], 'pulsing');
 
 		(function() { "use strict";
 			var chat = $.tags_find('#chat')[0];
