@@ -122,6 +122,8 @@ table.image img {
 	pointer-events: none;
 }
 
+/*
+
 #schedule {
 	position: fixed;
 	margin: 0;
@@ -157,6 +159,8 @@ table.image img {
 	font-weight: normal;
 	vertical-align: middle;
 }
+
+*/
 
 #outline {
 	padding: 0.5em;
@@ -336,11 +340,13 @@ nav {
 }
 
 #navmenu li#onair a:hover td {
-	color: #faa;
+/*	color: #faa; */
+	color: #f00;
 }
 
 #navmenu li#onair a:active td {
-	color: white;
+/*	color: white; */
+	color: #f00;
 }
 
 #navmenu li#onair.online a th,
@@ -349,11 +355,13 @@ nav {
 }
 
 #navmenu li#onair.online a:hover td {
-	color: #a00;
+/*	color: #a00; */
+	color: #500;
 }
 
 #navmenu li#onair.online a:active td {
-	color: #a55;
+/*	color: #a55; */
+	color: #500;
 }
 
 #navmenu li#onair.online a th.enabled {
