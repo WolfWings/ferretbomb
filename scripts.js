@@ -78,7 +78,7 @@ API_URL: (function(prefix, suffix){ "use strict";
 })
 
 ,banner_init: (function(){ "use strict";
-	$.JSON('/resources/banners/index.json', (function(banners){
+	$.JSON('/resources/banners/', (function(banners){
 		var banner = banners[Math.floor(Math.random() * banners.length)];
 		$.tags_find('#banner')[0]['style']['backgroundImage'] =
 			'url(/resources/banners/' + banner + ')';
