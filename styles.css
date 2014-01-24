@@ -122,46 +122,6 @@ table.image img {
 	pointer-events: none;
 }
 
-/*
-
-#schedule {
-	position: fixed;
-	margin: 0;
-	padding: 0;
-	padding-left: 0.5em;
-	margin-top: 2em;
-	top: 80px;
-	right: 0;
-	float: right;
-	font-family: Impact, Charcoal, sans-serif;
-	z-index: 2;
-	color: #500;
-	background: #000;
-	border-radius: 0 0 0 1em;
-}
-
-#schedule td {
-	padding: 0;
-	margin: 0;
-	line-height: 75%;
-	font-size: 75%;
-	font-family: "Lucida Console", Monaco, monospace;
-	font-weight: bold;
-	vertical-align: middle;
-}
-
-#schedule th {
-	padding: 0;
-	margin: 0;
-	font-size: 150%;
-	line-height: 82.5%;
-	text-align: right;
-	font-weight: normal;
-	vertical-align: middle;
-}
-
-*/
-
 #outline {
 	padding: 0.5em;
 }
@@ -340,12 +300,10 @@ nav {
 }
 
 #navmenu li#onair a:hover td {
-/*	color: #faa; */
 	color: #f00;
 }
 
 #navmenu li#onair a:active td {
-/*	color: white; */
 	color: #f00;
 }
 
@@ -355,12 +313,10 @@ nav {
 }
 
 #navmenu li#onair.online a:hover td {
-/*	color: #a00; */
 	color: #500;
 }
 
 #navmenu li#onair.online a:active td {
-/*	color: #a55; */
 	color: #500;
 }
 
@@ -464,27 +420,35 @@ footer {
 	bottom: 0;
 	height: 2em;
 	float: right;
-	padding-left: 1em;
-	padding-top: 1em;
-	border-radius: 3em 0 0 0;
-	-moz-border-radius: 3em 0 0 0;
-	-webkit-border-radius: 3em 0 0 0;
+	padding-left: 1.5em;
+	padding-top: 0.25em;
+	border-radius: 2em 0 0 0;
+	-moz-border-radius: 2em 0 0 0;
+	-webkit-border-radius: 2em 0 0 0;
 	text-align: right;
 	background: black;
 }
 
+.impact {
+	font-size: 200%;
+	line-height: 80%;
+	font-family: "Space Age", sans-serif;
+	font-wieght: normal;
+	color: #500;
+}
+
 .socialmedia {
 	position: relative;
-	padding-right: 29px;
-	font-family: Impact, Charcoal, sans-serif;
+	padding-left: 32px;
 	font-size: 24px;
+	font-family: Impact, Charcoal, sans-serif;
 }
 
 .socialmedia:after {
 	content: "";
 	position: absolute;
-	top: 0;
-	right: 0;
+	top: 2px;
+	left: 0;
 	width: 29px;
 	height: 24px;
 }
