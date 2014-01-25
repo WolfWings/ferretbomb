@@ -6,85 +6,6 @@ API_URL: (function(prefix, suffix){ "use strict";
 	return "https://api.twitch.tv/kraken/" + prefix + "/ferretbomb" + suffix;
 })
 
-,JSON: (function(url, callback){ "use strict";
-	var xhr = (function(){
-		try { return new XMLHttpRequest(); } catch(ignore) {}
-		try { return new ActiveXObject('Mxsml2.XMLHTTP'); } catch(ignore) {}
-		return null;
-	}());
-	xhr.open('GET', url, true);
-	xhr.onreadystatechange = (function(){ "use strict";
-		if (this.readyState !== 4) { return; }
-		callback(JSON.parse(this.responseText));
-	});
-	xhr.send(null);
-})
-
-,JSONP: (function(){ "use strict";
-	var counter = 0;
-
-	var memoryleakcap = function() {
-		if (this.readyState !== 'loaded' && this.readyState !== 'complete') {
-			return;
-		}
-
-		try {
-			this.onload = this.onreadystatechange = null;
-			this.parentNode.removeChild(this);
-		} catch(ignore) {}
-	};
-
-	return function(url, callback) { "use strict";
-		var uniqueName = 'callback_json' + (++counter);
-
-		var script = $.tags_create('script');
-		script.src = url + (url.toString().indexOf('?') === -1 ? '?' : '&') + 'callback=' + uniqueName;
-		script.async = true;
-
-		window[ uniqueName ] = function(data){
-			callback(data);
-			window[uniqueName] = null;
-			try {
-				delete window[uniqueName];
-			} catch (ignore) {}
-		};
-
-		script.onload = script.onreadystatechange = memoryleakcap;
-
-		$.tags_append_child($.tags_find('head')[0], script);
-
-		return uniqueName;
-	};
-}())
-
-,checkstream: (function() { "use strict";
-	$.JSONP($.API_URL('streams', ''), function(response) {
-		var tag = $.tags_find('#onair')[0];
-		var operation = $.classes_remove;
-		var delay = 60000;
-		var title = 'Live every night, starting at\nroughly 2200 PST/0600 GMT';
-
-		if (response['stream'] !== null) {
-			operation = $.classes_add;
-			delay = 600000;
-			title = response['stream']['channel']['status']
-			      + '\n' + response['stream']['channel']['game'];
-		}
-
-		setTimeout($.checkstream, delay);
-		$.tags_attribute_set(tag, 'title', title);
-		operation(tag, 'online');
-	});
-})
-
-,banner_init: (function(){ "use strict";
-	$.JSON('/resources/banners/', (function(banners){
-		var banner = banners[Math.floor(Math.random() * banners.length)];
-		$.tags_find('#banner')[0]['style']['backgroundImage'] =
-			'url(/resources/banners/' + banner + ')';
-	}));
-})
-
 /* Functions reformatted to allow more compact representations by Closure Compiler.
  *
  * Yes, it's UGLY as sin to any normal coder. Saves quite a bit of space. =O.o=
@@ -139,6 +60,85 @@ API_URL: (function(prefix, suffix){ "use strict";
 })
 ,tags_append_child: (function(parent, child){ "use strict";
 	parent['appendChild'](child);
+})
+
+,JSON: (function(url, callback){ "use strict";
+	var xhr = (function(){
+		try { return new XMLHttpRequest(); } catch(ignore) {}
+		try { return new ActiveXObject('Mxsml2.XMLHTTP'); } catch(ignore) {}
+		return null;
+	}());
+	xhr.open('GET', url, true);
+	xhr.onreadystatechange = (function(){ "use strict";
+		if (this.readyState !== 4) { return; }
+		callback(JSON.parse(this.responseText));
+	});
+	xhr.send(null);
+})
+
+,JSONP: (function(){ "use strict";
+	var counter = 0;
+
+	var memoryleakcap = function() {
+		if (this.readyState !== 'loaded' && this.readyState !== 'complete') {
+			return;
+		}
+
+		try {
+			this.onload = this.onreadystatechange = null;
+			this.parentNode.removeChild(this);
+		} catch(ignore) {}
+	};
+
+	return function(url, callback) { "use strict";
+		var uniqueName = 'callback_json' + (++counter);
+
+		window[ uniqueName ] = function(data){
+			callback(data);
+			window[uniqueName] = null;
+			try {
+				delete window[uniqueName];
+			} catch (ignore) {}
+		};
+
+		var script = $.tags_create('script');
+		script.src = url + (url.toString().indexOf('?') === -1 ? '?' : '&') + 'callback=' + uniqueName;
+		script.async = true;
+
+		script.onload = script.onreadystatechange = memoryleakcap;
+
+		$.tags_append_child($.tags_find('head')[0], script);
+
+		return uniqueName;
+	};
+}())
+
+,checkstream: (function() { "use strict";
+	$.JSONP($.API_URL('streams', ''), function(response) {
+		var tag = $.tags_find('#onair')[0];
+		var operation = $.classes_remove;
+		var delay = 60000;
+		var title = 'Live every night, starting at\nroughly 2200 PST/0600 GMT';
+
+		if (response['stream'] !== null) {
+			operation = $.classes_add;
+			delay = 600000;
+			title = response['stream']['channel']['status']
+			      + '\n' + response['stream']['channel']['game'];
+		}
+
+		setTimeout($.checkstream, delay);
+		$.tags_attribute_set(tag, 'title', title);
+		operation(tag, 'online');
+	});
+})
+
+,banner_init: (function(){ "use strict";
+	$.JSON('/resources/banners/', (function(banners){
+		var banner = banners[Math.floor(Math.random() * banners.length)];
+		$.tags_find('#banner')[0]['style']['backgroundImage'] =
+			'url(/resources/banners/' + banner + ')';
+	}));
 })
 
 ,inits: {
@@ -213,6 +213,14 @@ API_URL: (function(prefix, suffix){ "use strict";
 			}
 			outline.innerHTML = headings.join('<li');
 		})(outline);
+	})
+
+	,"twitter": (function() { "use strict";
+		var script = $.tags_create('script');
+		script['id'] = 'twitter-wjs';
+		script['src'] = '//platform.twitter.com/widgets.js';
+		script['async'] = true;
+		$.tags_append_child($.tags_find('head')[0], script);
 	})
 
 	,"stream": (function() { "use strict";

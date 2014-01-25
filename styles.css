@@ -279,7 +279,6 @@ nav {
 #navmenu li#onair.online a,
 #navmenu li#onair.online a:visited {
 	color: #f00;
-	text-shadow: 1px 0 1px #a00, -1px 0 1px #a00, 0 1px 1px #a00, 0 -1px 1px #a00;
 }
 
 #navmenu li#onair.online a:hover {
@@ -317,6 +316,7 @@ nav {
 }
 
 #navmenu li#onair.online a .pulsing {
+	text-shadow: 1px 0 1px #a00, -1px 0 1px #a00, 0 1px 1px #a00, 0 -1px 1px #a00;
 	-webkit-animation: pulseglow 4s linear 0.5s infinite alternate;
 	animation: pulseglow 4s linear 0.5s infinite alternate;
 }
