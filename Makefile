@@ -22,9 +22,9 @@ js: $(JS_MINIFIED)
 
 css: $(CSS_MINIFIED)
 
-header: htdocs/header.html
+header: htdocs/resources/header.html
 
-htdocs/header.html: header1.html header2.html $(CSS_MINIFIED)
+htdocs/resources/header.html: header1.html header2.html $(CSS_MINIFIED)
 	cat header1.html $(CSS_MINIFIED) header2.html > $@
 
 htdocs/resources/%.css: %.css

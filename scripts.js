@@ -223,6 +223,10 @@ API_URL: (function(prefix, suffix){ "use strict";
 		$.tags_append_child($.tags_find('head')[0], script);
 	})
 
+	,"callback": (function() { "use strict";
+		
+	})
+
 	,"stream": (function() { "use strict";
 		$.classes_remove($.tags_find('#onair')[0], 'pulsing');
 
