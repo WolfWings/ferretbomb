@@ -13,13 +13,18 @@ body {
 	min-height: 18em;
 }
 
+h1,h2,h3,h4,h5,h6 {
+	clear: both;
+	padding-left: 8px;
+}
+
 h1[id],h2[id],h3[id],h4[id],h5[id],h6[id] {
 	padding-top: 128px;
 	margin-top: -128px;	
 }
 
-h1,h2,h3,h4,h5,h6 {
-	clear: both;
+#content p {
+	padding-left: 23px;
 }
 
 a {
