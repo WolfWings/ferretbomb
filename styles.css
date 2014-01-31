@@ -92,7 +92,7 @@ table.image img {
 	width: 100%;
 	height: 128px;
 	background-repeat: no-repeat;
-	z-index: 10;
+	z-index: 11;
 	pointer-events: none;
 }
 
@@ -104,7 +104,7 @@ table.image img {
 	left: 0;
 	width: 160px;
 	height: 144px;
-	z-index: 5;
+	z-index: 10;
 	pointer-events: none;
 }
 
@@ -118,7 +118,6 @@ table.image img {
 	border-radius: 0 0 100% 0;
 	-moz-border-radius: 0 0 100% 0;
 	-webkit-border-radius: 0 0 100% 0;
-	z-index: 5;
 	pointer-events: none;
 }
 
@@ -198,7 +197,7 @@ nav {
 	min-height: 2em;
 	padding: 0 0 0 10em;
 	vertical-align: middle;
-	z-index: 2;
+	z-index: 9;
 }
 
 #navmenu {
@@ -459,6 +458,10 @@ footer {
 
 .socialmedia#youtube {
 	background: url("/resources/sprites.png") no-repeat -62px -162px;
+}
+
+.socialmedia#facebook {
+	background: url("/resources/sprites.png") no-repeat -93px -162px;
 }
 
 @-webkit-keyframes pulseglow {
