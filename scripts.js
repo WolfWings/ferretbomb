@@ -1,5 +1,6 @@
 (function(){ "use strict";
 
+/*
 window["_"] = (function(data){ "use strict";
 	var items = data.split('&');
 	for (var i = 0; i < items.length; i++) {
@@ -7,6 +8,7 @@ window["_"] = (function(data){ "use strict";
 	}
 	console.log(items);
 })
+*/
 
 window["$"] = {
 
@@ -232,7 +234,16 @@ API_URL: (function(prefix, suffix){ "use strict";
 	})
 
 	,"callback": (function() { "use strict";
+		var items = document['location']['hash'].split('&');
+		var data = {};
+		for (var i = 0; i < items.length; i++) {
+			items[i] = items[i].split('=');
+			data[items[i][0]] = items[i][1];
+		}
+		console.log(data);
+/*
 		window['opener']['_'](document['location']['hash']);
+ */
 	})
 
 	,"stream": (function() { "use strict";
