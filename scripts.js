@@ -234,13 +234,19 @@ API_URL: (function(prefix, suffix){ "use strict";
 	})
 
 	,"callback": (function() { "use strict";
-		var items = document['location']['hash'].split('&');
+		var items = document['location']['hash'].split('#')[1].split('&');
 		var data = {};
 		for (var i = 0; i < items.length; i++) {
 			items[i] = items[i].split('=');
 			data[items[i][0]] = items[i][1];
 		}
-		console.log(data);
+		if (data['access_token']) {
+			$.JSONP('https://api.twitch.tv/kraken?oauth_token=' + data['access_token'], (function(reply) { "use strict";
+				if (reply['token']['valid'] === true) {
+					console.log(reply['token']['user_name']);
+				}
+			}));
+		}
 /*
 		window['opener']['_'](document['location']['hash']);
  */
