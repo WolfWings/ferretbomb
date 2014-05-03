@@ -113,6 +113,19 @@ table.image img {
 	pointer-events: none;
 }
 
+#connectTwitch {
+	position: fixed;
+	bottom: 10em;
+	width: 170px;
+	height: 32px;
+	margin-bottom: -32px;
+	left: 0;
+}
+
+#connectTwitch.hidden {
+	display: none;
+}
+
 #tail {
 	position: fixed;
 	left: 0;

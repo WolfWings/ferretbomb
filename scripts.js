@@ -1,19 +1,9 @@
 (function(){ "use strict";
 
-/*
-window["_"] = (function(data){ "use strict";
-	var items = data.split('&');
-	for (var i = 0; i < items.length; i++) {
-		items[i] = items[i].split('=');
-	}
-	console.log(items);
-})
-*/
+window['$'] = {
 
-window["$"] = {
-
-API_URL: (function(prefix, suffix){ "use strict";
-	return "https://api.twitch.tv/kraken/" + prefix + "/ferretbomb" + suffix;
+API_URL: (function(prefix, suffix){
+	return 'https://api.twitch.tv/kraken/' + prefix + '/ferretbomb' + suffix;
 })
 
 /* Functions reformatted to allow more compact representations by Closure Compiler.
@@ -21,21 +11,21 @@ API_URL: (function(prefix, suffix){ "use strict";
  * Yes, it's UGLY as sin to any normal coder. Saves quite a bit of space. =O.o=
  */
 
-,classes_match: (function(theClass){ "use strict";
+,classes_match: (function(theClass){
 	return new RegExp('(?:^|\\s)' + theClass + '(?!\\S)', 'g');
 })
-,classes_has: (function(tag, theClass) { "use strict";
+,classes_has: (function(tag, theClass) {
 	return $.classes_match(theClass).test(tag['className']);
 })
-,classes_add: (function(tag, theClass) { "use strict";
+,classes_add: (function(tag, theClass) {
 	tag['className'] += ' ' + theClass;
 	return tag;
 })
-,classes_remove: (function(tag, theClass) { "use strict";
+,classes_remove: (function(tag, theClass) {
 	tag['className'] = tag['className'].replace($.classes_match(theClass), '');
 	return tag;
 })
-,classes_toggle: (function(tag, theClass) { "use strict";
+,classes_toggle: (function(tag, theClass) {
 	if ($.classes_has(tag, theClass)) {
 		$.classes_remove(tag, theClass);
 	} else {
@@ -44,7 +34,7 @@ API_URL: (function(prefix, suffix){ "use strict";
 	return tag;
 })
 
-,events_add: (function(object, event, callback){ "use strict";
+,events_add: (function(object, event, callback){
 	if (object['attachEvent']) {
 		object['attachEvent']('on' + event, callback);
 	} else {
@@ -53,40 +43,40 @@ API_URL: (function(prefix, suffix){ "use strict";
 	return callback;
 })
 
-,tags_create: (function(tagname){ "use strict";
+,tags_create: (function(tagname){
 	return document['createElement'](tagname);
 })
-,tags_find: (function(selector){ "use strict";
+,tags_find: (function(selector){
 	return document['querySelectorAll'](selector);
 })
-,tags_attribute_has: (function(tag, attribute){ "use strict";
+,tags_attribute_has: (function(tag, attribute){
 	return tag['hasAttribute'](attribute);
 })
-,tags_attribute_get: (function(tag, attribute){ "use strict";
+,tags_attribute_get: (function(tag, attribute){
 	return tag['getAttribute'](attribute);
 })
-,tags_attribute_set: (function(tag, attribute, value){ "use strict";
+,tags_attribute_set: (function(tag, attribute, value){
 	tag['setAttribute'](attribute, value);
 })
-,tags_append_child: (function(parent, child){ "use strict";
+,tags_append_child: (function(parent, child){
 	parent['appendChild'](child);
 })
 
-,JSON: (function(url, callback){ "use strict";
+,JSON: (function(url, callback){
 	var xhr = (function(){
 		try { return new XMLHttpRequest(); } catch(ignore) {}
 		try { return new ActiveXObject('Mxsml2.XMLHTTP'); } catch(ignore) {}
 		return null;
 	}());
 	xhr.open('GET', url, true);
-	xhr.onreadystatechange = (function(){ "use strict";
+	xhr.onreadystatechange = (function(){
 		if (this.readyState !== 4) { return; }
 		callback(JSON.parse(this.responseText));
 	});
 	xhr.send(null);
 })
 
-,JSONP: (function(){ "use strict";
+,JSONP: (function(){
 	var counter = 0;
 
 	var memoryleakcap = function() {
@@ -100,7 +90,7 @@ API_URL: (function(prefix, suffix){ "use strict";
 		} catch(ignore) {}
 	};
 
-	return function(url, callback) { "use strict";
+	return function(url, callback) {
 		var uniqueName = 'callback_json' + (++counter);
 
 		window[ uniqueName ] = function(data){
@@ -123,7 +113,7 @@ API_URL: (function(prefix, suffix){ "use strict";
 	};
 }())
 
-,checkstream: (function() { "use strict";
+,checkstream: (function() {
 	$.JSONP($.API_URL('streams', ''), function(response) {
 		var tag = $.tags_find('#onair')[0];
 		var operation = $.classes_remove;
@@ -143,7 +133,7 @@ API_URL: (function(prefix, suffix){ "use strict";
 	});
 })
 
-,banner_init: (function(){ "use strict";
+,banner_init: (function(){
 	$.JSON('/resources/banners/', (function(banners){
 		var banner = banners[Math.floor(Math.random() * banners.length)];
 		$.tags_find('#banner')[0]['style']['backgroundImage'] =
@@ -152,12 +142,12 @@ API_URL: (function(prefix, suffix){ "use strict";
 })
 
 ,inits: {
-	"article": (function() { "use strict";
+	'article': (function() {
 		var header = $.tags_find('header')[0];
 		var outline = $.tags_create('div');
 		$.tags_attribute_set(outline, 'id', 'outline');
 		$.tags_append_child(header, outline);
-		$.events_add(outline, 'click', (function(event){ "use strict";
+		$.events_add(outline, 'click', (function(event){
 			for (var tag = event.toElement;
 			     tag && $.tags_attribute_get(tag, 'id') !== 'outline';
 			     tag = tag.parentNode) {
@@ -181,10 +171,10 @@ API_URL: (function(prefix, suffix){ "use strict";
 			return false;
 		}));
 
-		(function(outline) { "use strict";
+		(function(outline) {
 			var headings = '';
 			var depth = 0;
-			for (var tag = $.tags_find("#content")[0].firstChild;
+			for (var tag = $.tags_find('#content')[0].firstChild;
 			     tag;
 			     tag = tag.nextSibling) {
 				var isheader = /^[Hh]([1-6])$/.exec(tag.nodeName);
@@ -225,7 +215,7 @@ API_URL: (function(prefix, suffix){ "use strict";
 		})(outline);
 	})
 
-	,"twitter": (function() { "use strict";
+	,'twitter': (function() {
 		var script = $.tags_create('script');
 		script['id'] = 'twitter-wjs';
 		script['src'] = '//platform.twitter.com/widgets.js';
@@ -233,7 +223,7 @@ API_URL: (function(prefix, suffix){ "use strict";
 		$.tags_append_child($.tags_find('head')[0], script);
 	})
 
-	,"callback": (function() { "use strict";
+	,'callback': (function() {
 		var items = document['location']['hash'].split('#')[1].split('&');
 		var data = {};
 		for (var i = 0; i < items.length; i++) {
@@ -241,21 +231,19 @@ API_URL: (function(prefix, suffix){ "use strict";
 			data[items[i][0]] = items[i][1];
 		}
 		if (data['access_token']) {
-			$.JSONP('https://api.twitch.tv/kraken?oauth_token=' + data['access_token'], (function(reply) { "use strict";
+			$.JSONP('https://api.twitch.tv/kraken?oauth_token=' + data['access_token'], (function(reply) {
 				if (reply['token']['valid'] === true) {
-					console.log(reply['token']['user_name']);
+					document['cookie'] = 'twitch_oauth=' + data['access_token'];
 				}
+				self.close();
 			}));
 		}
-/*
-		window['opener']['_'](document['location']['hash']);
- */
 	})
 
-	,"stream": (function() { "use strict";
+	,'stream': (function() {
 		$.classes_remove($.tags_find('#onair')[0], 'pulsing');
 
-		(function() { "use strict";
+		(function() {
 			var chat = $.tags_find('#chat')[0];
 			var tag = $.tags_create('iframe');
 			tag.id = 'chat_embed';
@@ -263,11 +251,11 @@ API_URL: (function(prefix, suffix){ "use strict";
 			tag.scrolling = 'no';
 			tag.width = '100%';
 			tag.height = '100%';
-			tag.src = 'http://twitch.tv/chat/embed?channel=ferretbomb&popout_chat=true';
+			tag.src = 'http://www.twitch.tv/ferretbomb/chat';
 			$.tags_append_child(chat, tag);
 		})();
 
-		(function() { "use strict";
+		(function() {
 			var stream = $.tags_find('#stream')[0];
 			var embed = $.tags_create('object');
 			var attribs = {
@@ -299,56 +287,87 @@ API_URL: (function(prefix, suffix){ "use strict";
 			$.tags_append_child(stream, embed);
 		})();
 
-		var bricks = $.tags_find('.brick');
-		var infopanels = $.tags_find('.infopanels')[0];
+		(function() {
+			var bricks = $.tags_find('.brick');
+			var infopanels = $.tags_find('.infopanels')[0];
 
-		$.events_add(window, 'resize', (function() { "use strict";
-			var oldcolumns = $.tags_find('.column');
-			var total = Math.floor(infopanels['scrollWidth'] / bricks[0]['scrollWidth']);
+			$.events_add(window, 'resize', (function() {
+				var oldcolumns = $.tags_find('.column');
+				var total = Math.floor(infopanels['scrollWidth'] / bricks[0]['scrollWidth']);
 
-			/* Skip old-column logic if there aren't any columns. */
-			if (oldcolumns.length > 0) {
-				/* Skip re-flow if not needed. */
-				if (oldcolumns.length === total) {
-					return;
-				}
-				/* First move all the bricks out of their columns. */
-				for (var i = 0; i < bricks.length; i++) {
-					$.tags_append_child(infopanels, bricks[i]);
-				}
-				/* Now delete all the columns to avoid leaking memory. */
-				for (var i = 0; i < oldcolumns.length; i++) {
-					oldcolumns[i].parentNode.removeChild(oldcolumns[i]);
-				}
-			}
-
-			/* If there isn't at least 2 columns, nothing to do! */
-			if (total < 2) {
-				return;
-			}
-
-			/* First, create all the columns needed. */
-			var columns = new Array(total);
-			for (var i = 0; i < total; i++) {
-				columns[i] = $.tags_create('div');
-				$.classes_add(columns[i], 'column');
-				$.tags_append_child(infopanels, columns[i]);
-			}
-
-			/* Flow mechanic is simple: Append each brick to vertically-shortest column. */
-			for (var i = 0; i < bricks.length; i++) {
-				var column = 0;
-				var height = columns[column].scrollHeight;
-				for (var j = 1; j < columns.length; j++) {
-					if (columns[j]['scrollHeight'] < height) {
-						height = columns[j]['scrollHeight'];
-						column = j;
+				/* Skip old-column logic if there aren't any columns. */
+				if (oldcolumns.length > 0) {
+					/* Skip re-flow if not needed. */
+					if (oldcolumns.length === total) {
+						return;
+					}
+					/* First move all the bricks out of their columns. */
+					for (var i = 0; i < bricks.length; i++) {
+						$.tags_append_child(infopanels, bricks[i]);
+					}
+					/* Now delete all the columns to avoid leaking memory. */
+					for (var i = 0; i < oldcolumns.length; i++) {
+						oldcolumns[i].parentNode.removeChild(oldcolumns[i]);
 					}
 				}
 
-				$.tags_append_child(columns[column], bricks[i]);
-			}
-		}))();
+				/* If there isn't at least 2 columns, nothing to do! */
+				if (total < 2) {
+					return;
+				}
+
+				/* First, create all the columns needed. */
+				var columns = new Array(total);
+				for (var i = 0; i < total; i++) {
+					columns[i] = $.tags_create('div');
+					$.classes_add(columns[i], 'column');
+					$.tags_append_child(infopanels, columns[i]);
+				}
+
+				/* Flow mechanic is simple: Append each brick to vertically-shortest column. */
+				for (var i = 0; i < bricks.length; i++) {
+					var column = 0;
+					var height = columns[column].scrollHeight;
+					for (var j = 1; j < columns.length; j++) {
+						if (columns[j]['scrollHeight'] < height) {
+							height = columns[j]['scrollHeight'];
+							column = j;
+						}
+					}
+
+					$.tags_append_child(columns[column], bricks[i]);
+				}
+			}))();
+		})();
+
+		(function() {
+			var connect_button_image = $.tags_create('img');
+			connect_button_image.src = 'http://ttv-api.s3.amazonaws.com/assets/connect_dark.png';
+			var connect_button = $.tags_create('a');
+			connect_button.target = '_blank';
+			connect_button.href = 'https://api.twitch.tv/kraken/oauth2/authorize?response_type=token&redirect_uri=http://ferretbomb.com/callback.html&scope=channel_check_subscription&client_id=';
+			connect_button.id = 'connectTwitch';
+			$.tags_append_child(connect_button, connect_button_image);
+			$.tags_append_child($.tags_find('header')[0], connect_button);
+
+			var voting_update = function() {
+				$.JSONP('/votes.php', function(response) {
+					/* Test if the oauth cookie exists, to hide the 'connect' button if so. */
+					if (('; ' + document.cookie).indexOf('; twitch_oauth=') === -1) {
+						$classes_remove($.tags_find('#connectTwitch')[0], 'hidden');
+					} else {
+						$classes_add($.tags_find('#connectTwitch')[0], 'hidden');
+					}
+					if (response.hasOwnProperty('rapid') &&
+					    response['rapid'] === true) {
+						setTimeout(voting_update, 5000);
+					} else {
+						setTimeout(voting_update, 60000);
+					}
+				};
+			};
+			setTimeout(voting_update, 0);
+		})();
 	})
 }
 
