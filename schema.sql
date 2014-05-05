@@ -7,7 +7,9 @@ DROP TABLE IF EXISTS polls;
 CREATE TABLE polls
 	(p_id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY
 	,p_title VARCHAR(255) NOT NULL
-	,p_flags SET('multiple','subonly') NOT NULL
+	,p_multiple BIT(1) NOT NULL DEFAULT 0
+	,p_subonly BIT(1) NOT NULL DEFAULT 0
+	,p_visible BIT(1) NOT NULL DEFAULT 0
 	) CHARACTER SET = utf8;
 
 CREATE TABLE choices
@@ -22,7 +24,8 @@ CREATE TABLE users
 	(u_id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY
 	,__H_oauth BINARY(32) UNIQUE NOT NULL COMMENT 'SHA256 hash of u_oauth field for indexing speed'
 	,__H_name BINARY(32) UNIQUE NOT NULL COMMENT 'SHA256 hash of u_name field for indexing speed'
-	,u_flags SET('sub','turbo') NOT NULL
+	,u_sub BIT(1) NOT NULL DEFAULT 0
+	,u_turbo BIT(1) NOT NULL DEFAULT 0
 	,u_oauth VARCHAR(255) NOT NULL
 	,u_name VARCHAR(255) NOT NULL
 	) CHARACTER SET = ascii COLLATE = ascii_general_ci;
