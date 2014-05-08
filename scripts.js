@@ -253,7 +253,7 @@ window['$'] = {
 	,'stream': (function() {
 		$.classes_remove($.tags_find('#onair')[0], 'pulsing');
 
-		(function() {
+		setTimeout(function() {
 			var chat = $.tags_find('#chat')[0];
 			var tag = $.tags_create('iframe');
 			tag.id = 'chat_embed';
@@ -263,9 +263,9 @@ window['$'] = {
 			tag.height = '100%';
 			tag.src = 'http://www.twitch.tv/ferretbomb/chat';
 			$.tags_append_child(chat, tag);
-		})();
+		}, 0);
 
-		(function() {
+		setTimeout(function() {
 			var stream = $.tags_find('#stream')[0];
 			var embed = $.tags_create('object');
 			var attribs = {
@@ -295,9 +295,9 @@ window['$'] = {
 				$.tags_append_child(embed, tag);
 			}
 			$.tags_append_child(stream, embed);
-		})();
+		}, 0);
 
-		(function() {
+		setTimeout(function() {
 			var bricks = $.tags_find('.brick');
 			var infopanels = $.tags_find('.infopanels')[0];
 
@@ -348,9 +348,9 @@ window['$'] = {
 					$.tags_append_child(columns[column], bricks[i]);
 				}
 			}))();
-		})();
+		}, 0);
 
-		(function() {
+		setTimeout(function() {
 			var connect_button_image = $.tags_create('img');
 			connect_button_image.src = 'http://ttv-api.s3.amazonaws.com/assets/connect_dark.png';
 			var connect_button = $.tags_create('a');
@@ -366,14 +366,7 @@ window['$'] = {
 			});
 
 			var voting_update = function() {
-				$.JSONP('/votes.php', function(response) {
-					/* Test if the oauth cookie exists, to hide the 'connect' button if so. */
-					if (localStorage.getItem('twitch_oauth') === null) {
-						$.classes_remove($.tags_find('#connectTwitch')[0], 'hidden');
-					} else {
-						$.classes_add($.tags_find('#connectTwitch')[0], 'hidden');
-					}
-
+				$.JSON('/votes.php', function(response) {
 					console.log(response);
 
 					if (response.hasOwnProperty('rapid') &&
@@ -382,10 +375,17 @@ window['$'] = {
 					} else {
 						setTimeout(voting_update, 60000);
 					}
+
+					/* Test if the oauth cookie exists, to hide the 'connect' button if so. */
+					if (localStorage.getItem('twitch_oauth') === null) {
+						$.classes_remove($.tags_find('#connectTwitch')[0], 'hidden');
+					} else {
+						$.classes_add($.tags_find('#connectTwitch')[0], 'hidden');
+					}
 				});
 			};
 			setTimeout(voting_update, 0);
-		})();
+		}, 0);
 	})
 }
 

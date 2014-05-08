@@ -83,18 +83,8 @@ function votes() {
 
 votes();
 
-if (isset($_GET['callback'])
- && preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $_GET['callback'])) {
+header('Content-Type: text/x-json');
 
-	header('Content-Type: text/javascript');
+echo json_encode($results);
 
-	echo $_GET['callback'], '(', json_encode($results), ')';
-
-} else {
-
-	header('Content-Type: text/x-json');
-
-	echo json_encode($results);
-
-} // Validate the 'callback' parameter to support JSONP
 ?>
