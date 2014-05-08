@@ -46,7 +46,7 @@ function votes() {
 	$results['title'] = $poll['p_title'];
 
 	// Store total number of votes so far
-	$results['voted'] = 0;
+	$results['votes'] = 0;
 
 	// Fetch all rows as we'll need them multiple times later
 	$choices = $res->fetch_all(MYSQLI_ASSOC);
@@ -54,14 +54,14 @@ function votes() {
 
 	$results['choices'] = array();
 	foreach ($choices as $choice) {
-		$results['choices'][$choice['c_bit']] = array('title' => $choice['p_i_name'], 'tally' => 0);
+		$results['choices'][$choice['c_bit']] = array('title' => $choice['p_i_name'], 'votes' => 0);
 	}
 
 	if ($poll['p_subonly'] === 0) {
-		$res = $db->query('SELECT v_choice AS bits, COUNT(*) AS tally FROM votes WHERE _p_id = (SELECT MAX(p_id) FROM polls) GROUP BY v_choice');
+		$res = $db->query('SELECT v_choice AS bits, COUNT(*) AS votes FROM votes WHERE _p_id = (SELECT MAX(p_id) FROM polls) GROUP BY v_choice');
 	} else {
 		$results['subonly'] = true;
-		$res = $db->query('SELECT v_choice AS bits, COUNT(*) AS tally FROM votes INNER JOIN users ON votes._u_id = users.u_id WHERE _p_id = (SELECT MAX(p_id) FROM polls) AND u_sub = 1 GROUP BY v_choice');
+		$res = $db->query('SELECT v_choice AS bits, COUNT(*) AS votes FROM votes INNER JOIN users ON votes._u_id = users.u_id WHERE _p_id = (SELECT MAX(p_id) FROM polls) AND u_sub = 1 GROUP BY v_choice');
 	}
 
 	if ($res->num_rows === 0) {
@@ -70,11 +70,11 @@ function votes() {
 	}
 	
 	while ($vote = $res->fetch_assoc()) {
-		$results['voted'] += $vote['tally'];
+		$results['votes'] += $vote['votes'];
 
 		foreach ($choices as $choice) {
 			if ((($vote['bits'] >> $choice['c_bit']) & 1) === 1) {
-				$results['choices'][$choice['c_bit']]['tally'] += $vote['tally'];
+				$results['choices'][$choice['c_bit']]['votes'] += $vote['votes'];
 			}
 		}
 	}

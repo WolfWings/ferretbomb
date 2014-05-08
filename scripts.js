@@ -25,7 +25,9 @@ window['$'] = {
 	return $.classes_match(theClass).test(tag['className']);
 })
 ,classes_add: (function(tag, theClass) {
-	tag['className'] += ' ' + theClass;
+	if (!($.classes_has(tag, theClass))) {
+		tag['className'] += ' ' + theClass;
+	}
 	return tag;
 })
 ,classes_remove: (function(tag, theClass) {
@@ -364,23 +366,72 @@ window['$'] = {
 				window.open('https://api.twitch.tv/kraken/oauth2/authorize?response_type=token&redirect_uri=http://dev.ferretbomb.wolfwings.us/callback.html&scope=channel_check_subscription&client_id=3em0oguw6wyn8h22m6z0y9wd8156884&state=' + localStorage.getItem('connect_secret'), 'twitchAuth', 'width=976,height=600,modal=yes,alwaysRaised=yes');
 //				window.open('https://api.twitch.tv/kraken/oauth2/authorize?response_type=token&redirect_uri=http://www.ferretbomb.com/callback.html&scope=channel_check_subscription&client_id=9hexi86zpth36z0u4zzqt8feorfanrt&state=' + localStorage.getItem('connect_secret'), 'twitchAuth', 'width=976,height=600,modal=yes,alwaysRaised=yes');
 			});
+		}, 0);
+
+		setTimeout(function() {
+			var voting_choices = $.tags_create('ul');
+			voting_choices.id = 'choices';
+			var voting_choices_title = $.tags_create('lh');
+			$.tags_append_child(voting_choices, voting_choices_title);
+			var voting_choices_item = [];
+			for (var i = 0; i < 36; i++) {
+				voting_choices_item[i] = $.tags_create('li');
+				voting_choices_item[i].id = 'choice_' + i;
+				$.classes_add(voting_choices_item[i], 'hidden');
+				$.tags_append_child(voting_choices, voting_choices_item[i]);
+			}
+			var voting_panel = $.tags_create('div');
+			voting_panel.id = 'voting';
+			$.tags_append_child(voting_panel, voting_choices);
+			$.tags_append_child($.tags_find('header')[0], voting_panel);
 
 			var voting_update = function() {
-				$.JSON('/votes.php', function(response) {
-					console.log(response);
+				$.JSON('/votes.php?' + ((new Date().getTime()).toString(36)), function(response) {
+					/* Test if the oauth token exists, and hide the 'connect' button if so. */
+					if (localStorage.getItem('twitch_oauth') === null) {
+						$.classes_remove($.tags_find('#connectTwitch')[0], 'hidden');
+					} else {
+						$.classes_add($.tags_find('#connectTwitch')[0], 'hidden');
+					}
+
+					if (response.hasOwnProperty('title')) {
+						$.tags_find('#voting ul lh')[0].innerHTML = response['title'];
+					}
+
+					if (response.hasOwnProperty('choices')) {
+						var min = response['choices'][0]['votes'];
+						var max = min;
+						for (var i = 0; i < response['choices'].length; i++) {
+							voting_choices_item[i].innerHTML = response['choices'][i]['title'];
+							$.classes_remove(voting_choices_item[i], 'hidden');
+							min = (response['choices'][i]['votes'] < min) ? response['choices'][i]['votes'] : min;
+							max = (response['choices'][i]['votes'] > max) ? response['choices'][i]['votes'] : max;
+						}
+						var div = max - min;
+						if ((div > 0)
+						 && response.hasOwnProperty('votes')
+						 && (response['votes'] > 0)) {
+							for (var i = 0; i < response['choices'].length; i++) {
+								var per = (((response['choices'][i]['votes'] - min) * 100) / div);
+								var tot = ((response['choices'][i]['votes'] * 100) / response['votes']);
+								var avg = (Math.floor(per + tot) * 0.05) - 10;
+								voting_choices_item[i]['style']['backgroundPositionX'] = '' + avg + 'em,' + avg + 'em';
+							}
+						} else {
+							for (var i = 0; i < response['choices'].length; i++) {
+								voting_choices_item[i]['style']['backgroundPositionX'] = '-10em,-10em';
+							}
+						}
+						for (var i = response['choices'].length; i < voting_choices_item.length; i++) {
+							$.classes_add(voting_choices_item[i], 'hidden');
+						}
+					}
 
 					if (response.hasOwnProperty('rapid') &&
 					    response['rapid'] === true) {
 						setTimeout(voting_update, 5000);
 					} else {
 						setTimeout(voting_update, 60000);
-					}
-
-					/* Test if the oauth cookie exists, to hide the 'connect' button if so. */
-					if (localStorage.getItem('twitch_oauth') === null) {
-						$.classes_remove($.tags_find('#connectTwitch')[0], 'hidden');
-					} else {
-						$.classes_add($.tags_find('#connectTwitch')[0], 'hidden');
 					}
 				});
 			};
