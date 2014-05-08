@@ -2,7 +2,14 @@
 
 window['$'] = {
 
-API_URL: (function(prefix, suffix){
+'_': (function(oauth, state) {
+	if (state === localStorage.getItem('connect_secret')) {
+		localStorage.removeItem('connect_secret');
+		localStorage.setItem('twitch_oauth', oauth);
+	}
+})
+
+,API_URL: (function(prefix, suffix){
 	return 'https://api.twitch.tv/kraken/' + prefix + '/ferretbomb' + suffix;
 })
 
@@ -230,13 +237,16 @@ API_URL: (function(prefix, suffix){
 			items[i] = items[i].split('=');
 			data[items[i][0]] = items[i][1];
 		}
-		if (data['access_token']) {
+		if ((data['access_token'])
+		 && (data['state'])) {
 			$.JSONP('https://api.twitch.tv/kraken?oauth_token=' + data['access_token'], (function(reply) {
 				if (reply['token']['valid'] === true) {
-					document['cookie'] = 'twitch_oauth=' + data['access_token'];
+					window.parent['$']['_'](data['access_token'], data['state']);
 				}
-				self.close();
+				window.close();
 			}));
+		} else {
+			window.close();
 		}
 	})
 
@@ -344,27 +354,35 @@ API_URL: (function(prefix, suffix){
 			var connect_button_image = $.tags_create('img');
 			connect_button_image.src = 'http://ttv-api.s3.amazonaws.com/assets/connect_dark.png';
 			var connect_button = $.tags_create('a');
-			connect_button.target = '_blank';
-			connect_button.href = 'https://api.twitch.tv/kraken/oauth2/authorize?response_type=token&redirect_uri=http://ferretbomb.com/callback.html&scope=channel_check_subscription&client_id=';
-			connect_button.id = 'connectTwitch';
 			$.tags_append_child(connect_button, connect_button_image);
+			connect_button.href = 'javascript:void(0)';
+			connect_button.id = 'connectTwitch';
+			$.classes_add(connect_button, 'hidden');
 			$.tags_append_child($.tags_find('header')[0], connect_button);
+			$.events_add(connect_button, 'click', function(){
+				localStorage.setItem('connect_secret', Math.floor((1+Math.random())*0x19A100).toString(36).substring(1));
+				window.open('https://api.twitch.tv/kraken/oauth2/authorize?response_type=token&redirect_uri=http://dev.ferretbomb.wolfwings.us/callback.html&scope=channel_check_subscription&client_id=3em0oguw6wyn8h22m6z0y9wd8156884&state=' + localStorage.getItem('connect_secret'), 'twitchAuth', 'width=976,height=600,modal=yes,alwaysRaised=yes');
+//				window.open('https://api.twitch.tv/kraken/oauth2/authorize?response_type=token&redirect_uri=http://www.ferretbomb.com/callback.html&scope=channel_check_subscription&client_id=9hexi86zpth36z0u4zzqt8feorfanrt&state=' + localStorage.getItem('connect_secret'), 'twitchAuth', 'width=976,height=600,modal=yes,alwaysRaised=yes');
+			});
 
 			var voting_update = function() {
 				$.JSONP('/votes.php', function(response) {
 					/* Test if the oauth cookie exists, to hide the 'connect' button if so. */
-					if (('; ' + document.cookie).indexOf('; twitch_oauth=') === -1) {
-						$classes_remove($.tags_find('#connectTwitch')[0], 'hidden');
+					if (localStorage.getItem('twitch_oauth') === null) {
+						$.classes_remove($.tags_find('#connectTwitch')[0], 'hidden');
 					} else {
-						$classes_add($.tags_find('#connectTwitch')[0], 'hidden');
+						$.classes_add($.tags_find('#connectTwitch')[0], 'hidden');
 					}
+
+					console.log(response);
+
 					if (response.hasOwnProperty('rapid') &&
 					    response['rapid'] === true) {
 						setTimeout(voting_update, 5000);
 					} else {
 						setTimeout(voting_update, 60000);
 					}
-				};
+				});
 			};
 			setTimeout(voting_update, 0);
 		})();
