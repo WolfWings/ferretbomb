@@ -1,16 +1,32 @@
+/** @const */ var twitch_client_id = '3em0oguw6wyn8h22m6z0y9wd8156884'; // Development Use
+// /** @const */ var twitch_client_id = '9hexi86zpth36z0u4zzqt8feorfanrt'; // Production Use
+
 (function(){ "use strict";
 
-window['$'] = {
-
-'_': (function(oauth, state) {
+/* 'Callback' trigger for OAuth logins. */
+window['_'] = (function(oauth, state) {
 	if (state === localStorage.getItem('connect_secret')) {
 		localStorage.removeItem('connect_secret');
 		localStorage.setItem('twitch_oauth', oauth);
 	}
+});
+
+window['$'] = {
+
+API_URL: (function(prefix, suffix){
+	return 'https://api.twitch.tv/kraken/' + prefix + '/ferretbomb' + suffix;
 })
 
-,API_URL: (function(prefix, suffix){
-	return 'https://api.twitch.tv/kraken/' + prefix + '/ferretbomb' + suffix;
+,URL: (function(base, parameters){
+	var URI = base.toString();
+	var packaged = [];
+	for (param in parameters) { if (parameters.hasOwnProperty(param)) {
+		packaged.push(param + '=' + parameters[param].toString());
+	} }
+	if (packaged.length > 0) {
+		URI = URI + "?" + packaged.join('&');
+	}
+	return URI;
 })
 
 /* Functions reformatted to allow more compact representations by Closure Compiler.
@@ -241,9 +257,9 @@ window['$'] = {
 		}
 		if ((data['access_token'])
 		 && (data['state'])) {
-			$.JSONP('https://api.twitch.tv/kraken?oauth_token=' + data['access_token'], (function(reply) {
+			$.JSONP(URL('https://api.twitch.tv/kraken',{'oauth_token':data['access_token']}), (function(reply) {
 				if (reply['token']['valid'] === true) {
-					window.parent['$']['_'](data['access_token'], data['state']);
+					window.parent['_'](data['access_token'], data['state']);
 				}
 				window.close();
 			}));
@@ -363,8 +379,13 @@ window['$'] = {
 			$.tags_append_child($.tags_find('header')[0], connect_button);
 			$.events_add(connect_button, 'click', function(){
 				localStorage.setItem('connect_secret', Math.floor((1+Math.random())*0x19A100).toString(36).substring(1));
-				window.open('https://api.twitch.tv/kraken/oauth2/authorize?response_type=token&redirect_uri=http://dev.ferretbomb.wolfwings.us/callback.html&scope=channel_check_subscription&client_id=3em0oguw6wyn8h22m6z0y9wd8156884&state=' + localStorage.getItem('connect_secret'), 'twitchAuth', 'width=976,height=600,modal=yes,alwaysRaised=yes');
-//				window.open('https://api.twitch.tv/kraken/oauth2/authorize?response_type=token&redirect_uri=http://www.ferretbomb.com/callback.html&scope=channel_check_subscription&client_id=9hexi86zpth36z0u4zzqt8feorfanrt&state=' + localStorage.getItem('connect_secret'), 'twitchAuth', 'width=976,height=600,modal=yes,alwaysRaised=yes');
+				window.open(URL('https://api.twitch.tv/kraken/oauth2/authorize',
+					{'response_type': 'token'
+					,'redirect_uri':  'http://www.ferretbomb.com/callback.html'
+					,'scope':         'channel_check_subscription'
+					,'client_id':     twitch_client_id
+					,'state':         localStorage.getItem('connect_secret')
+					}), 'twitchAuth', 'width=976,height=600,modal=yes,alwaysRaised=yes');
 			});
 		}, 0);
 
@@ -373,6 +394,7 @@ window['$'] = {
 			voting_choices.id = 'choices';
 			var voting_choices_title = $.tags_create('lh');
 			$.tags_append_child(voting_choices, voting_choices_title);
+
 			var voting_choices_item = [];
 			for (var i = 0; i < 36; i++) {
 				voting_choices_item[i] = $.tags_create('li');
@@ -380,6 +402,7 @@ window['$'] = {
 				$.classes_add(voting_choices_item[i], 'hidden');
 				$.tags_append_child(voting_choices, voting_choices_item[i]);
 			}
+
 			var voting_panel = $.tags_create('div');
 			voting_panel.id = 'voting';
 			$.tags_append_child(voting_panel, voting_choices);

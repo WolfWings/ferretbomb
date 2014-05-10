@@ -36,7 +36,7 @@ function votes() {
 
 	$results['maxvotes'] = 1 * $poll['p_maxvotes'];
 
-	$res = $db->query('SELECT c_bit,p_i_name FROM choices INNER JOIN poll_items ON choices._p_i_id = poll_items.p_i_id WHERE _p_id = (SELECT MAX(p_id) FROM polls)');
+	$res = $db->query('SELECT c_bit,p_i_id,p_i_name FROM choices INNER JOIN poll_items ON choices._p_i_id = poll_items.p_i_id WHERE _p_id = (SELECT MAX(p_id) FROM polls)');
 	if ($res->num_rows === 0) {
 		// No choices in poll, not valid yet
 		return;
@@ -54,7 +54,11 @@ function votes() {
 
 	$results['choices'] = array();
 	foreach ($choices as $choice) {
-		$results['choices'][$choice['c_bit']] = array('title' => $choice['p_i_name'], 'votes' => 0);
+		$results['choices'][$choice['c_bit']] = array(
+			  'title' => $choice['p_i_name']
+			, 'votes' => 0
+			, 'box' => base_convert($choice['p_i_id'], 10, 36)
+			);
 	}
 
 	if ($poll['p_subonly'] === 0) {
