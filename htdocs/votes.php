@@ -29,8 +29,8 @@ function votes() {
 	$poll = $res->fetch_assoc();
 	$res->free();
 
-	if ($poll['p_visible'] === 0) {
-		// Poll not visible
+	if ($poll['p_open'] === NULL) {
+		// Poll not open/visible
 		return;
 	}
 
@@ -52,37 +52,40 @@ function votes() {
 	$choices = $res->fetch_all(MYSQLI_ASSOC);
 	$res->free();
 
+	$query = [];
 	$results['choices'] = array();
 	foreach ($choices as $choice) {
+		$bit = base_convert($choice['c_bit'], 10, 36);
+		array_push($query, 'COUNT(v_choice_' . $bit . ') AS `' . $bit . '`');
 		$results['choices'][$choice['c_bit']] = array(
 			  'title' => $choice['p_i_name']
 			, 'votes' => 0
 			, 'box' => base_convert($choice['p_i_id'], 10, 36)
 			);
 	}
-
-	if ($poll['p_subonly'] === 0) {
-		$res = $db->query('SELECT v_choice AS bits, COUNT(*) AS votes FROM votes WHERE _p_id = (SELECT MAX(p_id) FROM polls) GROUP BY v_choice');
-	} else {
+	$query = 'SELECT ' . join(', ', $query) . ' FROM votes';
+	if ($poll['p_subonly'] !== NULL) {
 		$results['subonly'] = true;
-		$res = $db->query('SELECT v_choice AS bits, COUNT(*) AS votes FROM votes INNER JOIN users ON votes._u_id = users.u_id WHERE _p_id = (SELECT MAX(p_id) FROM polls) AND u_sub = 1 GROUP BY v_choice');
+		$query .= ' INNER JOIN users ON votes._u_id = users.u_id';
 	}
+	$query .= ' WHERE _p_id = (SELECT MAX(p_id) FROM polls)';
+	if ($poll['p_subonly'] !== NULL) {
+		$query .= ' AND u_sub IS NOT NULL';
+	}
+
+	$res = $db->query($query);
 
 	if ($res->num_rows === 0) {
 		// No votes to tally
 		return;
 	}
-	
-	while ($vote = $res->fetch_assoc()) {
-		$results['votes'] += $vote['votes'];
 
-		foreach ($choices as $choice) {
-			if ((($vote['bits'] >> $choice['c_bit']) & 1) === 1) {
-				$results['choices'][$choice['c_bit']]['votes'] += $vote['votes'];
-			}
-		}
-	}
+	$votes = $res->fetch_assoc();
 	$res->free();
+
+	foreach ($votes as $vote => $tally) {
+		$results['choices'][base_convert($vote, 36, 10)]['votes'] = $tally;
+	}
 }
 
 votes();

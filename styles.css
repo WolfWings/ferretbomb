@@ -167,6 +167,10 @@ table.image img {
 	border-top: 1px solid #000;
 }
 
+#voting ul li input {
+	display: none;
+}
+
 #voting ul li.hidden {
 	display: none;
 }

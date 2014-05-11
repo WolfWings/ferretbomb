@@ -5,8 +5,8 @@
 
 /* 'Callback' trigger for OAuth logins. */
 window['_'] = (function(oauth, state) {
-	if (state === localStorage.getItem('connect_secret')) {
-		localStorage.removeItem('connect_secret');
+	if (state === localStorage.getItem('twitch_secret')) {
+		localStorage.removeItem('twitch_secret');
 		localStorage.setItem('twitch_oauth', oauth);
 	}
 });
@@ -378,13 +378,13 @@ API_URL: (function(prefix, suffix){
 			$.classes_add(connect_button, 'hidden');
 			$.tags_append_child($.tags_find('header')[0], connect_button);
 			$.events_add(connect_button, 'click', function(){
-				localStorage.setItem('connect_secret', Math.floor((1+Math.random())*0x19A100).toString(36).substring(1));
+				localStorage.setItem('twitch_secret', Math.floor((1+Math.random())*0x19A100).toString(36).substring(1));
 				window.open(URL('https://api.twitch.tv/kraken/oauth2/authorize',
 					{'response_type': 'token'
 					,'redirect_uri':  'http://www.ferretbomb.com/callback.html'
 					,'scope':         'channel_check_subscription'
 					,'client_id':     twitch_client_id
-					,'state':         localStorage.getItem('connect_secret')
+					,'state':         localStorage.getItem('twitch_secret')
 					}), 'twitchAuth', 'width=976,height=600,modal=yes,alwaysRaised=yes');
 			});
 		}, 0);
@@ -397,10 +397,23 @@ API_URL: (function(prefix, suffix){
 
 			var voting_choices_item = [];
 			for (var i = 0; i < 36; i++) {
-				voting_choices_item[i] = $.tags_create('li');
-				voting_choices_item[i].id = 'choice_' + i;
-				$.classes_add(voting_choices_item[i], 'hidden');
-				$.tags_append_child(voting_choices, voting_choices_item[i]);
+				var li = $.tags_create('li');
+				li.id = 'choice_' + i.toString(36);
+				$.classes_add(li, 'hidden');
+
+				var input = $.tags_create('input');
+				input.name = 'voting';
+				input.id = 'vote_' + i.toString(36);
+				input.type = 'checkbox';
+				$.tags_append_child(li, input);
+
+				var label = $.tags_create('label');
+				label.id = 'label_' + i.toString(36);
+				label.htmlFor = 'vote_' + i.toString(36);
+				$.tags_append_child(li, label);
+
+				$.tags_append_child(voting_choices, li);
+				voting_choices_item[i] = {'wrapper':li,'input':input,'label':label};
 			}
 
 			var voting_panel = $.tags_create('div');
@@ -425,8 +438,9 @@ API_URL: (function(prefix, suffix){
 						var min = response['choices'][0]['votes'];
 						var max = min;
 						for (var i = 0; i < response['choices'].length; i++) {
-							voting_choices_item[i].innerHTML = response['choices'][i]['title'];
-							$.classes_remove(voting_choices_item[i], 'hidden');
+							var item = $.tags_find('
+							voting_choices_item[i]['label'].innerHTML = response['choices'][i]['title'];
+							$.classes_remove(voting_choices_item[i]['wrapper'], 'hidden');
 							min = (response['choices'][i]['votes'] < min) ? response['choices'][i]['votes'] : min;
 							max = (response['choices'][i]['votes'] > max) ? response['choices'][i]['votes'] : max;
 						}
@@ -438,15 +452,15 @@ API_URL: (function(prefix, suffix){
 								var per = (((response['choices'][i]['votes'] - min) * 100) / div);
 								var tot = ((response['choices'][i]['votes'] * 100) / response['votes']);
 								var avg = (Math.floor(per + tot) * 0.05) - 10;
-								voting_choices_item[i]['style']['backgroundPositionX'] = '' + avg + 'em,' + avg + 'em';
+								voting_choices_item[i]['wrapper']['style']['backgroundPositionX'] = '' + avg + 'em,' + avg + 'em';
 							}
 						} else {
 							for (var i = 0; i < response['choices'].length; i++) {
-								voting_choices_item[i]['style']['backgroundPositionX'] = '-10em,-10em';
+								voting_choices_item[i]['wrapper']['style']['backgroundPositionX'] = '-10em,-10em';
 							}
 						}
 						for (var i = response['choices'].length; i < voting_choices_item.length; i++) {
-							$.classes_add(voting_choices_item[i], 'hidden');
+							$.classes_add(voting_choices_item[i]['wrapper'], 'hidden');
 						}
 					}
 
