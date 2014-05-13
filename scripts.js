@@ -439,9 +439,13 @@ API_URL: (function(prefix, suffix){
 				voting_choices_item[reorg[i]] = {'wrapper':li,'input':input,'label':label};
 			}
 
+//			var submit_button = $.tags_create('button');
+//			submit_button.innerHTML = 'Cast Vote';
+
 			var voting_panel = $.tags_create('div');
 			voting_panel.id = 'voting';
 			$.tags_append_child(voting_panel, voting_choices);
+//			$.tags_append_child(voting_panel, submit_button);
 
 			var voting_form = $.tags_create('form');
 			$.tags_append_child(voting_form, voting_panel);
