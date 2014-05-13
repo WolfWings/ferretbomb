@@ -13,7 +13,7 @@ function checkifvoted() {
 		return false;
 	}
 
-	$userfind = $db->prepare('SELECT v_id FROM votes WHERE _u_id = (SELECT u_id FROM users WHERE __H_oauth = UNHEX(SHA2(?, 256)) AND u_oauth = ?) AND _p_id = (SELECT CAST(value AS UNSIGNED INTEGER) FROM config WHERE option = "poll_active")');
+	$userfind = $db->prepare('SELECT * FROM votes INNER JOIN users ON votes._u_id=users.u_id INNER JOIN polls ON votes._p_id=polls.p_id WHERE _u_id = (SELECT u_id FROM users WHERE __H_oauth = UNHEX(SHA2(?, 256)) AND u_oauth = ?) AND _p_id = (SELECT CAST(value AS UNSIGNED INTEGER) FROM config WHERE option = "poll_active")');
 	$userfind->bind_param('ss', $_GET['oauth'], $_GET['oauth']);
 	$userfind->execute();
 	$res = $userfind->get_result();
@@ -21,6 +21,8 @@ function checkifvoted() {
 		// User not in list, can't have voted
 		return false;
 	}
+	$row = $res->fetch_assoc();
+	var_dump($row);
 	$res->free();
 
 	return true;
