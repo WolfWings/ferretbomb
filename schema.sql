@@ -29,12 +29,13 @@ CREATE TABLE choices
 
 CREATE TABLE users
 	(u_id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY
-	,__H_oauth BINARY(32) UNIQUE NOT NULL COMMENT 'SHA256 hash of u_oauth field for indexing speed'
+	,__H_oauth BINARY(32) UNIQUE COMMENT 'SHA256 hash of u_oauth field for indexing speed'
 	,__H_name BINARY(32) UNIQUE NOT NULL COMMENT 'SHA256 hash of u_name field for indexing speed'
 	,u_sub CHAR(0) DEFAULT NULL
-	,u_turbo CHAR(0) DEFAULT NULL
-	,u_oauth VARCHAR(255) NOT NULL
+	,u_follows CHAR(0) DEFAULT NULL
+	,u_oauth VARCHAR(255)
 	,u_name VARCHAR(255) NOT NULL
+	,u_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 	) CHARACTER SET = ascii COLLATE = ascii_general_ci;
 
 CREATE TABLE votes
