@@ -33,7 +33,7 @@ function process() {
 		return;
 	}
 
-	$db = new mysqli('localhost', 'ferretbomb', '', 'ferretbomb', 0, '/var/run/mysqld/mysqld.sock');
+	$db = new mysqli('localhost', 'ferretbomb', '', 'ferretbomb');
 	if (mysqli_connect_errno()) {
 		$response['status_code'] = 500;
 		$response['status_message'] = 'Unable to connect to database.';

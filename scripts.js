@@ -449,7 +449,7 @@ API_URL: (function(prefix, suffix){
 			$.tags_append_child($.tags_find('header')[0], voting_form);
 
 			var voting_update = function() {
-				$.JSON('/votes.php?' + ((new Date().getTime()).toString(36)), function(response) {
+				$.JSON('/voting/tally.php?' + ((new Date().getTime()).toString(36)), function(response) {
 					/* Test if the oauth token exists, and hide the 'connect' button if so. */
 					if (localStorage.getItem('twitch_oauth') === null) {
 						$.classes_remove($.tags_find('#connectTwitch')[0], 'hidden');
