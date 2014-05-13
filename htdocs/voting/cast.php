@@ -14,10 +14,12 @@ function process() {
 	$post = [];
 	foreach (explode('&', $p) as $v) {
 		$kv = explode('=', $v, 2);
-		if (!isset($post[$kv[0]])) {
-			$post[$kv[0]] = [$kv[1]];
-		} else {
-			array_push($post[$kv[0]], $kv[1]);
+		if (count($kv) == 2) {
+			if (!isset($post[$kv[0]])) {
+				$post[$kv[0]] = [$kv[1]];
+			} else {
+				array_push($post[$kv[0]], $kv[1]);
+			}
 		}
 	}
 
@@ -40,17 +42,24 @@ function process() {
 		return;
 	}
 
-	$userfind = $db->prepare('SELECT * FROM users WHERE __H_oauth = SHA2(?, 2) AND oauth = ?');
+	$userfind = $db->prepare('SELECT * FROM users WHERE __H_oauth = UNHEX(SHA2(?, 256)) AND u_oauth = ?');
 	$userfind->bind_param('ss', $post['oauth'][0], $post['oauth'][0]);
 	$userfind->execute();
 	$res = $userfind->get_result();
 	if ($res->num_rows === 0) {
 		$twitch = json_decode(http_parse_message(http_get('https://api.twitch.tv/kraken?oauth_token=' . $post['oauth'][0]))->body, true);
+		if (!isset($twitch['token'])
+		 || !isset($twitch['token']['valid'])
+		 || ($twitch['token']['valid'] !== true)) {
+			$response['status_message'] = 'Invalid OAuth token.';
+			return;
+		}
+
 		print_r($twitch);
 
-		// User not in table, need to ping Twitch...
-		$response['status_message'] = 'User not found.';
-		return;
+		$user = json_decode(http_parse_message(http_get('https://api.twitch.tv/kraken/users/' . $twitch['token']['user_name'] . '/subscriptions/lethalfrag?oauth_token=' . $post['oauth'][0]))->body, true);
+
+		print_r($user);
 	}
 
 	$response['status_code'] = 200;
