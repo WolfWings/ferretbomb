@@ -5,38 +5,31 @@ $results = array('rapid' => false);
 function votes() {
 	global $results;
 
-	$db = new mysqli('localhost', 'ferretbomb', '', 'ferretbomb', 0, '/var/run/mysqld/mysqld.sock');
+	$db = new mysqli('localhost', 'ferretbomb', '', 'ferretbomb');
 
 	if (mysqli_connect_errno()) {
 		// Can't connect
 		return;
 	}
 
-	$res = $db->query('SELECT value FROM config WHERE option = "poll_active"');
+	$res = $db->query('SELECT * FROM polls WHERE p_id = (SELECT CAST(value AS UNSIGNED INTEGER) FROM config WHERE option = "poll_active")');
 	if ($res->num_rows === 0) {
-		// No poll active
-		return;
-	}
-	$res->free();
-
-	$results['rapid'] = true;
-
-	$res = $db->query('SELECT * FROM polls ORDER BY p_id DESC LIMIT 1');
-	if ($res->num_rows === 0) {
-		// No polls
+		// No poll matching poll_active, and/or no poll_active/polls
 		return;
 	}
 	$poll = $res->fetch_assoc();
 	$res->free();
+
+	$results['rapid'] = true;
 
 	if ($poll['p_open'] === NULL) {
 		// Poll not open/visible
 		return;
 	}
 
-	$results['maxvotes'] = 1 * $poll['p_maxvotes'];
+	$results['maxvotes'] = $poll['p_maxvotes'];
 
-	$res = $db->query('SELECT c_bit,p_i_id,p_i_name FROM choices INNER JOIN poll_items ON choices._p_i_id = poll_items.p_i_id WHERE _p_id = (SELECT MAX(p_id) FROM polls)');
+	$res = $db->query('SELECT c_bit,p_i_id,p_i_name FROM choices INNER JOIN poll_items ON choices._p_i_id = poll_items.p_i_id WHERE _p_id = (SELECT CAST(value AS UNSIGNED INTEGER) FROM config WHERE option = "poll_active")');
 	if ($res->num_rows === 0) {
 		// No choices in poll, not valid yet
 		return;
@@ -46,7 +39,7 @@ function votes() {
 	$results['title'] = $poll['p_title'];
 
 	// Store total number of votes so far
-	$results['votes'] = 0;
+	$results['ballots'] = 0;
 
 	// Fetch all rows as we'll need them multiple times later
 	$choices = $res->fetch_all(MYSQLI_ASSOC);
@@ -68,7 +61,7 @@ function votes() {
 		$results['subonly'] = true;
 		$query .= ' INNER JOIN users ON votes._u_id = users.u_id';
 	}
-	$query .= ' WHERE _p_id = (SELECT MAX(p_id) FROM polls)';
+	$query .= ' WHERE _p_id = (SELECT CAST(value AS UNSIGNED INTEGER) FROM config WHERE option = "poll_active")';
 	if ($poll['p_subonly'] !== NULL) {
 		$query .= ' AND u_sub IS NOT NULL';
 	}
@@ -84,11 +77,20 @@ function votes() {
 	$res->free();
 
 	foreach ($votes as $vote => $tally) {
+		$results['ballots'] += $tally;
 		$results['choices'][base_convert($vote, 36, 10)]['votes'] = $tally;
 	}
 }
 
+function choice_compare($a, $b) {
+	return strcasecmp($a['title'], $b['title']);
+}
+
 votes();
+
+if (isset($results['choices'])) {
+	usort($results['choices'], 'choice_compare');
+}
 
 header('Content-Type: text/x-json');
 

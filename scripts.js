@@ -1,26 +1,31 @@
-/** @const */ var twitch_client_id = '3em0oguw6wyn8h22m6z0y9wd8156884'; // Development Use
-// /** @const */ var twitch_client_id = '9hexi86zpth36z0u4zzqt8feorfanrt'; // Production Use
+// Development Use
+// /** @const */ var twitch_client_id = '3em0oguw6wyn8h22m6z0y9wd8156884';
+// /** @const */ var twitch_redirect  = 'http://dev.ferretbomb.wolfwings.us/callback.html';
+
+// Production Use
+/** @const */ var twitch_client_id = '9hexi86zpth36z0u4zzqt8feorfanrt';
+/** @const */ var twitch_redirect  = 'http://www.ferretbomb.com/callback.html';
 
 (function(){ "use strict";
 
 /* 'Callback' trigger for OAuth logins. */
-window['_'] = (function(oauth, state) {
-	if (state === localStorage.getItem('twitch_secret')) {
-		localStorage.removeItem('twitch_secret');
-		localStorage.setItem('twitch_oauth', oauth);
-	}
-});
-
 window['$'] = {
 
 API_URL: (function(prefix, suffix){
 	return 'https://api.twitch.tv/kraken/' + prefix + '/ferretbomb' + suffix;
 })
 
+,'oauth': (function(oauth, state) {
+	if (state === localStorage.getItem('twitch_secret')) {
+		localStorage.removeItem('twitch_secret');
+		localStorage.setItem('twitch_oauth', oauth);
+	}
+})
+
 ,URL: (function(base, parameters){
 	var URI = base.toString();
 	var packaged = [];
-	for (param in parameters) { if (parameters.hasOwnProperty(param)) {
+	for (var param in parameters) { if (parameters['hasOwnProperty'](param)) {
 		packaged.push(param + '=' + parameters[param].toString());
 	} }
 	if (packaged.length > 0) {
@@ -257,9 +262,9 @@ API_URL: (function(prefix, suffix){
 		}
 		if ((data['access_token'])
 		 && (data['state'])) {
-			$.JSONP(URL('https://api.twitch.tv/kraken',{'oauth_token':data['access_token']}), (function(reply) {
+			$.JSONP($.URL('https://api.twitch.tv/kraken',{'oauth_token':data['access_token']}), (function(reply) {
 				if (reply['token']['valid'] === true) {
-					window.parent['_'](data['access_token'], data['state']);
+					window.parent['$']['oauth'](data['access_token'], data['state']);
 				}
 				window.close();
 			}));
@@ -379,13 +384,22 @@ API_URL: (function(prefix, suffix){
 			$.tags_append_child($.tags_find('header')[0], connect_button);
 			$.events_add(connect_button, 'click', function(){
 				localStorage.setItem('twitch_secret', Math.floor((1+Math.random())*0x19A100).toString(36).substring(1));
-				window.open(URL('https://api.twitch.tv/kraken/oauth2/authorize',
+				window.open($.URL('https://api.twitch.tv/kraken/oauth2/authorize',
 					{'response_type': 'token'
-					,'redirect_uri':  'http://www.ferretbomb.com/callback.html'
-					,'scope':         'channel_check_subscription'
+					,'scope':         'user_subscriptions'
+					,'redirect_uri':  twitch_redirect
 					,'client_id':     twitch_client_id
 					,'state':         localStorage.getItem('twitch_secret')
-					}), 'twitchAuth', 'width=976,height=600,modal=yes,alwaysRaised=yes');
+					})
+				,	'Login with TwitchTV'
+				,	['width=660'
+					,'height=600'
+					,'modal=yes'
+					,'alwaysRaised=yes'
+					,'resizable=yes'
+					,'status=yes'
+					].join(',')
+				);
 			});
 		}, 0);
 
@@ -394,6 +408,15 @@ API_URL: (function(prefix, suffix){
 			voting_choices.id = 'choices';
 			var voting_choices_title = $.tags_create('lh');
 			$.tags_append_child(voting_choices, voting_choices_title);
+
+			var reorg = [];
+			for (var i = 0; i < 36; i++) {
+				var j = Math.floor(Math.random() * (i + 1));
+				if (i !== j) {
+					reorg[i] = reorg[j];
+				}
+				reorg[j] = i;
+			}
 
 			var voting_choices_item = [];
 			for (var i = 0; i < 36; i++) {
@@ -413,13 +436,17 @@ API_URL: (function(prefix, suffix){
 				$.tags_append_child(li, label);
 
 				$.tags_append_child(voting_choices, li);
-				voting_choices_item[i] = {'wrapper':li,'input':input,'label':label};
+				voting_choices_item[reorg[i]] = {'wrapper':li,'input':input,'label':label};
 			}
 
 			var voting_panel = $.tags_create('div');
 			voting_panel.id = 'voting';
 			$.tags_append_child(voting_panel, voting_choices);
-			$.tags_append_child($.tags_find('header')[0], voting_panel);
+
+			var voting_form = $.tags_create('form');
+			$.tags_append_child(voting_form, voting_panel);
+
+			$.tags_append_child($.tags_find('header')[0], voting_form);
 
 			var voting_update = function() {
 				$.JSON('/votes.php?' + ((new Date().getTime()).toString(36)), function(response) {
@@ -438,19 +465,20 @@ API_URL: (function(prefix, suffix){
 						var min = response['choices'][0]['votes'];
 						var max = min;
 						for (var i = 0; i < response['choices'].length; i++) {
-							var item = $.tags_find('
-							voting_choices_item[i]['label'].innerHTML = response['choices'][i]['title'];
+							voting_choices_item[i]['label']['innerHTML'] = response['choices'][i]['title'];
+							voting_choices_item[i]['input']['value'] = response['choices'][i]['box'];
 							$.classes_remove(voting_choices_item[i]['wrapper'], 'hidden');
+							voting_choices_item[i]['input'].disabled = false;
 							min = (response['choices'][i]['votes'] < min) ? response['choices'][i]['votes'] : min;
 							max = (response['choices'][i]['votes'] > max) ? response['choices'][i]['votes'] : max;
 						}
 						var div = max - min;
 						if ((div > 0)
-						 && response.hasOwnProperty('votes')
-						 && (response['votes'] > 0)) {
+						 && response.hasOwnProperty('ballots')
+						 && (response['ballots'] > 0)) {
 							for (var i = 0; i < response['choices'].length; i++) {
 								var per = (((response['choices'][i]['votes'] - min) * 100) / div);
-								var tot = ((response['choices'][i]['votes'] * 100) / response['votes']);
+								var tot = ((response['choices'][i]['votes'] * 100) / response['ballots']);
 								var avg = (Math.floor(per + tot) * 0.05) - 10;
 								voting_choices_item[i]['wrapper']['style']['backgroundPositionX'] = '' + avg + 'em,' + avg + 'em';
 							}
@@ -461,6 +489,8 @@ API_URL: (function(prefix, suffix){
 						}
 						for (var i = response['choices'].length; i < voting_choices_item.length; i++) {
 							$.classes_add(voting_choices_item[i]['wrapper'], 'hidden');
+							voting_choices_item[i]['input'].checked = false;
+							voting_choices_item[i]['input'].disabled = true;
 						}
 					}
 

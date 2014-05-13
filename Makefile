@@ -31,4 +31,4 @@ htdocs/resources/%.css: %.css
 	$(CSS) $(CSS_FLAGS) -i $< -o $@
 
 htdocs/resources/%.js: %.js
-	$(JS) $(JS_FLAGS) --js=$< --js_output_file=$@
+	$(JS) $(JS_FLAGS) --js=$< --js_output_file=$@ --create_source_map $@.map --source_map_format=V3

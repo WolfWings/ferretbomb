@@ -139,15 +139,17 @@ table.image img {
 }
 
 #voting ul li {
+	width: 100%;
 	margin: 0;
 	padding: 0;
-	padding-left: 0.25em;
+	margin-left: 0.25em;
 	margin-top: 1px;
 	margin-bottom: 1px;
 	list-style: none;
 	display: block;
 	line-height: 150%;
 	font-size: 80%;
+	border-top: 1px solid #000;
 	background-repeat: no-repeat;
 	background-image:
 		-webkit-linear-gradient(rgba(0,0,0,0.5) 0%, transparent 15%, transparent 85%, rgba(0,0,0,0.5) 100%),
@@ -163,12 +165,17 @@ table.image img {
 	background-position-y: center,center;
 }
 
-#voting ul li + li {
-	border-top: 1px solid #000;
-}
-
 #voting ul li input {
 	display: none;
+}
+
+#voting ul li label {
+	display: inline-block;
+	width: 100%;
+}
+
+#voting ul li input:checked + label {
+	background: rgba(255,255,0,0.25);
 }
 
 #voting ul li.hidden {
