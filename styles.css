@@ -5,12 +5,12 @@
 
 body {
 	text-align: justify;
-	margin: 80px 0 0 0.5em;
-	padding: 2em 1em 3em 10em;
+	margin: 80px 0 0 8px;
+	padding: 32px 16px 48px 160px;
 	background: #202020;
 	color: #ddd;
-	min-width: 32em;
-	min-height: 18em;
+	min-width: 512px;
+	min-height: 288px;
 }
 
 h1,h2,h3,h4,h5,h6 {
@@ -49,9 +49,9 @@ header {
 	position: fixed;
 	top: 80px;
 	left: 0;
-	bottom: 13em;
-	width: 10em;
-	overflow: auto;
+	bottom: 208px;
+	width: 160px;
+	overflow: hidden;
 	background: #181818;
 	margin: 0;
 	padding: 64px 0 0 0;
@@ -117,18 +117,20 @@ table.image img {
 	display: block;
 	position: fixed;
 	left: 0;
-	width: 10em;
+	width: 160px;
 	top: 160px;
+	bottom: 208px;
 	margin-bottom: 32px;
-	bottom: 13em;
 }
 
 #voting ul {
+	overflow-y: auto;
+	overflow-x: hidden;
 	width: 100%;
+	height: 100%;
 	margin: 0;
 	padding: 0;
 	list-style: none;
-	margin-bottom: 32px;
 }
 
 #voting ul lh {
@@ -145,7 +147,7 @@ table.image img {
 	width: 100%;
 	margin: 0;
 	padding: 0;
-	margin-left: 0.25em;
+	margin-left: 4px;
 	margin-top: 1px;
 	margin-bottom: 1px;
 	list-style: none;
@@ -164,7 +166,7 @@ table.image img {
 		linear-gradient(rgba(0,0,0,0.5) 0%, transparent 15%, transparent 85%, rgba(0,0,0,0.5) 100%),
 		linear-gradient(90deg, rgba(170,0,0,0.5) 0%, rgba(170,0,0,0.5) 97.5%, rgba(85,0,0,0.5) 100%);
 	background-size: 100% 100%,100% 100%;
-	background-position-x: -10em,-10em;
+	background-position-x: -160px,-160px;
 	background-position-y: center,center;
 }
 
@@ -172,15 +174,17 @@ table.image img {
 	display: none;
 }
 
-#voting button {
-	position: absolute;
-	bottom: -32px;
+#castvote {
+	position: fixed;
+	bottom: 208px;
 	left: 0;
-	width: 100%;
+	width: 160px;
 	height: 32px;
+	padding: 0;
+	border-width: 2px;
 }
 
-#voting button.hidden {
+#castvote.hidden {
 	display: none;
 }
 
@@ -199,18 +203,18 @@ table.image img {
 
 #connectTwitch {
 	position: fixed;
-	bottom: 13em;
-	width: 10em;
+	bottom: 208px;
+	width: 160px;
 	height: 32px;
 	margin-bottom: 0;
-	left: 5em;
+	left: 0;
 }
 
 #connectTwitch img {
-	position: absolute;
-	left: -50px;
+	display: block;
 	width: 100px;
 	height: 32px;
+	margin: auto;
 }
 
 #connectTwitch.hidden {
@@ -220,9 +224,9 @@ table.image img {
 #tail {
 	position: fixed;
 	left: 0;
-	bottom: 3em;
-	width: 10em;
-	height: 10em;
+	bottom: 48px;
+	width: 160px;
+	height: 160px;
 	background: #181818;
 	border-radius: 0 0 100% 0;
 	-moz-border-radius: 0 0 100% 0;
@@ -303,8 +307,8 @@ nav {
 	top: 0;
 	left: 0;
 	right: 0;
-	min-height: 2em;
-	padding: 0 0 0 10em;
+	min-height: 32px;
+	padding: 0 0 0 160px;
 	vertical-align: middle;
 	z-index: 9;
 }
@@ -333,11 +337,11 @@ nav {
 #navmenu li a {
 	display: block;
 	float: left;
-	padding: 0 0.5em;
+	padding: 0 16px;
 }
 
 #navmenu li#onair a {
-	padding-right: 0.5em;
+	padding-right: 16px;
 }
 
 #navmenu li a:hover {
@@ -450,19 +454,19 @@ ul.notecards li + li {
 }
 
 #content #chat {
-	top: 2em;
+	top: 32px;
 	right: 0;
-	width: 20em;
-	bottom: 3em;
+	width: 320px;
+	bottom: 48px;
 	margin-top: 80px;
 	position: fixed;
 	background: #fff;
 }
 
 #content #stream {
-	top: 2em;
-	left: 10em;
-	right: 20em;
+	top: 32px;
+	left: 160px;
+	right: 320px;
 	margin-top: 80px;
 	position: absolute;
 	background: #fff;
@@ -472,7 +476,7 @@ ul.notecards li + li {
 #content #stream:before {
 	content: "";
 	display: block;
-	padding: 56.25% 0 2em;
+	padding: 56.25% 0 32px;
 }
 
 #content #stream #stream_embed {
@@ -484,10 +488,10 @@ ul.notecards li + li {
 }
 
 .infopanels {
-	left: 10em;
-	right: 20em;
+	left: 160px;
+	right: 320px;
 	top: 80px;
-	margin-top: 4em;
+	margin-top: 64px;
 	display: block;
 	position: absolute;
 }
@@ -529,14 +533,14 @@ footer {
 	position: fixed;
 	right: 0;
 	bottom: 0;
-	height: 2em;
+	height: 32px;
 	float: right;
-	padding-left: 1.5em;
-	padding-top: 0.25em;
-	padding-right: 0.5em;
-	border-radius: 2em 0 0 0;
-	-moz-border-radius: 2em 0 0 0;
-	-webkit-border-radius: 2em 0 0 0;
+	padding-left: 24px;
+	padding-top: 4px;
+	padding-right: 8px;
+	border-radius: 32px 0 0 0;
+	-moz-border-radius: 32px 0 0 0;
+	-webkit-border-radius: 32px 0 0 0;
 	text-align: right;
 	background: black;
 }
@@ -605,12 +609,12 @@ footer {
 
 #content #twittershell {
 	position: absolute;
-	left: 10em;
+	left: 160px;
 	right: 0;
 	max-width: 1000px;
 	padding-top: 80px;
-	top: 2em;
-	bottom: 3em;
+	top: 32px;
+	bottom: 48px;
 }
 
 .twitter-timeline {

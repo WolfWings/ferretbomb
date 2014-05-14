@@ -19,6 +19,7 @@ API_URL: (function(prefix, suffix){
 	if (state === localStorage.getItem('twitch_secret')) {
 		localStorage.removeItem('twitch_secret');
 		localStorage.setItem('twitch_oauth', oauth);
+		$.voting_button_update();
 	}
 })
 
@@ -162,6 +163,10 @@ API_URL: (function(prefix, suffix){
 	});
 })
 
+,cachebuster: (function() {
+	return (new Date().getTime()).toString(36);
+})
+
 ,banner_init: (function(){
 	$.JSON('/resources/banners/', (function(banners){
 		var banner = banners[Math.floor(Math.random() * banners.length)];
@@ -170,7 +175,7 @@ API_URL: (function(prefix, suffix){
 	}));
 })
 
-,packages_bricklayer: (function() {
+,infobricklayer: (function() {
 	var bricks = $.tags_find('.brick');
 	var infopanels = $.tags_find('.infopanels')[0];
 
@@ -220,37 +225,7 @@ API_URL: (function(prefix, suffix){
 
 			$.tags_append_child(columns[column], bricks[i]);
 		}
-	}));
-})
-
-,packages_oauth_twitch: (function() {
-	var connect_button_image = $.tags_create('img');
-	connect_button_image.src = '/resources/connect_twitch.png';
-	var connect_button = $.tags_create('a');
-	$.tags_append_child(connect_button, connect_button_image);
-	connect_button.href = 'javascript:void(0)';
-	connect_button.id = 'connectTwitch';
-	$.classes_add(connect_button, 'hidden');
-	$.tags_append_child($.tags_find('header')[0], connect_button);
-	$.events_add(connect_button, 'click', function(){
-		localStorage.setItem('twitch_secret', Math.floor((1+Math.random())*0x19A100).toString(36).substring(1));
-		window.open($.URL('https://api.twitch.tv/kraken/oauth2/authorize',
-			{'response_type': 'token'
-			,'scope':         'user_subscriptions'
-			,'redirect_uri':  twitch_redirect
-			,'client_id':     twitch_client_id
-			,'state':         localStorage.getItem('twitch_secret')
-			})
-		,	'Login with TwitchTV'
-		,	['width=660'
-			,'height=600'
-			,'modal=yes'
-			,'alwaysRaised=yes'
-			,'resizable=yes'
-			,'status=yes'
-			].join(',')
-		);
-	});
+	}))();
 })
 
 ,packages_chat_twitch: (function() {
@@ -297,7 +272,50 @@ API_URL: (function(prefix, suffix){
 	$.tags_append_child(stream, embed);
 })
 
-,packages_voting: (function() {
+,voting_button_update: (function() {
+	/* Test if the oauth token exists, and hide the 'connect' button if so. */
+	$.classes_add($.tags_find('#castvote')[0], 'hidden');
+	if (localStorage.getItem('twitch_oauth') === null) {
+		$.classes_remove($.tags_find('#connectTwitch')[0], 'hidden');
+	} else {
+		$.classes_add($.tags_find('#connectTwitch')[0], 'hidden');
+		$.tags_find('#castvote')[0].disabled = true;
+		$.JSON('/voting/votedyet.php?oauth=' + localStorage.getItem('twitch_oauth') + '&' + $.cachebuster(), function(response) {
+			$.tags_find('#castvote')[0].disabled = (response !== false);
+			$.classes_remove($.tags_find('#castvote')[0], 'hidden');
+		});
+	}
+})
+
+,voting_init: (function() {
+	var connect_button_image = $.tags_create('img');
+	connect_button_image.src = '/resources/connect_twitch.png';
+	var connect_button = $.tags_create('a');
+	$.tags_append_child(connect_button, connect_button_image);
+	connect_button.href = 'javascript:void(0)';
+	connect_button.id = 'connectTwitch';
+	$.classes_add(connect_button, 'hidden');
+	$.tags_append_child($.tags_find('header')[0], connect_button);
+	$.events_add(connect_button, 'click', function(){
+		localStorage.setItem('twitch_secret', Math.floor((1+Math.random())*0x19A100).toString(36).substring(1));
+		window.open($.URL('https://api.twitch.tv/kraken/oauth2/authorize',
+			{'response_type': 'token'
+			,'scope':         'user_subscriptions'
+			,'redirect_uri':  twitch_redirect
+			,'client_id':     twitch_client_id
+			,'state':         localStorage.getItem('twitch_secret')
+			})
+		,	'Login with TwitchTV'
+		,	['width=660'
+			,'height=600'
+			,'modal=yes'
+			,'alwaysRaised=yes'
+			,'resizable=yes'
+			,'status=yes'
+			].join(',')
+		);
+	});
+
 	var voting_choices = $.tags_create('ul');
 	voting_choices.id = 'choices';
 	var voting_choices_title = $.tags_create('lh');
@@ -333,28 +351,24 @@ API_URL: (function(prefix, suffix){
 		voting_choices_item[reorg[i]] = {'wrapper':li,'input':input,'label':label};
 	}
 
-	var voting_button = $.tags_create('button');
-	voting_button.id = 'castvote';
-	voting_button.type = 'button';
-	$.classes_add(voting_button, 'hidden');
-	$.classes_add(voting_button, 'disabled');
-
 	var voting_form = $.tags_create('form');
 	voting_form.id = 'voting';
 	$.tags_append_child(voting_form, voting_choices);
-	$.tags_append_child(voting_form, voting_button);
 
 	$.tags_append_child($.tags_find('header')[0], voting_form);
 
-	var voting_update = function() {
-		$.JSON('/voting/tally.php?' + ((new Date().getTime()).toString(36)), function(response) {
-			/* Test if the oauth token exists, and hide the 'connect' button if so. */
-			if (localStorage.getItem('twitch_oauth') === null) {
-				$.classes_remove($.tags_find('#connectTwitch')[0], 'hidden');
-			} else {
-				$.classes_add($.tags_find('#connectTwitch')[0], 'hidden');
-			}
+	var voting_button = $.tags_create('button');
+	voting_button.id = 'castvote';
+	voting_button.type = 'button';
+	voting_button.disabled = true;
+	voting_button.innerHTML = 'Cast Vote';
+	$.classes_add(voting_button, 'hidden');
+	$.tags_append_child($.tags_find('header')[0], voting_button);
 
+	$.voting_button_update();
+
+	var voting_update = function() {
+		$.JSON('/voting/tally.php?' + $.cachebuster(), function(response) {
 			if (response.hasOwnProperty('title')) {
 				$.tags_find('#voting ul lh')[0].innerHTML = response['title'];
 			}
@@ -510,9 +524,8 @@ API_URL: (function(prefix, suffix){
 
 		setTimeout($.packages_chat_twitch, 0);
 		setTimeout($.packages_stream_twitch, 0);
-		setTimeout($.packages_bricklayer, 0);
-		setTimeout($.packages_oauth_twitch, 0);
-		setTimeout($.packages_voting, 0);
+		setTimeout($.infobricklayer, 0);
+		setTimeout($.voting_init, 0);
 	})
 }
 
