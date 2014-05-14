@@ -114,10 +114,12 @@ table.image img {
 }
 
 #voting {
+	display: block;
 	position: fixed;
 	left: 0;
 	width: 10em;
 	top: 160px;
+	margin-bottom: 32px;
 	bottom: 13em;
 }
 
@@ -172,10 +174,14 @@ table.image img {
 
 #voting button {
 	position: absolute;
-	bottom: 0;
+	bottom: -32px;
 	left: 0;
 	width: 100%;
 	height: 32px;
+}
+
+#voting button.hidden {
+	display: none;
 }
 
 #voting ul li label {
@@ -194,10 +200,17 @@ table.image img {
 #connectTwitch {
 	position: fixed;
 	bottom: 13em;
-	width: 170px;
+	width: 10em;
 	height: 32px;
 	margin-bottom: 0;
-	left: 0;
+	left: 5em;
+}
+
+#connectTwitch img {
+	position: absolute;
+	left: -50px;
+	width: 100px;
+	height: 32px;
 }
 
 #connectTwitch.hidden {
