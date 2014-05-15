@@ -144,30 +144,28 @@ table.image img {
 }
 
 #voting ul li {
-	width: 100%;
-	margin: 0;
-	padding: 0;
-	margin-left: 4px;
-	margin-top: 1px;
-	margin-bottom: 1px;
+	width: 160px;
+	margin: 1px 0;
+	padding: 0 0 0 4px;
 	list-style: none;
 	display: block;
-	line-height: 150%;
-	font-size: 80%;
+	height: 19px;
+	line-height: 20px;
+	font-size: 12px;
 	border-top: 1px solid #000;
 	background-repeat: no-repeat;
 	background-image:
-		-webkit-linear-gradient(rgba(0,0,0,0.5) 0%, transparent 15%, transparent 85%, rgba(0,0,0,0.5) 100%),
-		-webkit-linear-gradient(0, rgba(170,0,0,0.5) 0%, rgba(170,0,0,0.5) 97.5%, rgba(85,0,0,0.5) 100%);
+		-webkit-linear-gradient(rgba(0,0,0,0.5) 0px, transparent 4px, transparent 14px, rgba(0,0,0,0.5) 18px),
+		-webkit-linear-gradient(0, rgba(170,0,0,0.5) 0px, rgba(170,0,0,0.5) 156px, rgba(85,0,0,0.5) 160px);
 	background-image:
-		-moz-linear-gradient(rgba(0,0,0,0.5) 0%, transpernt 15%, transparent 85%, rgba(0,0,0,0.5) 100%),
-		-moz-linear-gradient(0, rgba(170,0,0,0.5) 0%, rgba(170,0,0,0.5) 97.5%, rgba(85,0,0,0.5) 100%);
+		-moz-linear-gradient(rgba(0,0,0,0.5) 0px, transpernt 4px, transparent 14px, rgba(0,0,0,0.5) 18px),
+		-moz-linear-gradient(0, rgba(170,0,0,0.5) 0px, rgba(170,0,0,0.5) 156px, rgba(85,0,0,0.5) 160px);
 	background-image: 
-		linear-gradient(rgba(0,0,0,0.5) 0%, transparent 15%, transparent 85%, rgba(0,0,0,0.5) 100%),
-		linear-gradient(90deg, rgba(170,0,0,0.5) 0%, rgba(170,0,0,0.5) 97.5%, rgba(85,0,0,0.5) 100%);
-	background-size: 100% 100%,100% 100%;
+		linear-gradient(rgba(0,0,0,0.5) 0px, transparent 4px, transparent 14px, rgba(0,0,0,0.5) 18px),
+		linear-gradient(90deg, rgba(170,0,0,0.5) 0px, rgba(170,0,0,0.5) 156px, rgba(85,0,0,0.5) 160px);
+	background-size: 160px 18px, 160px 18px;
 	background-position-x: -160px,-160px;
-	background-position-y: center,center;
+	background-position-y: 1px,1px;
 }
 
 #voting ul li input {

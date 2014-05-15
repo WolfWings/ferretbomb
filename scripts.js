@@ -16,10 +16,10 @@ API_URL: (function(prefix, suffix){
 })
 
 ,'oauth': (function(oauth, state) {
-	if (state === localStorage.getItem('twitch_secret')) {
-		localStorage.removeItem('twitch_secret');
-		localStorage.setItem('twitch_oauth', oauth);
-		$.voting_button_update();
+	if (state === localStorage['getItem']('twitch_secret')) {
+		localStorage['removeItem']('twitch_secret');
+		localStorage['setItem']('twitch_oauth', oauth);
+		//$.voting_button_update();
 	}
 })
 
@@ -273,21 +273,32 @@ API_URL: (function(prefix, suffix){
 })
 
 ,voting_button_update: (function() {
+	var castvote = $.tags_find('#castvote')[0];
+	var connectTwitch = $.tags_find('#connectTwitch')[0];
 	/* Test if the oauth token exists, and hide the 'connect' button if so. */
-	$.classes_add($.tags_find('#castvote')[0], 'hidden');
-	if (localStorage.getItem('twitch_oauth') === null) {
-		$.classes_remove($.tags_find('#connectTwitch')[0], 'hidden');
+	console.log(castvote);
+	console.log(connectTwitch);
+	$.classes_add(castvote, 'hidden');
+	if (localStorage['getItem']('twitch_oauth') === null) {
+		$.classes_remove(connectTwitch, 'hidden');
 	} else {
-		$.classes_add($.tags_find('#connectTwitch')[0], 'hidden');
-		$.tags_find('#castvote')[0].disabled = true;
-		$.JSON('/voting/votedyet.php?oauth=' + localStorage.getItem('twitch_oauth') + '&' + $.cachebuster(), function(response) {
-			$.tags_find('#castvote')[0].disabled = (response !== false);
-			$.classes_remove($.tags_find('#castvote')[0], 'hidden');
+		$.classes_add(connectTwitch, 'hidden');
+		castvote['disabled'] = true;
+		$.JSON('/voting/votedyet.php?oauth=' + localStorage['getItem']('twitch_oauth') + '&' + $.cachebuster(), function(response) {
+			if (response === false) {
+				castvote['disabled'] = false;
+				$.classes_remove(castvote, 'hidden');
+			} else {
+				castvote['disabled'] = true;
+				$.classes_add(castvote, 'hidden');
+			}
 		});
 	}
 })
 
 ,voting_init: (function() {
+	var voting_maxchoices = undefined;
+
 	var connect_button_image = $.tags_create('img');
 	connect_button_image.src = '/resources/connect_twitch.png';
 	var connect_button = $.tags_create('a');
@@ -295,15 +306,14 @@ API_URL: (function(prefix, suffix){
 	connect_button.href = 'javascript:void(0)';
 	connect_button.id = 'connectTwitch';
 	$.classes_add(connect_button, 'hidden');
-	$.tags_append_child($.tags_find('header')[0], connect_button);
 	$.events_add(connect_button, 'click', function(){
-		localStorage.setItem('twitch_secret', Math.floor((1+Math.random())*0x19A100).toString(36).substring(1));
-		window.open($.URL('https://api.twitch.tv/kraken/oauth2/authorize',
+		localStorage['setItem']('twitch_secret', Math.floor((1+Math.random())*0x19A100).toString(36).substring(1));
+		var popup = window.open($.URL('https://api.twitch.tv/kraken/oauth2/authorize',
 			{'response_type': 'token'
 			,'scope':         'user_subscriptions'
 			,'redirect_uri':  twitch_redirect
 			,'client_id':     twitch_client_id
-			,'state':         localStorage.getItem('twitch_secret')
+			,'state':         localStorage['getItem']('twitch_secret')
 			})
 		,	'Login with TwitchTV'
 		,	['width=660'
@@ -314,7 +324,13 @@ API_URL: (function(prefix, suffix){
 			,'status=yes'
 			].join(',')
 		);
+		$.events_add(popup, 'load', (function() {
+			$.events_add(popup, 'unload', (function() {
+				$.voting_button_update();
+			}));
+		}));
 	});
+	$.tags_append_child($.tags_find('header')[0], connect_button);
 
 	var voting_choices = $.tags_create('ul');
 	voting_choices.id = 'choices';
@@ -363,14 +379,22 @@ API_URL: (function(prefix, suffix){
 	voting_button.disabled = true;
 	voting_button.innerHTML = 'Cast Vote';
 	$.classes_add(voting_button, 'hidden');
+	// onclick handler added below the voting_update function
 	$.tags_append_child($.tags_find('header')[0], voting_button);
-
 	$.voting_button_update();
 
-	var voting_update = function() {
+	var voting_update = function(oneshot) {
 		$.JSON('/voting/tally.php?' + $.cachebuster(), function(response) {
 			if (response.hasOwnProperty('title')) {
 				$.tags_find('#voting ul lh')[0].innerHTML = response['title'];
+			}
+
+			var voting_button_type = 'checkbox';
+			if (response.hasOwnProperty('maxchoices')) {
+				voting_maxchoices = response['maxchoices'];
+				if (voting_maxchoices === 0) {
+					voting_button_type = 'radio';
+				}
 			}
 
 			if (response.hasOwnProperty('choices')) {
@@ -380,9 +404,16 @@ API_URL: (function(prefix, suffix){
 					voting_choices_item[i]['label']['innerHTML'] = response['choices'][i]['title'];
 					voting_choices_item[i]['input']['value'] = response['choices'][i]['box'];
 					$.classes_remove(voting_choices_item[i]['wrapper'], 'hidden');
-					voting_choices_item[i]['input'].disabled = false;
+					voting_choices_item[i]['input']['disabled'] = false;
+					voting_choices_item[i]['input']['type'] = voting_button_type;
 					min = (response['choices'][i]['votes'] < min) ? response['choices'][i]['votes'] : min;
 					max = (response['choices'][i]['votes'] > max) ? response['choices'][i]['votes'] : max;
+				}
+				for (var i = response['choices'].length; i < voting_choices_item.length; i++) {
+					$.classes_add(voting_choices_item[i]['wrapper'], 'hidden');
+					voting_choices_item[i]['input']['checked'] = false;
+					voting_choices_item[i]['input']['disabled'] = true;
+					voting_choices_item[i]['input']['type'] = voting_button_type;
 				}
 				var div = max - min;
 				if ((div > 0)
@@ -399,11 +430,10 @@ API_URL: (function(prefix, suffix){
 						voting_choices_item[i]['wrapper']['style']['backgroundPositionX'] = '-10em,-10em';
 					}
 				}
-				for (var i = response['choices'].length; i < voting_choices_item.length; i++) {
-					$.classes_add(voting_choices_item[i]['wrapper'], 'hidden');
-					voting_choices_item[i]['input'].checked = false;
-					voting_choices_item[i]['input'].disabled = true;
-				}
+			}
+
+			if (oneshot === true) {
+				return;
 			}
 
 			if (response.hasOwnProperty('rapid') &&
@@ -415,6 +445,45 @@ API_URL: (function(prefix, suffix){
 		});
 	};
 	setTimeout(voting_update, 0);
+
+	$.events_add(voting_button, 'click', function(event){
+		if ($.classes_has(this, 'processing')
+		 || (voting_maxchoices === undefined)) {
+			event['stopPropegation']();
+			return;
+		}
+		var votes = [];
+		for (var i = 0; i < 36; i++) {
+			if (voting_choices_item[i]['input'].checked) {
+				votes.push('votes=' + voting_choices_item[i]['input']['value']);
+			}
+		}
+		if (votes.length < 1) {
+			// No items selected
+			return;
+		}
+		if (votes.length > (1 + voting_maxchoices)) {
+			// Too many items selected
+			return;
+		}
+		$.classes_add(this, 'processing');
+		votes.push('oauth=' + localStorage['getItem']('twitch_oauth'));
+		votes.push('cachebuster=' + $.cachebuster());
+		var params = votes.join('&');
+		var http = new XMLHttpRequest();
+		http['open']('POST', '/voting/cast.php', true);
+		http['setRequestHeader']('Content-Type', 'application/x-www-form-urlencoded');
+		http['onreadystatechange'] = (function() {
+			if (this.readyState !== 4) {
+				return;
+			}
+			$.classes_remove($.tags_find('#castvote')[0], 'processing');
+			console.log(JSON.parse(this.responseText));
+			setTimeout($.voting_button_update, 0);
+			voting_update(true);
+		});
+		http.send(params);
+	});
 })
 
 ,inits: {

@@ -13,7 +13,8 @@ function votes() {
 	}
 
 	$res = $db->query('SELECT * FROM polls WHERE p_id = (SELECT CAST(value AS UNSIGNED INTEGER) FROM config WHERE option = "poll_active")');
-	if ($res->num_rows === 0) {
+	if (($res === false)
+	 || ($res->num_rows === 0)) {
 		// No poll matching poll_active, and/or no poll_active/polls
 		return;
 	}
@@ -27,10 +28,11 @@ function votes() {
 		return;
 	}
 
-	$results['maxvotes'] = $poll['p_maxvotes'];
+	$results['maxchoices'] = (int) $poll['p_maxchoices'];
 
 	$res = $db->query('SELECT c_bit,p_i_id,p_i_name FROM choices INNER JOIN poll_items ON choices._p_i_id = poll_items.p_i_id WHERE _p_id = (SELECT CAST(value AS UNSIGNED INTEGER) FROM config WHERE option = "poll_active")');
-	if ($res->num_rows === 0) {
+	if (($res === false)
+	 || ($res->num_rows === 0)) {
 		// No choices in poll, not valid yet
 		return;
 	}
@@ -68,7 +70,8 @@ function votes() {
 
 	$res = $db->query($query);
 
-	if ($res->num_rows === 0) {
+	if (($res === false)
+	 || ($res->num_rows === 0)) {
 		// No votes to tally
 		return;
 	}

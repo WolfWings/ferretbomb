@@ -21,20 +21,23 @@ function process() {
 				array_push($post[$kv[0]], $kv[1]);
 			}
 		}
+		$kv = null;
+		unset($kv);
+	}
+	$v = null;
+	unset($v);
+	$p = null;
+	unset($p);
+
+	if (!isset($post['votes'])) {
+		$response['status_message'] = 'Missing votes to cast.';
+		return;
 	}
 
 	if (!isset($post['oauth'])
 	 || (count($post['oauth']) > 1)
 	 || (strlen($post['oauth'][0]) > 255)) {
 		$response['status_message'] = 'Missing or invalid OAuth token.';
-		return;
-	}
-
-	$oauth = $post['oauth'][0];
-	$oauthhash = hash('sha256', $oauth);
-
-	if (!isset($post['votes'])) {
-		$response['status_message'] = 'Missing votes to cast.';
 		return;
 	}
 
@@ -45,66 +48,125 @@ function process() {
 		return;
 	}
 
+	$res = $db->query('SELECT p_id,p_maxchoices,p_subonly,p_open FROM polls WHERE p_id = (SELECT CAST(value AS UNSIGNED INTEGER) FROM config WHERE option = "poll_active")');
+	if (($res === false)
+	 || ($res->num_rows === 0)) {
+		$response['status_message'] = 'No poll active.';
+		return;
+	}
+	$poll = $res->fetch_assoc();
+	$res->free();
+	$res = null;
+	unset($res);
+
+	if (is_null($poll['p_open'])) {
+		$response['status_message'] = 'Poll is not open.';
+		return;
+	}
+
+	if (count($post['votes']) > 1 + $poll['p_maxchoices']) {
+		$response['status_message'] = 'Too many choices in ballot.';
+		return;
+	}
+
+	$res = $db->query('SELECT c_bit,_p_i_id FROM choices WHERE _p_id = (SELECT CAST(value AS UNSIGNED INTEGER) FROM config WHERE option = "poll_active")');
+	if (($res === false)
+	 || ($res->num_rows === 0)) {
+		$response['status_message'] = 'No choices in active poll.';
+		return;
+	}
+	$choices = [];
+	while ($choice = $res->fetch_assoc()) {
+		$choices[base_convert($choice['_p_i_id'], 10, 36)] = $choice['c_bit'];
+	}
+	unset($choice);
+	$res->free();
+	$res = null;
+	unset($res);
+
+	$votes = array_fill(0, 36, false);
+	foreach ($post['votes'] as $vote) {
+		if (!array_key_exists($vote, $choices)) {
+			$response['status_message'] = 'Invalid ballot cast for currently active poll.';
+			return;
+		}
+		$votes[$choices[$vote]] = true;
+	}
+	$vote = null;
+	unset($vote);
+	$choices = null;
+	unset($choices);
+
+	for ($i = 0; $i < 36; $i++) {
+		if ($votes[$i] === true) {
+			$votes[$i] = 'v_choice_' . base_convert($i, 10, 36) . '=""';
+		} else {
+			$votes[$i] = null;
+			unset($votes[$i]);
+		}
+	}
+	$i = null;
+	unset($i);
+
+	$oauth = $post['oauth'][0];
+	$post = null;
+	unset($post);
+
+	$oauthhash = hash('sha256', $oauth);
+
 	$userfind = $db->prepare('SELECT u_id FROM users WHERE __H_oauth = UNHEX(?) AND u_oauth = ?');
 	$userfind->bind_param('ss', $oauthhash, $oauth);
 	$userfind->execute();
 	$res = $userfind->get_result();
-	if ($res->num_rows === 0) {
-		$twitch = json_decode(http_parse_message(http_get('https://api.twitch.tv/kraken?oauth_token=' . $oauth))->body, true);
-
-		if (!isset($twitch['token'])
-		 || !isset($twitch['token']['valid'])
-		 || ($twitch['token']['valid'] !== true)) {
-			$response['status_message'] = 'Invalid OAuth token.';
-			return;
-		}
-
-		$username = $twitch['token']['user_name'];
-		$usernamehash = hash('sha256', $username);
-
-		// This can be replaced with a central ferretbomb auth
-		// w/ scope "channel_check_subscription"
-		// to '/channels/ferretbomb/subscriptions/' . $username
-		$sub = 0;
-		$twitch = json_decode(http_parse_message(http_get('https://api.twitch.tv/kraken/users/' . $username . '/subscriptions/ferretbomb?oauth_token=' . $oauth))->body, true);
-		if (isset($twitch['channel'])) {
-			$sub = 1;
-		}
-
-		$follow = 0;
-		$twitch = json_decode(http_parse_message(http_get('https://api.twitch.tv/kraken/users/' . $username . '/follows/channels/ferretbomb?oauth_token=' . $oauth))->body, true);
-		if (isset($twitch['channel'])) {
-			$follow = 1;
-		}
-
-		// Can't use 'INSERT ... ON DUPLICATE KEY UPDATE' due to MySQL bug #30915
-		$useradd = $db->prepare('INSERT INTO users (__H_oauth,u_oauth,__H_name,u_name,u_sub,u_follows) VALUES (UNHEX(?), ?, UNHEX(?), ?, IF(? = 0, NULL, ""), IF(? = 0, NULL, ""))');
-		$useradd->bind_param('ssssii', $oauthhash, $oauth, $usernamehash, $username, $sub, $follow);
-		if (!$useradd->execute()) {
-			$useradd->close();
-			$useradd = $db->prepare('UPDATE users SET __H_oauth=UNHEX(?), u_oauth=?, u_sub=IF(? = 0, NULL, ""), u_follows=IF(? = 0, NULL, "") WHERE __H_name=UNHEX(?) AND u_name=?');
-			$useradd->bind_param('ssiiss', $oauthhash, $oauth, $sub, $follow, $usernamehash, $username);
-			if (!$useradd->execute()) {
-				$response['status_message'] = 'Unable to update existing local record for user.';
-				return;
-			}
-		}
-		$useradd->close();
-
-//		$userfind = $db->prepare('SELECT * FROM users WHERE __H_oauth = UNHEX(?) AND u_oauth = ?');
-		$userfind->bind_param('ss', $oauthhash, $oauth);
-		$userfind->execute();
-		$res = $userfind->get_result();
-		if ($res->num_rows === 0) {
-			$response['status_message'] = 'Error adding/updating local record for user.';
-		}
+	if (($res === false)
+	 || ($res->num_rows === 0)) {
+		$response['status_message'] = 'User record does not exist; hasvoted.php not called first?';
+		return;
 	}
+	$oauthhash = null;
+	unset($oauthhash);
+	$oauth = null;
+	unset($oauth);
 
 	$user = $res->fetch_assoc();
 	$res->free();
-	$userfind->close();
+	$res = null;
+	unset($res);
 
-	print_r($user); echo "\n";
+	$userfind->close();
+	$userfind = null;
+	unset($userfind);
+
+	$ip = unpack('H*', inet_pton($_SERVER['REMOTE_ADDR']))[1];
+	if (strlen($ip) === 8) {
+		array_push($votes, 'IPv6=NULL');
+		array_push($votes, 'IPv4=UNHEX(' . $ip . ')');
+	} elseif (strlen($ip) === 32) {
+		array_push($votes, 'IPv6=UNHEX(' . substr($ip, 0, 16) . ')');
+		array_push($votes, 'IPv4=UNHEX(' . substr($ip, 16, 16) . ')');
+	}
+	$ip = null;
+	unset($ip);
+
+	array_push($votes, '_u_id=' . $user['u_id']);
+	$user = null;
+	unset($user);
+
+	array_push($votes, '_p_id=' . $poll['p_id']);
+	$poll = null;
+	unset($poll);
+
+	$query = 'INSERT INTO votes SET ' . join(',', $votes);
+	$votes = null;
+	unset($votes);
+
+	if ($db->query($query) === false) {
+		$response['status_message'] = 'Unable to add vote; duplicate?';
+		return;
+	}
+	$db->close();
+	$db = null;
+	unset($db);
 
 	$response['status_code'] = 200;
 	$response['status_message'] = 'Vote successfully cast!';
@@ -113,7 +175,7 @@ function process() {
 process();
 
 http_response_code($response['status_code']);
-unset($response['status_code']);
-echo json_encode($response),"\n";
+
+echo json_encode($response);
 
 ?>
