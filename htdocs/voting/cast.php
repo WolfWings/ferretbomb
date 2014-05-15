@@ -1,8 +1,36 @@
 <?php
 
+$queries = [
+
+'activepoll' => <<<'SQL'
+SELECT p_id,
+       p_maxchoices,
+       p_subonly,
+       p_open
+  FROM polls
+ WHERE p_id =
+	(SELECT CAST(value AS UNSIGNED INTEGER)
+	   FROM config
+	  WHERE OPTION = "poll_active")
+SQL
+
+,
+
+'pollchoices' => <<<'SQL'
+SELECT c_bit,_p_i_id
+  FROM choices
+ WHERE _p_id =
+	(SELECT CAST(value AS UNSIGNED INTEGER)
+	   FROM config
+	  WHERE OPTION = "poll_active")
+SQL
+
+];
+
 $response = array('status_code' => 400, 'status_message' => 'Unknown error!');
 
 function process() {
+	global $queries;
 	global $response;
 
 	$p = file_get_contents('php://input');
@@ -48,7 +76,7 @@ function process() {
 		return;
 	}
 
-	$res = $db->query('SELECT p_id,p_maxchoices,p_subonly,p_open FROM polls WHERE p_id = (SELECT CAST(value AS UNSIGNED INTEGER) FROM config WHERE option = "poll_active")');
+	$res = $db->query($queries->['activepoll']);
 	if (($res === false)
 	 || ($res->num_rows === 0)) {
 		$response['status_message'] = 'No poll active.';
@@ -69,7 +97,7 @@ function process() {
 		return;
 	}
 
-	$res = $db->query('SELECT c_bit,_p_i_id FROM choices WHERE _p_id = (SELECT CAST(value AS UNSIGNED INTEGER) FROM config WHERE option = "poll_active")');
+	$res = $db->query($queries['pollchoices']);
 	if (($res === false)
 	 || ($res->num_rows === 0)) {
 		$response['status_message'] = 'No choices in active poll.';
@@ -161,7 +189,7 @@ function process() {
 	unset($votes);
 
 	if ($db->query($query) === false) {
-		$response['status_message'] = 'Unable to add vote; duplicate?';
+		$response['status_message'] = 'Unable to add vote; duplicate vote?';
 		return;
 	}
 	$db->close();

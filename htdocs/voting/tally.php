@@ -1,8 +1,35 @@
 <?php
 
+$queries = [
+
+'activepoll' => <<<'SQL'
+SELECT *
+  FROM polls
+ WHERE p_id =
+	(SELECT CAST(value AS UNSIGNED INTEGER)
+	   FROM config
+	  WHERE option = "poll_active")
+SQL
+
+,
+
+'pollchoices' => <<<'SQL'
+SELECT c_bit,p_i_id,p_i_name
+  FROM choices
+       INNER JOIN poll_items
+               ON choices._p_i_id = poll_items.p_i_id
+ WHERE _p_id =
+	(SELECT CAST(value AS UNSIGNED INTEGER)
+	   FROM config
+	  WHERE option = "poll_active")
+SQL
+
+];
+
 $results = array('rapid' => false);
 
 function votes() {
+	global $queries;
 	global $results;
 
 	$db = new mysqli('localhost', 'ferretbomb', '', 'ferretbomb');
@@ -12,7 +39,7 @@ function votes() {
 		return;
 	}
 
-	$res = $db->query('SELECT * FROM polls WHERE p_id = (SELECT CAST(value AS UNSIGNED INTEGER) FROM config WHERE option = "poll_active")');
+	$res = $db->query($queries['activepoll']);
 	if (($res === false)
 	 || ($res->num_rows === 0)) {
 		// No poll matching poll_active, and/or no poll_active/polls
@@ -28,14 +55,14 @@ function votes() {
 		return;
 	}
 
-	$results['maxchoices'] = (int) $poll['p_maxchoices'];
-
-	$res = $db->query('SELECT c_bit,p_i_id,p_i_name FROM choices INNER JOIN poll_items ON choices._p_i_id = poll_items.p_i_id WHERE _p_id = (SELECT CAST(value AS UNSIGNED INTEGER) FROM config WHERE option = "poll_active")');
+	$res = $db->query($queries['pollchoices']);
 	if (($res === false)
 	 || ($res->num_rows === 0)) {
 		// No choices in poll, not valid yet
 		return;
 	}
+
+	$results['maxchoices'] = (int) $poll['p_maxchoices'];
 
 	// Store poll title in the results JSON
 	$results['title'] = $poll['p_title'];
@@ -43,13 +70,9 @@ function votes() {
 	// Store total number of votes so far
 	$results['ballots'] = 0;
 
-	// Fetch all rows as we'll need them multiple times later
-	$choices = $res->fetch_all(MYSQLI_ASSOC);
-	$res->free();
-
 	$query = [];
 	$results['choices'] = array();
-	foreach ($choices as $choice) {
+	while ($choice = $res->fetch_assoc()) {
 		$bit = base_convert($choice['c_bit'], 10, 36);
 		array_push($query, 'COUNT(v_choice_' . $bit . ') AS `' . $bit . '`');
 		$results['choices'][$choice['c_bit']] = array(
@@ -58,6 +81,8 @@ function votes() {
 			, 'box' => base_convert($choice['p_i_id'], 10, 36)
 			);
 	}
+	$res->free();
+
 	$query = 'SELECT ' . join(', ', $query) . ' FROM votes';
 	if ($poll['p_subonly'] !== NULL) {
 		$results['subonly'] = true;

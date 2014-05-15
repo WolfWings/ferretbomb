@@ -1,8 +1,8 @@
 <?php
 
-function checkifvoted() {
+$queries = [
 
-$uservote_query = <<<'SQL'
+'uservote' => <<<'SQL'
 SELECT u_id, v_id
 FROM users
 LEFT JOIN votes ON users.u_id=votes._u_id
@@ -13,9 +13,11 @@ WHERE u_oauth = ?
          (SELECT CAST(value AS UNSIGNED INTEGER)
           FROM config
           WHERE OPTION = "poll_active"))
-SQL;
+SQL
 
-$useradd_query = <<<'SQL'
+,
+
+'userinsert' => <<<'SQL'
 INSERT INTO users
 SET __H_oauth=UNHEX(?),
       u_oauth=?,
@@ -23,9 +25,11 @@ SET __H_oauth=UNHEX(?),
       u_name=?,
       u_sub=IF(? = 0, NULL, ""),
       u_follows=IF(? = 0, NULL, "")
-SQL;
+SQL
 
-$userupdate_query = <<<'SQL'
+,
+
+'userupdate' => <<<'SQL'
 UPDATE users
 SET __H_oauth=UNHEX(?),
       u_oauth=?,
@@ -33,7 +37,12 @@ SET __H_oauth=UNHEX(?),
       u_follows=IF(? = 0, NULL, "")
 WHERE __H_name=UNHEX(?)
   AND u_name=?
-SQL;
+SQL
+
+];
+
+function checkifvoted() {
+	global $queries;
 
 	if (!isset($_GET['oauth'])
 	 || preg_match('[^a-zA-Z0-9]', $_GET['oauth'])) {
@@ -50,7 +59,7 @@ SQL;
 		return false;
 	}
 
-	$query = $db->prepare($uservote_query);
+	$query = $db->prepare($queries['uservote']);
 	$query->bind_param('ss', $oauth, $oauthhash);
 	$query->execute();
 	$res = $query->get_result();
@@ -85,11 +94,11 @@ SQL;
 		}
 
 		// Can't use 'INSERT ... ON DUPLICATE KEY UPDATE' due to MySQL bug #30915
-		$query = $db->prepare($useradd_query);
+		$query = $db->prepare($queries['userinsert']);
 		$query->bind_param('ssssii', $oauthhash, $oauth, $usernamehash, $username, $sub, $follow);
 		if (!$query->execute()) {
 			$query->close();
-			$query = $db->prepare($userupdate_query);
+			$query = $db->prepare($queries['userupdate']);
 			$query->bind_param('ssiiss', $oauthhash, $oauth, $sub, $follow, $usernamehash, $username);
 			if (!$query->execute()) {
 				// Unable to update existing local record for user
