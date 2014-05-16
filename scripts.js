@@ -19,7 +19,6 @@ API_URL: (function(prefix, suffix){
 	if (state === localStorage['getItem']('twitch_secret')) {
 		localStorage['removeItem']('twitch_secret');
 		localStorage['setItem']('twitch_oauth', oauth);
-		//$.voting_button_update();
 	}
 })
 
@@ -272,37 +271,122 @@ API_URL: (function(prefix, suffix){
 	$.tags_append_child(stream, embed);
 })
 
-,voting_button_update: (function() {
-	var castvote = $.tags_find('#castvote')[0];
-	var connectTwitch = $.tags_find('#connectTwitch')[0];
-	/* Test if the oauth token exists, and hide the 'connect' button if so. */
-	console.log(castvote);
-	console.log(connectTwitch);
-	$.classes_add(castvote, 'hidden');
-	if (localStorage['getItem']('twitch_oauth') === null) {
-		$.classes_remove(connectTwitch, 'hidden');
-	} else {
-		$.classes_add(connectTwitch, 'hidden');
-		castvote['disabled'] = true;
-		$.JSON('/voting/votedyet.php?oauth=' + localStorage['getItem']('twitch_oauth') + '&' + $.cachebuster(), function(response) {
-			if (response === false) {
-				castvote['disabled'] = false;
-				$.classes_remove(castvote, 'hidden');
-			} else {
-				castvote['disabled'] = true;
-				$.classes_add(castvote, 'hidden');
-			}
-		});
+,voting_form_init: (function() {
+	var voting_choices = $.tags_create('ul');
+	voting_choices.id = 'choices';
+
+	$.tags_append_child(voting_choices, $.tags_create('lh'));
+
+	var reorg = [];
+	for (var i = 0; i < 36; i++) {
+		var j = Math.floor(Math.random() * (i + 1));
+		if (i !== j) {
+			reorg[i] = reorg[j];
+		}
+		reorg[j] = i;
 	}
+
+	for (var i = 0; i < 36; i++) {
+		var bit = reorg[i].toString(36);
+		var li = $.tags_create('li');
+		li.id = 'choice_' + bit;
+		$.classes_add(li, 'hidden');
+
+		var input = $.tags_create('input');
+		input.name = 'voting';
+		input.id = 'vote_' + bit;
+		input.type = 'checkbox';
+		$.tags_append_child(li, input);
+
+		var label = $.tags_create('label');
+		label.id = 'label_' + bit;
+		label.htmlFor = 'vote_' + bit;
+		$.tags_append_child(li, label);
+
+		$.tags_append_child(voting_choices, li);
+	}
+
+	var voting_form = $.tags_create('form');
+	voting_form.id = 'voting';
+	voting_form.maxchoices = undefined;
+	$.tags_append_child(voting_form, voting_choices);
+
+	$.tags_append_child($.tags_find('header')[0], voting_form);
+
+	setTimeout($.voting_form_update, 0);
 })
 
-,voting_init: (function() {
-	var voting_maxchoices = undefined;
+,voting_form_update: (function(oneshot) {
+	$.JSON('/voting/tally.php?' + $.cachebuster(), function(response) {
+		if (oneshot !== true) {
+			if (response.hasOwnProperty('rapid') &&
+			    response['rapid'] === true) {
+				setTimeout($.voting_form_update, 5000);
+			} else {
+				setTimeout($.voting_form_update, 60000);
+			}
+		}
 
-	var connect_button_image = $.tags_create('img');
-	connect_button_image.src = '/resources/connect_twitch.png';
+		if (response.hasOwnProperty('title')) {
+			$.tags_find('#voting ul lh')[0].innerHTML = response['title'];
+		}
+
+		var voting_button_type = 'checkbox';
+		if (response.hasOwnProperty('maxchoices')) {
+			$.tags_find('#voting')[0].maxchoices = response['maxchoices'];
+			if (response['maxchoices'] === 0) {
+				voting_button_type = 'radio';
+			}
+		}
+
+		for (var i = (response.hasOwnProperty('choices') ? response['choices'].length : 0); i < 36; i++) {
+			$.classes_add($.tags_find('#choice_' + i.toString(36))[0], 'hidden');
+			var input = $.tags_find('#vote_' + i.toString(36))[0];
+			input['checked'] = false;
+			input['disabled'] = true;
+			input['type'] = voting_button_type;
+		}
+
+		if (!response.hasOwnProperty('choices')) {
+			return;
+		}
+
+		var min = response['choices'][0]['votes'];
+		var max = min;
+		for (var i = 0; i < response['choices'].length; i++) {
+			$.tags_find('#label_' + i.toString(36))[0]['innerHTML'] = response['choices'][i]['title'];
+			var input = $.tags_find('#vote_' + i.toString(36))[0];
+			input['value'] = response['choices'][i]['box'];
+			input['disabled'] = false;
+			input['type'] = voting_button_type;
+			min = (response['choices'][i]['votes'] < min) ? response['choices'][i]['votes'] : min;
+			max = (response['choices'][i]['votes'] > max) ? response['choices'][i]['votes'] : max;
+		}
+
+		var offsets = [];
+		if ((max > min)
+		 && response.hasOwnProperty('ballots')
+		 && (response['ballots'] > 0)) {
+			for (var i = 0; i < response['choices'].length; i++) {
+				var per = (((response['choices'][i]['votes'] - min) * 80) / (max - min));
+				var tot = ((response['choices'][i]['votes'] * 80) / response['ballots']);
+				offsets[i] = Math.floor(per + tot);
+			}
+		} else {
+			for (var i = 0; i < response['choices'].length; i++) {
+				offsets[i] = -160;
+			}
+		}
+		for (var i = 0; i < response['choices'].length; i++) {
+			var choice = $.tags_find('#choice_' + i.toString(36))[0];
+			choice['style']['backgroundPosition'] = '' + offsets[i] + 'px 1px';
+			$.classes_remove(choice, 'hidden');
+		}
+	});
+})
+
+,voting_buttons_init: (function() {
 	var connect_button = $.tags_create('a');
-	$.tags_append_child(connect_button, connect_button_image);
 	connect_button.href = 'javascript:void(0)';
 	connect_button.id = 'connectTwitch';
 	$.classes_add(connect_button, 'hidden');
@@ -326,52 +410,11 @@ API_URL: (function(prefix, suffix){
 		);
 		$.events_add(popup, 'load', (function() {
 			$.events_add(popup, 'unload', (function() {
-				$.voting_button_update();
+				$.voting_buttons_update();
 			}));
 		}));
 	});
 	$.tags_append_child($.tags_find('header')[0], connect_button);
-
-	var voting_choices = $.tags_create('ul');
-	voting_choices.id = 'choices';
-	var voting_choices_title = $.tags_create('lh');
-	$.tags_append_child(voting_choices, voting_choices_title);
-
-	var reorg = [];
-	for (var i = 0; i < 36; i++) {
-		var j = Math.floor(Math.random() * (i + 1));
-		if (i !== j) {
-			reorg[i] = reorg[j];
-		}
-		reorg[j] = i;
-	}
-
-	var voting_choices_item = [];
-	for (var i = 0; i < 36; i++) {
-		var li = $.tags_create('li');
-		li.id = 'choice_' + i.toString(36);
-		$.classes_add(li, 'hidden');
-
-		var input = $.tags_create('input');
-		input.name = 'voting';
-		input.id = 'vote_' + i.toString(36);
-		input.type = 'checkbox';
-		$.tags_append_child(li, input);
-
-		var label = $.tags_create('label');
-		label.id = 'label_' + i.toString(36);
-		label.htmlFor = 'vote_' + i.toString(36);
-		$.tags_append_child(li, label);
-
-		$.tags_append_child(voting_choices, li);
-		voting_choices_item[reorg[i]] = {'wrapper':li,'input':input,'label':label};
-	}
-
-	var voting_form = $.tags_create('form');
-	voting_form.id = 'voting';
-	$.tags_append_child(voting_form, voting_choices);
-
-	$.tags_append_child($.tags_find('header')[0], voting_form);
 
 	var voting_button = $.tags_create('button');
 	voting_button.id = 'castvote';
@@ -379,90 +422,28 @@ API_URL: (function(prefix, suffix){
 	voting_button.disabled = true;
 	voting_button.innerHTML = 'Cast Vote';
 	$.classes_add(voting_button, 'hidden');
-	// onclick handler added below the voting_update function
+	// onclick handler added below the voting_form_update function
 	$.tags_append_child($.tags_find('header')[0], voting_button);
-	$.voting_button_update();
-
-	var voting_update = function(oneshot) {
-		$.JSON('/voting/tally.php?' + $.cachebuster(), function(response) {
-			if (response.hasOwnProperty('title')) {
-				$.tags_find('#voting ul lh')[0].innerHTML = response['title'];
-			}
-
-			var voting_button_type = 'checkbox';
-			if (response.hasOwnProperty('maxchoices')) {
-				voting_maxchoices = response['maxchoices'];
-				if (voting_maxchoices === 0) {
-					voting_button_type = 'radio';
-				}
-			}
-
-			if (response.hasOwnProperty('choices')) {
-				var min = response['choices'][0]['votes'];
-				var max = min;
-				for (var i = 0; i < response['choices'].length; i++) {
-					voting_choices_item[i]['label']['innerHTML'] = response['choices'][i]['title'];
-					voting_choices_item[i]['input']['value'] = response['choices'][i]['box'];
-					$.classes_remove(voting_choices_item[i]['wrapper'], 'hidden');
-					voting_choices_item[i]['input']['disabled'] = false;
-					voting_choices_item[i]['input']['type'] = voting_button_type;
-					min = (response['choices'][i]['votes'] < min) ? response['choices'][i]['votes'] : min;
-					max = (response['choices'][i]['votes'] > max) ? response['choices'][i]['votes'] : max;
-				}
-				for (var i = response['choices'].length; i < voting_choices_item.length; i++) {
-					$.classes_add(voting_choices_item[i]['wrapper'], 'hidden');
-					voting_choices_item[i]['input']['checked'] = false;
-					voting_choices_item[i]['input']['disabled'] = true;
-					voting_choices_item[i]['input']['type'] = voting_button_type;
-				}
-				var div = max - min;
-				if ((div > 0)
-				 && response.hasOwnProperty('ballots')
-				 && (response['ballots'] > 0)) {
-					for (var i = 0; i < response['choices'].length; i++) {
-						var per = (((response['choices'][i]['votes'] - min) * 100) / div);
-						var tot = ((response['choices'][i]['votes'] * 100) / response['ballots']);
-						var avg = (Math.floor(per + tot) * 0.05) - 10;
-						voting_choices_item[i]['wrapper']['style']['backgroundPositionX'] = '' + avg + 'em,' + avg + 'em';
-					}
-				} else {
-					for (var i = 0; i < response['choices'].length; i++) {
-						voting_choices_item[i]['wrapper']['style']['backgroundPositionX'] = '-10em,-10em';
-					}
-				}
-			}
-
-			if (oneshot === true) {
-				return;
-			}
-
-			if (response.hasOwnProperty('rapid') &&
-			    response['rapid'] === true) {
-				setTimeout(voting_update, 5000);
-			} else {
-				setTimeout(voting_update, 60000);
-			}
-		});
-	};
-	setTimeout(voting_update, 0);
+	$.voting_buttons_update();
 
 	$.events_add(voting_button, 'click', function(event){
 		if ($.classes_has(this, 'processing')
-		 || (voting_maxchoices === undefined)) {
+		 || ($tags_find('#voting')[0].maxchoices === undefined)) {
 			event['stopPropegation']();
 			return;
 		}
 		var votes = [];
 		for (var i = 0; i < 36; i++) {
-			if (voting_choices_item[i]['input'].checked) {
-				votes.push('votes=' + voting_choices_item[i]['input']['value']);
+			var input = $.tags_find('vote_' + i.toString(36))[0];
+			if (input['checked']) {
+				votes.push('votes=' + input['value']);
 			}
 		}
 		if (votes.length < 1) {
 			// No items selected
 			return;
 		}
-		if (votes.length > (1 + voting_maxchoices)) {
+		if (votes.length > (1 + $tags_find('#voting')[0].maxchoices)) {
 			// Too many items selected
 			return;
 		}
@@ -479,10 +460,35 @@ API_URL: (function(prefix, suffix){
 			}
 			$.classes_remove($.tags_find('#castvote')[0], 'processing');
 			console.log(JSON.parse(this.responseText));
-			setTimeout($.voting_button_update, 0);
-			voting_update(true);
+			setTimeout($.voting_buttons_update, 0);
+			$.voting_form_update(true);
 		});
 		http.send(params);
+	});
+})
+
+,voting_buttons_update: (function() {
+	var castvote = $.tags_find('#castvote')[0];
+	var connectTwitch = $.tags_find('#connectTwitch')[0];
+	/* Test if the oauth token exists, and hide the 'connect' button if so. */
+	$.classes_add(castvote, 'hidden');
+	if (localStorage['getItem']('twitch_oauth') === null) {
+		castvote['disabled'] = true;
+		$.classes_add(castvote, 'hidden');
+		$.classes_remove(connectTwitch, 'hidden');
+		return;
+	}
+
+	$.classes_add(connectTwitch, 'hidden');
+	castvote['disabled'] = true;
+	$.JSON('/voting/votedyet.php?oauth=' + localStorage['getItem']('twitch_oauth') + '&' + $.cachebuster(), function(response) {
+		if (response === false) {
+			castvote['disabled'] = false;
+			$.classes_remove(castvote, 'hidden');
+		} else {
+			castvote['disabled'] = true;
+			$.classes_add(castvote, 'hidden');
+		}
 	});
 })
 
@@ -594,7 +600,42 @@ API_URL: (function(prefix, suffix){
 		setTimeout($.packages_chat_twitch, 0);
 		setTimeout($.packages_stream_twitch, 0);
 		setTimeout($.infobricklayer, 0);
-		setTimeout($.voting_init, 0);
+
+		/*
+		 * There's several things in motion here;
+		 *
+		 *   1) Build a button to be able to 'Connect w/ Twitch'
+		 *      a) Uses popup w/ callback-to-parent construct
+		 *      b) Stores data in localStorage, not cookies
+		 *      c) Uses per-attempt 'state' parameter as well
+		 *	 2) Build the poll item storage w/ randomized order
+		 *      a) Uses 'inside out' Fisher-Yates shuffle
+		 *      b) Items are shuffled via client-side layout
+		 *      c) Shuffle is calculated once per page-load
+		 *   3) Build a button to allow for votes to be cast
+		 *      a) Only show after server recognizes OAuth
+		 *      b) Disable if server sees a vote already
+		 *      c) Trigger #4 when vote successfully cast
+		 *   4) Setup periodic poll query to verify poll status
+		 *      a) By default, every 60 seconds
+		 *      b) Polling system active? Every 5 seconds
+		 *      c) Blind rewrites labels/input-type
+		 *      d) Percentage bars are background-images.
+		 *
+		 * Keeping these things orderly w/ the multiple interlocking
+		 * components is a bit delicate as it relies on external and
+		 * untrusted sources.  Using localStorage instead of cookies 
+		 * is to avoid cluttering the client/server traffic, we only
+		 * send the OAuth string when verifying voting accessibility
+		 * and when actually casting a vote.
+		 *
+		 * The OAuth string is only kept server-side for a short bit
+		 * of time to allow caching requests without hitting Twitch,
+		 * and flushed to force re-checking Twitch periodically.
+		 */
+
+		$.voting_form_init();
+		$.voting_buttons_init();
 	})
 }
 

@@ -163,9 +163,8 @@ table.image img {
 	background-image: 
 		linear-gradient(rgba(0,0,0,0.5) 0px, transparent 4px, transparent 14px, rgba(0,0,0,0.5) 18px),
 		linear-gradient(90deg, rgba(170,0,0,0.5) 0px, rgba(170,0,0,0.5) 156px, rgba(85,0,0,0.5) 160px);
-	background-size: 160px 18px, 160px 18px;
-	background-position-x: -160px,-160px;
-	background-position-y: 1px,1px;
+	background-size: 160px 18px;
+	background-position: -160px 1px;
 }
 
 #voting ul li input {
@@ -200,19 +199,13 @@ table.image img {
 }
 
 #connectTwitch {
+	background: url(/resources/connect_twitch.png) no-repeat center;
 	position: fixed;
 	bottom: 208px;
-	width: 160px;
-	height: 32px;
-	margin-bottom: 0;
-	left: 0;
-}
-
-#connectTwitch img {
-	display: block;
+	margin: 0 30px;
 	width: 100px;
 	height: 32px;
-	margin: auto;
+	left: 0;
 }
 
 #connectTwitch.hidden {
