@@ -1,8 +1,6 @@
 <?php
 
-$queries = [
-
-'user_vote' => <<<'SQL'
+define('QUERY_USER_VOTE', <<<'SQL'
 SELECT u_id, v_id
 FROM users
 LEFT JOIN votes ON users.u_id=votes._u_id
@@ -14,10 +12,9 @@ WHERE u_oauth = ?
           FROM config
           WHERE OPTION = "poll_active"))
 SQL
+);
 
-,
-
-'user_insert' => <<<'SQL'
+define('QUERY_USER_INSERT', <<<'SQL'
 INSERT INTO users
 SET __H_oauth=UNHEX(?),
       u_oauth=?,
@@ -26,10 +23,9 @@ SET __H_oauth=UNHEX(?),
       u_sub=IF(? = 0, NULL, ""),
       u_follows=IF(? = 0, NULL, "")
 SQL
+);
 
-,
-
-'user_update' => <<<'SQL'
+define('QUERY_USER_UPDATE', <<<'SQL'
 UPDATE users
 SET __H_oauth=UNHEX(?),
       u_oauth=?,
@@ -38,8 +34,7 @@ SET __H_oauth=UNHEX(?),
 WHERE __H_name=UNHEX(?)
   AND u_name=?
 SQL
-
-];
+);
 
 $response = [
 	  'status_code' => 400
@@ -48,7 +43,6 @@ $response = [
 ];
 
 function checkifvoted() {
-	global $queries;
 	global $response;
 
 	if (!isset($_GET['oauth'])
@@ -68,7 +62,7 @@ function checkifvoted() {
 		return;
 	}
 
-	$query = $db->prepare($queries['user_vote']);
+	$query = $db->prepare(QUERY_USER_VOTE);
 	$query->bind_param('ss', $oauth, $oauthhash);
 	$query->execute();
 	$res = $query->get_result();
@@ -106,11 +100,11 @@ function checkifvoted() {
 		}
 
 		// Can't use 'INSERT ... ON DUPLICATE KEY UPDATE' due to MySQL bug #30915
-		$query = $db->prepare($queries['user_insert']);
+		$query = $db->prepare(QUERY_USER_INSERT);
 		$query->bind_param('ssssii', $oauthhash, $oauth, $usernamehash, $username, $sub, $follow);
 		if (!$query->execute()) {
 			$query->close();
-			$query = $db->prepare($queries['user_update']);
+			$query = $db->prepare(QUERY_USER_UPDATE);
 			$query->bind_param('ssiiss', $oauthhash, $oauth, $sub, $follow, $usernamehash, $username);
 			if (!$query->execute()) {
 				$response['status_code'] = 500;
