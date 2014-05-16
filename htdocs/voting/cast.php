@@ -1,8 +1,6 @@
 <?php
 
-$queries = [
-
-'activepoll' => <<<'SQL'
+define('QUERY_POLL_ACTIVE', <<<'SQL'
 SELECT p_id,
        p_maxchoices,
        p_subonly,
@@ -13,10 +11,9 @@ SELECT p_id,
 	   FROM config
 	  WHERE OPTION = "poll_active")
 SQL
+);
 
-,
-
-'pollchoices' => <<<'SQL'
+define('QUERY_POLL_CHOICES', <<<'SQL'
 SELECT c_bit,_p_i_id
   FROM choices
  WHERE _p_id =
@@ -24,13 +21,14 @@ SELECT c_bit,_p_i_id
 	   FROM config
 	  WHERE OPTION = "poll_active")
 SQL
+);
 
+$response = [
+	  'status_code' => 400
+	, 'status_message' => 'Unknown error!'
 ];
 
-$response = array('status_code' => 400, 'status_message' => 'Unknown error!');
-
 function process() {
-	global $queries;
 	global $response;
 
 	$p = file_get_contents('php://input');
@@ -65,7 +63,7 @@ function process() {
 	if (!isset($post['oauth'])
 	 || (count($post['oauth']) > 1)
 	 || (strlen($post['oauth'][0]) > 255)) {
-		$response['status_message'] = 'Missing or invalid OAuth token.';
+		$response['status_message'] = 'Missing or invalid OAuth parameter.';
 		return;
 	}
 
@@ -76,7 +74,7 @@ function process() {
 		return;
 	}
 
-	$res = $db->query($queries->['activepoll']);
+	$res = $db->query(QUERY_POLL_ACTIVE);
 	if (($res === false)
 	 || ($res->num_rows === 0)) {
 		$response['status_message'] = 'No poll active.';
@@ -97,7 +95,7 @@ function process() {
 		return;
 	}
 
-	$res = $db->query($queries['pollchoices']);
+	$res = $db->query(QUERY_POLL_CHOICES);
 	if (($res === false)
 	 || ($res->num_rows === 0)) {
 		$response['status_message'] = 'No choices in active poll.';

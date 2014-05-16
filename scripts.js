@@ -370,7 +370,7 @@ API_URL: (function(prefix, suffix){
 			for (var i = 0; i < response['choices'].length; i++) {
 				var per = (((response['choices'][i]['votes'] - min) * 80) / (max - min));
 				var tot = ((response['choices'][i]['votes'] * 80) / response['ballots']);
-				offsets[i] = Math.floor(per + tot);
+				offsets[i] = Math.floor(per + tot) - 160;
 			}
 		} else {
 			for (var i = 0; i < response['choices'].length; i++) {
@@ -417,79 +417,122 @@ API_URL: (function(prefix, suffix){
 	$.tags_append_child($.tags_find('header')[0], connect_button);
 
 	var voting_button = $.tags_create('button');
-	voting_button.id = 'castvote';
-	voting_button.type = 'button';
-	voting_button.disabled = true;
-	voting_button.innerHTML = 'Cast Vote';
+	voting_button['id'] = 'castvote';
+	voting_button['type'] = 'button';
+	voting_button['disabled'] = true;
+	voting_button['innerHTML'] = 'Cast Vote';
+	voting_button['title'] = 'Initializing... please wait!';
 	$.classes_add(voting_button, 'hidden');
-	// onclick handler added below the voting_form_update function
+	$.events_add(voting_button, 'click', $.voting_buttons_castvote);
 	$.tags_append_child($.tags_find('header')[0], voting_button);
-	$.voting_buttons_update();
 
-	$.events_add(voting_button, 'click', function(event){
-		if ($.classes_has(this, 'processing')
-		 || ($tags_find('#voting')[0].maxchoices === undefined)) {
-			event['stopPropegation']();
-			return;
-		}
-		var votes = [];
-		for (var i = 0; i < 36; i++) {
-			var input = $.tags_find('vote_' + i.toString(36))[0];
-			if (input['checked']) {
-				votes.push('votes=' + input['value']);
-			}
-		}
-		if (votes.length < 1) {
-			// No items selected
-			return;
-		}
-		if (votes.length > (1 + $tags_find('#voting')[0].maxchoices)) {
-			// Too many items selected
-			return;
-		}
-		$.classes_add(this, 'processing');
-		votes.push('oauth=' + localStorage['getItem']('twitch_oauth'));
-		votes.push('cachebuster=' + $.cachebuster());
-		var params = votes.join('&');
-		var http = new XMLHttpRequest();
-		http['open']('POST', '/voting/cast.php', true);
-		http['setRequestHeader']('Content-Type', 'application/x-www-form-urlencoded');
-		http['onreadystatechange'] = (function() {
-			if (this.readyState !== 4) {
-				return;
-			}
-			$.classes_remove($.tags_find('#castvote')[0], 'processing');
-			console.log(JSON.parse(this.responseText));
-			setTimeout($.voting_buttons_update, 0);
-			$.voting_form_update(true);
-		});
-		http.send(params);
-	});
+	$.voting_buttons_update();
 })
 
 ,voting_buttons_update: (function() {
 	var castvote = $.tags_find('#castvote')[0];
 	var connectTwitch = $.tags_find('#connectTwitch')[0];
-	/* Test if the oauth token exists, and hide the 'connect' button if so. */
-	$.classes_add(castvote, 'hidden');
-	if (localStorage['getItem']('twitch_oauth') === null) {
+
+	var oauth_invalid = (function() {
+		localStorage['removeItem']('twitch_oauth');
 		castvote['disabled'] = true;
+		castvote['title'] = 'No "Connect w/ Twitch" credentials available.';
 		$.classes_add(castvote, 'hidden');
 		$.classes_remove(connectTwitch, 'hidden');
+	});
+
+	/* No OAuth token? 'Connect with Twitch, done. */
+	if (localStorage['getItem']('twitch_oauth') === null) {
+		oauth_invalid();
 		return;
 	}
 
-	$.classes_add(connectTwitch, 'hidden');
-	castvote['disabled'] = true;
-	$.JSON('/voting/votedyet.php?oauth=' + localStorage['getItem']('twitch_oauth') + '&' + $.cachebuster(), function(response) {
-		if (response === false) {
-			castvote['disabled'] = false;
-			$.classes_remove(castvote, 'hidden');
-		} else {
-			castvote['disabled'] = true;
-			$.classes_add(castvote, 'hidden');
+	/*
+	 * Now we need to verify if the OAuth token is valid.
+	 *
+	 * First, ping Twitch first. Two reasons:
+	 *   1) If they say it's invalid, once we re-auth we'll wipe our server's OAuth immediately.
+	 *   2) Only if Twitch says it's valid, THEN we poke our server which will either:
+	 *      a) Have the right one cached and return immediately.
+	 *      b) Update it's internal status, including pulling the subscriber info a'new.
+	 *
+	 * So this sequence avoids as much load as possible on things.
+	 */
+	$.JSONP($.URL('https://api.twitch.tv/kraken'
+	             , {'oauth_token':localStorage['getItem']('twitch_oauth')})
+	       , (function(response) {
+
+		if ((!response['hasOwnProperty']('token'))
+		 || (!response['token']['hasOwnProperty']('valid'))
+		 || (response['token']['valid'] !== true)) {
+			/* Nope, invalid. WIPE! */
+			oauth_invalid();
+			return;
 		}
+
+		/* Yay, valid OAuth token, now to update our site! */
+		$.classes_add(connectTwitch, 'hidden');
+		castvote['disabled'] = true;
+		$.JSON('/voting/votedyet.php?oauth=' + localStorage['getItem']('twitch_oauth') + '&' + $.cachebuster(), function(response) {
+			if ((response['hasOwnProperty']('invalid_oauth'))
+			 && (response['invalid_oauth'] === true)) {
+				/* Nope, invalid. WIPE! */
+				oauth_invalid();
+				return;
+			}
+
+			if ((response['hasOwnProperty']('user_voted'))
+			 && (response['user_voted'] === true)) {
+				castvote['disabled'] = true;
+				castvote['title'] = 'You have already voted in this poll!';
+			} else {
+				castvote['disabled'] = false;
+				delete castvote['title'];
+			}
+
+			$.classes_remove(castvote, 'hidden');
+		});
+	}));
+})
+
+,voting_buttons_castvote: (function() {
+	if ($.classes_has(this, 'processing')
+	 || ($.tags_find('#voting')[0].maxchoices === undefined)) {
+		event['stopPropegation']();
+		return;
+	}
+	var votes = [];
+	for (var i = 0; i < 36; i++) {
+		var input = $.tags_find('#vote_' + i.toString(36))[0];
+		if (input['checked']) {
+			votes.push('votes=' + input['value']);
+		}
+	}
+	if (votes.length < 1) {
+		// No items selected
+		return;
+	}
+	if (votes.length > (1 + $.tags_find('#voting')[0].maxchoices)) {
+		// Too many items selected
+		return;
+	}
+	$.classes_add(this, 'processing');
+	votes.push('oauth=' + localStorage['getItem']('twitch_oauth'));
+	votes.push('cachebuster=' + $.cachebuster());
+	var params = votes.join('&');
+	var http = new XMLHttpRequest();
+	http['open']('POST', '/voting/cast.php', true);
+	http['setRequestHeader']('Content-Type', 'application/x-www-form-urlencoded');
+	http['onreadystatechange'] = (function() {
+		if (this.readyState !== 4) {
+			return;
+		}
+		$.classes_remove($.tags_find('#castvote')[0], 'processing');
+		console.log(JSON.parse(this.responseText));
+		setTimeout($.voting_buttons_update, 0);
+		$.voting_form_update(true);
 	});
+	http.send(params);
 })
 
 ,inits: {
