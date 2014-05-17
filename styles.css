@@ -45,7 +45,7 @@ a:active {
 }
 
 header {
-	z-index: 2;
+	z-index: 5;
 	text-align: left;
 	position: fixed;
 	top: 80px;
@@ -282,7 +282,7 @@ table.image img {
 	bottom: 204px;
 	left: 160px;
 	width: 320px;
-	z-index: 20;
+	z-index: 4;
 }
 
 #error_not_subscriber .button_close {
@@ -305,7 +305,6 @@ table.image img {
 #error_not_subscriber.hidden {
 	left: -160px;
 	opacity: 0;
-	z-index: 1;
 }
 
 #tail {
