@@ -92,16 +92,21 @@ API_URL: (function(prefix, suffix){
 	parent['appendChild'](child);
 })
 
-,JSON: (function(url, callback){
+,JSON: (function(url, callback, post_params){
 	var xhr = new XMLHttpRequest();
-	xhr.open('GET', url, true);
-	xhr.onreadystatechange = (function(){
-		if (this.readyState !== 4) { return; }
-		if (this.status < 200) { return; }
-		if (this.status >= 400) { return; }
-		callback(JSON.parse(this.responseText));
+	xhr['open']((post_params === undefined) ? 'GET' : 'POST', url, true);
+	if (post_params !== undefined) {
+		xhr['setRequestHeader']('Content-Type', 'application/x-www-form-urlencoded');
+	}
+	xhr['onreadystatechange'] = (function(){
+		if (this['readyState'] !== 4) { return; }
+		callback(JSON['parse'](this['responseText']));
 	});
-	xhr.send();
+	if (post_params === undefined) {
+		xhr.send();
+	} else {
+		xhr.send(post_params.join('&'));
+	}
 	xhr = null;
 })
 
@@ -379,7 +384,7 @@ API_URL: (function(prefix, suffix){
 		}
 		for (var i = 0; i < response['choices'].length; i++) {
 			var choice = $.tags_find('#choice_' + i.toString(36))[0];
-			choice['style']['backgroundPosition'] = '' + offsets[i] + 'px 1px';
+			choice['style']['backgroundPosition'] = '' + offsets[i] + 'px 1px,' + offsets[i] + 'px 1px';
 			$.classes_remove(choice, 'hidden');
 		}
 	});
@@ -433,6 +438,7 @@ API_URL: (function(prefix, suffix){
 	var castvote = $.tags_find('#castvote')[0];
 	var connectTwitch = $.tags_find('#connectTwitch')[0];
 
+	/* Commonly triggered case, hoisted out into it's own sub-function. */
 	var oauth_invalid = (function() {
 		localStorage['removeItem']('twitch_oauth');
 		castvote['disabled'] = true;
@@ -441,7 +447,7 @@ API_URL: (function(prefix, suffix){
 		$.classes_remove(connectTwitch, 'hidden');
 	});
 
-	/* No OAuth token? 'Connect with Twitch, done. */
+	/* No OAuth token? 'Connect with Twitch' and done. */
 	if (localStorage['getItem']('twitch_oauth') === null) {
 		oauth_invalid();
 		return;
@@ -461,7 +467,6 @@ API_URL: (function(prefix, suffix){
 	$.JSONP($.URL('https://api.twitch.tv/kraken'
 	             , {'oauth_token':localStorage['getItem']('twitch_oauth')})
 	       , (function(response) {
-
 		if ((!response['hasOwnProperty']('token'))
 		 || (!response['token']['hasOwnProperty']('valid'))
 		 || (response['token']['valid'] !== true)) {
@@ -473,7 +478,8 @@ API_URL: (function(prefix, suffix){
 		/* Yay, valid OAuth token, now to update our site! */
 		$.classes_add(connectTwitch, 'hidden');
 		castvote['disabled'] = true;
-		$.JSON('/voting/votedyet.php?oauth=' + localStorage['getItem']('twitch_oauth') + '&' + $.cachebuster(), function(response) {
+		$.JSON('/voting/votedyet.php?oauth=' + localStorage['getItem']('twitch_oauth') + '&cachebuster=' + $.cachebuster(), function(response) {
+
 			if ((response['hasOwnProperty']('invalid_oauth'))
 			 && (response['invalid_oauth'] === true)) {
 				/* Nope, invalid. WIPE! */
@@ -519,20 +525,16 @@ API_URL: (function(prefix, suffix){
 	$.classes_add(this, 'processing');
 	votes.push('oauth=' + localStorage['getItem']('twitch_oauth'));
 	votes.push('cachebuster=' + $.cachebuster());
-	var params = votes.join('&');
-	var http = new XMLHttpRequest();
-	http['open']('POST', '/voting/cast.php', true);
-	http['setRequestHeader']('Content-Type', 'application/x-www-form-urlencoded');
-	http['onreadystatechange'] = (function() {
-		if (this.readyState !== 4) {
-			return;
-		}
+	$.JSON('/voting/cast.php', (function(response) {
 		$.classes_remove($.tags_find('#castvote')[0], 'processing');
-		console.log(JSON.parse(this.responseText));
+		if ((response['hasOwnProperty']('not_subscriber'))
+		 && (response['not_subscriber'] === true)) {
+			console.log($.tags_find('#error_not_subscriber'));
+			$.classes_remove($.tags_find('#error_not_subscriber')[0], 'hidden');
+		}
 		setTimeout($.voting_buttons_update, 0);
 		$.voting_form_update(true);
-	});
-	http.send(params);
+	}), votes);
 })
 
 ,inits: {

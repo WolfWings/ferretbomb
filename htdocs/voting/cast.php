@@ -1,10 +1,19 @@
 <?php
 
+define('QUERY_USER_FIND', <<<'SQL'
+SELECT u_id
+     , u_sub
+  FROM users
+ WHERE __H_oauth = UNHEX(?)
+   AND u_oauth = ?
+SQL
+);
+
 define('QUERY_POLL_ACTIVE', <<<'SQL'
-SELECT p_id,
-       p_maxchoices,
-       p_subonly,
-       p_open
+SELECT p_id
+     , p_maxchoices
+     , p_subonly
+     , p_open
   FROM polls
  WHERE p_id =
 	(SELECT CAST(value AS UNSIGNED INTEGER)
@@ -14,7 +23,8 @@ SQL
 );
 
 define('QUERY_POLL_CHOICES', <<<'SQL'
-SELECT c_bit,_p_i_id
+SELECT c_bit
+     , _p_i_id
   FROM choices
  WHERE _p_id =
 	(SELECT CAST(value AS UNSIGNED INTEGER)
@@ -47,13 +57,7 @@ function process() {
 				array_push($post[$kv[0]], $kv[1]);
 			}
 		}
-		$kv = null;
-		unset($kv);
 	}
-	$v = null;
-	unset($v);
-	$p = null;
-	unset($p);
 
 	if (!isset($post['votes'])) {
 		$response['status_message'] = 'Missing votes to cast.';
@@ -63,7 +67,7 @@ function process() {
 	if (!isset($post['oauth'])
 	 || (count($post['oauth']) > 1)
 	 || (strlen($post['oauth'][0]) > 255)) {
-		$response['status_message'] = 'Missing or invalid OAuth parameter.';
+		$response['status_message'] = 'Missing/invalid OAuth parameter(s).';
 		return;
 	}
 
@@ -74,6 +78,21 @@ function process() {
 		return;
 	}
 
+	$oauth = $post['oauth'][0];
+	$oauthhash = hash('sha256', $oauth);
+
+	$query = $db->prepare(QUERY_USER_FIND);
+	$query->bind_param('ss', $oauthhash, $oauth);
+	$query->execute();
+	$res = $query->get_result();
+	if (($res === false)
+	 || ($res->num_rows === 0)) {
+		$response['unknown_oauth'] = true;
+		$response['status_message'] = 'User record does not exist; hasvoted.php not called first?';
+		return;
+	}
+	$user = $res->fetch_assoc();
+
 	$res = $db->query(QUERY_POLL_ACTIVE);
 	if (($res === false)
 	 || ($res->num_rows === 0)) {
@@ -81,9 +100,13 @@ function process() {
 		return;
 	}
 	$poll = $res->fetch_assoc();
-	$res->free();
-	$res = null;
-	unset($res);
+
+	if ((!is_null($poll['p_subonly']))
+	 && (is_null($user['u_sub']))) {
+		$response['status_message'] = 'Poll is subscriber-only, but user does not appear to be one.';
+		$response['not_subscriber'] = true;
+		return;
+	}
 
 	if (is_null($poll['p_open'])) {
 		$response['status_message'] = 'Poll is not open.';
@@ -105,12 +128,8 @@ function process() {
 	while ($choice = $res->fetch_assoc()) {
 		$choices[base_convert($choice['_p_i_id'], 10, 36)] = $choice['c_bit'];
 	}
-	unset($choice);
-	$res->free();
-	$res = null;
-	unset($res);
 
-	$votes = array_fill(0, 36, false);
+	$votes = array_fill(0, 40, false);
 	foreach ($post['votes'] as $vote) {
 		if (!array_key_exists($vote, $choices)) {
 			$response['status_message'] = 'Invalid ballot cast for currently active poll.';
@@ -118,10 +137,6 @@ function process() {
 		}
 		$votes[$choices[$vote]] = true;
 	}
-	$vote = null;
-	unset($vote);
-	$choices = null;
-	unset($choices);
 
 	for ($i = 0; $i < 36; $i++) {
 		if ($votes[$i] === true) {
@@ -131,68 +146,30 @@ function process() {
 			unset($votes[$i]);
 		}
 	}
-	$i = null;
-	unset($i);
-
-	$oauth = $post['oauth'][0];
-	$post = null;
-	unset($post);
-
-	$oauthhash = hash('sha256', $oauth);
-
-	$userfind = $db->prepare('SELECT u_id FROM users WHERE __H_oauth = UNHEX(?) AND u_oauth = ?');
-	$userfind->bind_param('ss', $oauthhash, $oauth);
-	$userfind->execute();
-	$res = $userfind->get_result();
-	if (($res === false)
-	 || ($res->num_rows === 0)) {
-		$response['status_message'] = 'User record does not exist; hasvoted.php not called first?';
-		return;
-	}
-	$oauthhash = null;
-	unset($oauthhash);
-	$oauth = null;
-	unset($oauth);
-
-	$user = $res->fetch_assoc();
-	$res->free();
-	$res = null;
-	unset($res);
-
-	$userfind->close();
-	$userfind = null;
-	unset($userfind);
 
 	$ip = unpack('H*', inet_pton($_SERVER['REMOTE_ADDR']))[1];
 	if (strlen($ip) === 8) {
-		array_push($votes, 'IPv6=NULL');
-		array_push($votes, 'IPv4=UNHEX(' . $ip . ')');
+		$votes[36] = 'IPv6=NULL';
+		$votes[37] = 'IPv4=UNHEX(00000000' . $ip . ')';
 	} elseif (strlen($ip) === 32) {
-		array_push($votes, 'IPv6=UNHEX(' . substr($ip, 0, 16) . ')');
-		array_push($votes, 'IPv4=UNHEX(' . substr($ip, 16, 16) . ')');
+		$votes[36] = 'IPv6=UNHEX(' . substr($ip,  0, 16) . ')';
+		$votes[37] = 'IPv4=UNHEX(' . substr($ip, 16, 16) . ')';
+	} else {
+		$votes[36] = 'IPv6=NULL';
+		$votes[37] = 'IPv4=UNHEX(0000000000000000)';
 	}
-	$ip = null;
-	unset($ip);
 
-	array_push($votes, '_u_id=' . $user['u_id']);
-	$user = null;
-	unset($user);
+	$votes[38] = '_u_id=' . $user['u_id'];
 
-	array_push($votes, '_p_id=' . $poll['p_id']);
-	$poll = null;
-	unset($poll);
+	$votes[39] = '_p_id=' . $poll['p_id'];
 
 	$query = 'INSERT INTO votes SET ' . join(',', $votes);
-	$votes = null;
-	unset($votes);
 
 	if ($db->query($query) === false) {
+		$response['status_code'] = 409;
 		$response['status_message'] = 'Unable to add vote; duplicate vote?';
 		return;
 	}
-	$db->close();
-	$db = null;
-	unset($db);
 
 	$response['status_code'] = 200;
 	$response['status_message'] = 'Vote successfully cast!';

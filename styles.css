@@ -45,6 +45,7 @@ a:active {
 }
 
 header {
+	z-index: 2;
 	text-align: left;
 	position: fixed;
 	top: 80px;
@@ -55,6 +56,7 @@ header {
 	background: #181818;
 	margin: 0;
 	padding: 64px 0 0 0;
+
 }
 
 table {
@@ -88,6 +90,52 @@ table.image caption {
 table.image img {
 	max-width: 128px;
 	max-height: 128px;
+}
+
+.subscribe_button {
+	background-color: #6A4E9E;
+	background-image: -webkit-linear-gradient(#8266B6 0%, #533787 100%);
+	background-image: -moz-linear-gradient(#8266B6 0%, #533787 100%);
+	background-image: linear-gradient(90deg, #8266B6 0%, #533787 100%);
+	border: 1px solid;
+	border-color: #5B3F8F #412771 #2A1453 #412771;
+	-webkit-box-shadow: rgba(255, 255, 255, 0.1) 0px 1px 0px 0px inset, rgba(0, 0, 0, 0.15) 0px 1px 0px 0px;
+	box-shadow: rgba(255, 255, 255, 0.1) 0px 1px 0px 0px inset, rgba(0, 0, 0, 0.15) 0px 1px 0px 0px;
+	color: #FFF;
+	display: inline-block;
+	font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+	font-size: 12px;
+	height: 28px;
+	line-height: 18px;
+	margin: 0 10px 0 0;
+	padding: 0;
+	position: relative;
+	text-decoration: none solid #FFF;
+	text-shadow: rgba(0, 0, 0, 0.75) 0px 1px 0px;
+	vertical-align: baseline;
+	width: 119px;
+}
+
+.subscribe_title {
+	display: inline-block;
+	height: 18px;
+	margin: 0;
+	padding: 5px 5px 5px 9px;
+	text-shadow: rgba(0, 0, 0, 0.75) 0px 1px 0px;
+	width: 56px;
+}
+
+.subscribe_price {
+	background-color: rgba(0, 0, 0, 0.5);
+	-webkit-box-shadow: rgba(0, 0, 0, 0.25) 0px 1px 0px 0px inset, rgba(255, 255, 255, 0.0666667) 0px 1px 0px 0px;
+	box-shadow: rgba(0, 0, 0, 0.25) 0px 1px 0px 0px inset, rgba(255, 255, 255, 0.0666667) 0px 1px 0px 0px;
+	display: inline-block;
+	font-size: 10px;
+	height: 18px;
+	margin: 0 5px 0 0;
+	padding: 0 7px;
+	text-shadow: rgba(0, 0, 0, 0.75) 0px 1px 0px;
+	width: 27px;
 }
 
 #banner {
@@ -144,9 +192,9 @@ table.image img {
 }
 
 #voting ul li {
-	width: 160px;
+	width: 100%;
 	margin: 1px 0;
-	padding: 0 0 0 4px;
+	padding: 0;
 	list-style: none;
 	display: block;
 	height: 19px;
@@ -164,10 +212,31 @@ table.image img {
 		linear-gradient(rgba(0,0,0,0.5) 0px, transparent 4px, transparent 14px, rgba(0,0,0,0.5) 18px),
 		linear-gradient(90deg, rgba(170,0,0,0.5) 0px, rgba(170,0,0,0.5) 156px, rgba(85,0,0,0.5) 160px);
 	background-size: 160px 18px;
-	background-position: -160px 1px;
+	background-position: -160px 1px,-160px 1px;
+	transition: background-position 0.5 linear;
+	-o-transition: background-position 0.5s linear;
+	-webkit-transition: background-position 0.5s linear;
 }
 
 #voting ul li input {
+	display: none;
+}
+
+#voting ul li label {
+	display: inline-block;
+	width: 100%;
+	padding-left: 4px;
+	background-color: rgba(0,0,0,0);
+	-webkit-transition: background-color 0.5s cubic-bezier(0.25,1,0.5,2);
+	-o-transition: background-color 0.5s cubic-bezier(0.25,1,0.5,2);
+	transition: background-color 0.5s cubic-bezier(0.25,1,0.5,2);
+}
+
+#voting ul li input:checked + label {
+	background-color: rgba(255,255,255,0.25);
+}
+
+#voting ul li.hidden {
 	display: none;
 }
 
@@ -185,19 +254,6 @@ table.image img {
 	display: none;
 }
 
-#voting ul li label {
-	display: inline-block;
-	width: 100%;
-}
-
-#voting ul li input:checked + label {
-	background: rgba(255,255,0,0.25);
-}
-
-#voting ul li.hidden {
-	display: none;
-}
-
 #connectTwitch {
 	background: url(/resources/connect_twitch.png) no-repeat center;
 	position: fixed;
@@ -212,7 +268,48 @@ table.image img {
 	display: none;
 }
 
+#error_not_subscriber {
+	padding: 0;
+	margin: 0;
+	border: 4px solid #181818;
+	border-left: none;
+	border-radius: 0 0 20px 0;
+	color: #000;
+	background: #FFC;
+	overflow: hidden;
+	position: fixed;
+	transition: left 1s ease, opacity 1s linear;
+	bottom: 204px;
+	left: 160px;
+	width: 320px;
+	z-index: 20;
+}
+
+#error_not_subscriber .button_close {
+	background: #181818;
+	width: 32px;
+	height: 32px;
+	float: right;
+	font-family: monospace;
+	font-size: 24px;
+	text-align: right;
+	vartical-align: middle;
+	border-radius: 0 0 0 100%;
+}
+
+#error_not_subscriber p {
+	padding-left: 0;
+	margin: 10px 10px;
+}
+
+#error_not_subscriber.hidden {
+	left: -160px;
+	opacity: 0;
+	z-index: 1;
+}
+
 #tail {
+	z-index: 2;
 	position: fixed;
 	left: 0;
 	bottom: 48px;
@@ -461,7 +558,7 @@ ul.notecards li + li {
 	margin-top: 80px;
 	position: absolute;
 	background: #fff;
-	z-index: 2;
+	z-index: 3;
 }
 
 #content #stream:before {

@@ -1,16 +1,10 @@
 <?php
 
-define('QUERY_USER_VOTE', <<<'SQL'
-SELECT u_id, v_id
-FROM users
-LEFT JOIN votes ON users.u_id=votes._u_id
-WHERE u_oauth = ?
-  AND __H_oauth = UNHEX(?)
-  AND (_p_id IS NULL
-       OR _p_id=
-         (SELECT CAST(value AS UNSIGNED INTEGER)
-          FROM config
-          WHERE OPTION = "poll_active"))
+define('QUERY_USER_FIND', <<<'SQL'
+SELECT u_id
+  FROM users
+ WHERE __H_oauth = UNHEX(?)
+   AND u_oauth = ?
 SQL
 );
 
@@ -36,10 +30,21 @@ WHERE __H_name=UNHEX(?)
 SQL
 );
 
+define('QUERY_VOTE_COUNT', <<<'SQL'
+SELECT v_id
+  FROM votes
+ WHERE _u_id = ?
+   AND _p_id =
+	(SELECT CAST(value AS UNSIGNED INTEGER)
+	   FROM config
+	  WHERE option = "poll_active")
+SQL
+);
+
 $response = [
 	  'status_code' => 400
 	, 'status_message' => 'Unknown error!'
-	, 'voted_yet' => false
+	, 'user_voted' => false
 ];
 
 function checkifvoted() {
@@ -62,8 +67,8 @@ function checkifvoted() {
 		return;
 	}
 
-	$query = $db->prepare(QUERY_USER_VOTE);
-	$query->bind_param('ss', $oauth, $oauthhash);
+	$query = $db->prepare(QUERY_USER_FIND);
+	$query->bind_param('ss', $oauthhash, $oauth);
 	$query->execute();
 	$res = $query->get_result();
 	if (($res === false)
@@ -114,25 +119,35 @@ function checkifvoted() {
 		}
 		$query->close();
 
-		$query = $db->prepare($queries['user_vote']);
-		$query->bind_param('ss', $oauth, $oauthhash);
+		$query = $db->prepare(QUERY_USER_FIND);
+		$query->bind_param('ss', $oauthhash, $oauth);
 		$query->execute();
 		$res = $query->get_result();
 	}
 
-	$data = $res->fetch_assoc();
+	if (($res === false)
+	 || ($res->num_rows === 0)) {
+		$response['status_code'] = 500;
+		$response['status_message'] = 'Unable to find user record after creation/update.';
+		return;
+	}
+
+	$user = $res->fetch_assoc();
 	$res->free();
 	$query->close();
 
-	$response['status_code'] = 200;
-	if (is_null($data['v_id'])) {
+	$query = $db->prepare(QUERY_VOTE_COUNT);
+	$query->bind_param('i', $user['u_id']);
+	$query->execute();
+	$res = $query->get_result();
+	if (($res === false)
+	 || ($res->num_rows === 0)) {
 		$response['status_message'] = 'User has not voted.';
-	} else {
-		$response['user_voted'] = true;
-		$response['status_message'] = 'User HAS voted.';
+		return;
 	}
 
-	return;
+	$response['user_voted'] = true;
+	$response['status_message'] = 'User HAS voted.';
 }
 
 checkifvoted();
