@@ -413,10 +413,8 @@ API_URL: (function(prefix, suffix){
 			,'status=yes'
 			].join(',')
 		);
-		console.log('Popup opened...');
 		var test_window_closed = (function() {
 			if (popup && popup.closed) {
-				console.log('Popup window closed.');
 				$.voting_buttons_update();
 				return;
 			}
@@ -541,7 +539,6 @@ API_URL: (function(prefix, suffix){
 
 		if ((response['hasOwnProperty']('not_subscriber'))
 		 && (response['not_subscriber'] === true)) {
-			console.log($.tags_find('#error_not_subscriber'));
 			$.classes_remove($.tags_find('#error_not_subscriber')[0], 'hidden');
 			return;
 		}
@@ -654,8 +651,8 @@ API_URL: (function(prefix, suffix){
 	,'stream': (function() {
 		$.classes_remove($.tags_find('#onair')[0], 'pulsing');
 
-//		setTimeout($.packages_chat_twitch, 0);
-//		setTimeout($.packages_stream_twitch, 0);
+		setTimeout($.packages_chat_twitch, 0);
+		setTimeout($.packages_stream_twitch, 0);
 		setTimeout($.infobricklayer, 0);
 
 		/*
