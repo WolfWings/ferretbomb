@@ -172,6 +172,7 @@ function process() {
 	}
 
 	$response['status_code'] = 200;
+	$response['vote_cast'] = true;
 	$response['status_message'] = 'Vote successfully cast!';
 }
 

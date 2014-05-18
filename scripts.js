@@ -65,10 +65,10 @@ API_URL: (function(prefix, suffix){
 })
 
 ,events_add: (function(object, event, callback){
-	if (object['attachEvent']) {
-		object['attachEvent']('on' + event, callback);
+	if (object['addEventListener']) {
+		object['addEventListener'](event, callback, true);
 	} else {
-		object['addEventListener'](event, callback, false);
+		object['attachEvent']('on' + event, callback);
 	}
 	return callback;
 })
@@ -88,8 +88,8 @@ API_URL: (function(prefix, suffix){
 ,tags_attribute_set: (function(tag, attribute, value){
 	tag['setAttribute'](attribute, value);
 })
-,tags_append_child: (function(parent, child){
-	parent['appendChild'](child);
+,tags_append_child: (function(parent, child, before){
+	parent['insertBefore'](child, before);
 })
 
 ,JSON: (function(url, callback, post_params){
@@ -316,7 +316,7 @@ API_URL: (function(prefix, suffix){
 	voting_form.maxchoices = undefined;
 	$.tags_append_child(voting_form, voting_choices);
 
-	$.tags_append_child($.tags_find('header')[0], voting_form);
+	$.tags_append_child($.tags_find('header')[0], voting_form, $.tags_find('#tail')[0]);
 
 	setTimeout($.voting_form_update, 0);
 })
@@ -404,7 +404,7 @@ API_URL: (function(prefix, suffix){
 			,'client_id':     twitch_client_id
 			,'state':         localStorage['getItem']('twitch_secret')
 			})
-		,	'Login with TwitchTV'
+		,	'LoginWithTwitchTV'
 		,	['width=660'
 			,'height=600'
 			,'modal=yes'
@@ -413,13 +413,18 @@ API_URL: (function(prefix, suffix){
 			,'status=yes'
 			].join(',')
 		);
-		$.events_add(popup, 'load', (function() {
-			$.events_add(popup, 'unload', (function() {
+		console.log('Popup opened...');
+		var test_window_closed = (function() {
+			if (popup && popup.closed) {
+				console.log('Popup window closed.');
 				$.voting_buttons_update();
-			}));
-		}));
+				return;
+			}
+			setTimeout(test_window_closed, 500);
+		});
+		test_window_closed();
 	});
-	$.tags_append_child($.tags_find('header')[0], connect_button);
+	$.tags_append_child($.tags_find('header')[0], connect_button, $.tags_find('#tail')[0]);
 
 	var voting_button = $.tags_create('button');
 	voting_button['id'] = 'castvote';
@@ -429,7 +434,7 @@ API_URL: (function(prefix, suffix){
 	voting_button['title'] = 'Initializing... please wait!';
 	$.classes_add(voting_button, 'hidden');
 	$.events_add(voting_button, 'click', $.voting_buttons_castvote);
-	$.tags_append_child($.tags_find('header')[0], voting_button);
+	$.tags_append_child($.tags_find('header')[0], voting_button, $.tags_find('#tail')[0]);
 
 	$.voting_buttons_update();
 })
@@ -489,14 +494,16 @@ API_URL: (function(prefix, suffix){
 
 			if ((response['hasOwnProperty']('user_voted'))
 			 && (response['user_voted'] === true)) {
+				$.classes_add(castvote, 'hidden');
 				castvote['disabled'] = true;
 				castvote['title'] = 'You have already voted in this poll!';
-			} else {
-				castvote['disabled'] = false;
-				delete castvote['title'];
+				return;
 			}
 
+			castvote['title'] = 'Click here to cast your vote!';
+			castvote['disabled'] = false;
 			$.classes_remove(castvote, 'hidden');
+
 		});
 	}));
 })
@@ -511,6 +518,7 @@ API_URL: (function(prefix, suffix){
 	for (var i = 0; i < 36; i++) {
 		var input = $.tags_find('#vote_' + i.toString(36))[0];
 		if (input['checked']) {
+			input['checked'] = false;
 			votes.push('votes=' + input['value']);
 		}
 	}
@@ -526,14 +534,18 @@ API_URL: (function(prefix, suffix){
 	votes.push('oauth=' + localStorage['getItem']('twitch_oauth'));
 	votes.push('cachebuster=' + $.cachebuster());
 	$.JSON('/voting/cast.php', (function(response) {
+
 		$.classes_remove($.tags_find('#castvote')[0], 'processing');
+		setTimeout($.voting_buttons_update, 0);
+		$.voting_form_update(true);
+
 		if ((response['hasOwnProperty']('not_subscriber'))
 		 && (response['not_subscriber'] === true)) {
 			console.log($.tags_find('#error_not_subscriber'));
 			$.classes_remove($.tags_find('#error_not_subscriber')[0], 'hidden');
+			return;
 		}
-		setTimeout($.voting_buttons_update, 0);
-		$.voting_form_update(true);
+
 	}), votes);
 })
 
@@ -642,8 +654,8 @@ API_URL: (function(prefix, suffix){
 	,'stream': (function() {
 		$.classes_remove($.tags_find('#onair')[0], 'pulsing');
 
-		setTimeout($.packages_chat_twitch, 0);
-		setTimeout($.packages_stream_twitch, 0);
+//		setTimeout($.packages_chat_twitch, 0);
+//		setTimeout($.packages_stream_twitch, 0);
 		setTimeout($.infobricklayer, 0);
 
 		/*
