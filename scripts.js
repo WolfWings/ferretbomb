@@ -431,7 +431,9 @@ API_URL: (function(prefix, suffix){
 	 *      a) Have the right one cached and return immediately.
 	 *      b) Update it's internal status, including pulling the subscriber info a'new.
 	 *
-	 * So this sequence avoids as much load as possible on things.
+	 * So this sequence avoids as much load as possible on things, and is needed because
+	 * we're checking w/ Twitch directly to avoid hitting the cached OAuth hash we store
+	 * on our own database for rapid vote handling.
 	 */
 	$.JSONP($.URL('https://api.twitch.tv/kraken'
 	             , {'oauth_token':localStorage['getItem']('twitch_oauth')})
