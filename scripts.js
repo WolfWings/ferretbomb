@@ -114,7 +114,8 @@ API_URL: (function(prefix, suffix){
 	var counter = 0;
 
 	var memoryleakcap = function() {
-		if (this.readyState !== 'loaded' && this.readyState !== 'complete') {
+		if ((this.readyState !== 'loaded')
+		 && (this.readyState !== 'complete')) {
 			return;
 		}
 
@@ -127,7 +128,7 @@ API_URL: (function(prefix, suffix){
 	return function(url, callback) {
 		var uniqueName = 'callback_json' + (++counter);
 
-		window[ uniqueName ] = function(data){
+		window[uniqueName] = function(data){
 			callback(data);
 			window[uniqueName] = null;
 			try {
@@ -183,23 +184,32 @@ API_URL: (function(prefix, suffix){
 	var bricks = $.tags_find('.brick');
 	var infopanels = $.tags_find('.infopanels')[0];
 
-	$.events_add(window, 'resize', (function() {
+	setTimeout($.events_add(window, 'resize', (function() {
 		var oldcolumns = $.tags_find('.column');
+		var columns = [];
 		var total = Math.floor(infopanels['scrollWidth'] / bricks[0]['scrollWidth']);
+
+		/* Skip re-flow if not needed. */
+		if (oldcolumns.length === total) {
+			return;
+		}
 
 		/* Skip old-column logic if there aren't any columns. */
 		if (oldcolumns.length > 0) {
-			/* Skip re-flow if not needed. */
-			if (oldcolumns.length === total) {
-				return;
-			}
-			/* First move all the bricks out of their columns. */
+			/* Move all the bricks out of their old columns. */
 			for (var i = 0; i < bricks.length; i++) {
 				$.tags_append_child(infopanels, bricks[i]);
 			}
-			/* Now delete all the columns to avoid leaking memory. */
+
+			/* Convert NodeList into Array. */
 			for (var i = 0; i < oldcolumns.length; i++) {
-				oldcolumns[i].parentNode.removeChild(oldcolumns[i]);
+				columns.push(oldcolumns[i]);
+			}
+
+			/* Delete excess columns. */
+			while (columns.length > total) {
+				var i = columns.pop();
+				i.parentNode.removeChild(i);
 			}
 		}
 
@@ -208,18 +218,18 @@ API_URL: (function(prefix, suffix){
 			return;
 		}
 
-		/* First, create all the columns needed. */
-		var columns = new Array(total);
-		for (var i = 0; i < total; i++) {
-			columns[i] = $.tags_create('div');
-			$.classes_add(columns[i], 'column');
-			$.tags_append_child(infopanels, columns[i]);
+		/* Create additional columns if/as needed. */
+		while (columns.length < total) {
+			var i = $.tags_create('div');
+			$.classes_add(i, 'column');
+			$.tags_append_child(infopanels, i);
+			columns.push(i);
 		}
 
-		/* Flow mechanic is simple: Append each brick to vertically-shortest column. */
+		/* Append each brick to vertically-shortest column. */
 		for (var i = 0; i < bricks.length; i++) {
 			var column = 0;
-			var height = columns[column].scrollHeight;
+			var height = columns[0].scrollHeight;
 			for (var j = 1; j < columns.length; j++) {
 				if (columns[j]['scrollHeight'] < height) {
 					height = columns[j]['scrollHeight'];
@@ -229,51 +239,7 @@ API_URL: (function(prefix, suffix){
 
 			$.tags_append_child(columns[column], bricks[i]);
 		}
-	}))();
-})
-
-,packages_chat_twitch: (function() {
-	var chat = $.tags_find('#chat')[0];
-	var tag = $.tags_create('iframe');
-	tag.id = 'chat_embed';
-	tag.frameborder = 0;
-	tag.scrolling = 'no';
-	tag.width = '100%';
-	tag.height = '100%';
-	tag.src = 'http://www.twitch.tv/ferretbomb/chat';
-	$.tags_append_child(chat, tag);
-})
-
-,packages_stream_twitch: (function() {
-	var stream = $.tags_find('#stream')[0];
-	var embed = $.tags_create('object');
-	var attribs = {
-		'type': 'application/x-shockwave-flash'
-		,'wmode': 'opaque'
-		,'width': '100%'
-		,'height': '100%'
-		,'id': 'stream_embed'
-		,'bgcolor': '#000'
-		,'data': 'http://www.twitch.tv/widgets/live_embed_player.swf?channel=ferretbomb'
-	};
-	for (var attrib in attribs) {
-		$.tags_attribute_set(embed, attrib, attribs[attrib]);
-	}
-	var params = {
-		'allowFullScreen': 'true'
-		,'allowScriptAccess': 'true'
-		,'allowNetworking': 'true'
-		,'wmode': 'opaque'
-		,'movie': 'http://www.twitch.tv/widgets/live_embed_player.swf'
-		,'flashvars': 'hostname=www.twitch.tv&channel=ferretbomb&auto_play=true&start_volume=50'
-	};
-	for (var param in params) {
-		var tag = $.tags_create('param');
-		$.tags_attribute_set(tag, 'name', param);
-		$.tags_attribute_set(tag, 'value', params[param]);
-		$.tags_append_child(embed, tag);
-	}
-	$.tags_append_child(stream, embed);
+	})), 0);
 })
 
 ,voting_form_init: (function() {
@@ -651,9 +617,51 @@ API_URL: (function(prefix, suffix){
 	,'stream': (function() {
 		$.classes_remove($.tags_find('#onair')[0], 'pulsing');
 
-		setTimeout($.packages_chat_twitch, 0);
-		setTimeout($.packages_stream_twitch, 0);
-		setTimeout($.infobricklayer, 0);
+		setTimeout(function() {
+			var chat = $.tags_find('#chat')[0];
+			var tag = $.tags_create('iframe');
+			tag.id = 'chat_embed';
+			tag.frameborder = 0;
+			tag.scrolling = 'no';
+			tag.width = '100%';
+			tag.height = '100%';
+			tag.src = 'http://www.twitch.tv/ferretbomb/chat';
+			$.tags_append_child(chat, tag);
+		}, 0);
+
+		setTimeout(function() {
+			var stream = $.tags_find('#stream')[0];
+			var embed = $.tags_create('object');
+			var attribs = {
+				'type': 'application/x-shockwave-flash'
+				,'wmode': 'opaque'
+				,'width': '100%'
+				,'height': '100%'
+				,'id': 'stream_embed'
+				,'bgcolor': '#000'
+				,'data': 'http://www.twitch.tv/widgets/live_embed_player.swf?channel=ferretbomb'
+			};
+			for (var attrib in attribs) {
+				$.tags_attribute_set(embed, attrib, attribs[attrib]);
+			}
+			var params = {
+				'allowFullScreen': 'true'
+				,'allowScriptAccess': 'true'
+				,'allowNetworking': 'true'
+				,'wmode': 'opaque'
+				,'movie': 'http://www.twitch.tv/widgets/live_embed_player.swf'
+				,'flashvars': 'hostname=www.twitch.tv&channel=ferretbomb&auto_play=true&start_volume=50'
+			};
+			for (var param in params) {
+				var tag = $.tags_create('param');
+				$.tags_attribute_set(tag, 'name', param);
+				$.tags_attribute_set(tag, 'value', params[param]);
+				$.tags_append_child(embed, tag);
+			}
+			$.tags_append_child(stream, embed);
+		}, 0);
+
+		$.infobricklayer();
 
 		/*
 		 * There's several things in motion here;
