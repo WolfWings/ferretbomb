@@ -316,7 +316,7 @@ API_URL: (function(prefix, suffix){
 	voting_form.maxchoices = undefined;
 	$.tags_append_child(voting_form, voting_choices);
 
-	$.tags_append_child($.tags_find('header')[0], voting_form, $.tags_find('#tail')[0]);
+	$.tags_append_child($.tags_find('header')[0], voting_form /* , $.tags_find('#tail')[0] */ );
 
 	setTimeout($.voting_form_update, 0);
 })
@@ -422,7 +422,7 @@ API_URL: (function(prefix, suffix){
 		});
 		test_window_closed();
 	});
-	$.tags_append_child($.tags_find('header')[0], connect_button, $.tags_find('#tail')[0]);
+	$.tags_append_child($.tags_find('header')[0], connect_button /* , $.tags_find('#tail')[0] */ );
 
 	var voting_button = $.tags_create('button');
 	voting_button['id'] = 'castvote';
@@ -432,7 +432,7 @@ API_URL: (function(prefix, suffix){
 	voting_button['title'] = 'Initializing... please wait!';
 	$.classes_add(voting_button, 'hidden');
 	$.events_add(voting_button, 'click', $.voting_buttons_castvote);
-	$.tags_append_child($.tags_find('header')[0], voting_button, $.tags_find('#tail')[0]);
+	$.tags_append_child($.tags_find('header')[0], voting_button /* , $.tags_find('#tail')[0] */ );
 
 	$.voting_buttons_update();
 })

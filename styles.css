@@ -188,6 +188,7 @@ table.image img {
 }
 
 #voting ul li {
+	position: relative;
 	width: 100%;
 	margin: 1px 0;
 	padding: 0;
@@ -215,13 +216,22 @@ table.image img {
 }
 
 #voting ul li input {
+/*
 	display: none;
+ */
+	margin: 0;
+	padding: 0;
+	position: absolute;
+	left: 1px;
+	top: 2px;
+	width: 16px;
+	height: 16px;
 }
 
 #voting ul li label {
 	display: inline-block;
 	width: 100%;
-	padding-left: 4px;
+	padding-left: 24px;
 	background-color: rgba(0,0,0,0);
 	-webkit-transition: background-color 0.5s cubic-bezier(0.25,1,0.5,2);
 	-o-transition: background-color 0.5s cubic-bezier(0.25,1,0.5,2);
@@ -280,7 +290,7 @@ table.image img {
 }
 
 #error_not_subscriber img {
-	vertical-align: middle;
+	vertical-align: text-top;
 }
 
 #error_not_subscriber p {
@@ -295,13 +305,13 @@ table.image img {
 #error_not_subscriber .button_close {
 	position: relative;
 	padding: 0;
-	margin: -4px -4px 0 8px;
+	margin: 4px 4px 0 8px;
 	color: #000;
 	background: #F00;
 	border: 4px solid #181818;
 	border-radius: 100%;
-	width: 30px;
-	height: 30px;
+	width: 22px;
+	height: 22px;
 	float: right;
 }
 
@@ -310,11 +320,11 @@ table.image img {
 	content: "";
 	display: inline-block;
 	position: absolute;
-	right: 5px;
-	top: 13px;
+	right: 3px;
+	top: 9px;
 	border: none;
 	background: #000;
-	width: 20px;
+	width: 16px;
 	height: 4px;
 }
 
