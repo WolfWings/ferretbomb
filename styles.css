@@ -232,14 +232,19 @@ table.image img {
 	display: inline-block;
 	width: 100%;
 	padding-left: 24px;
-	background-color: rgba(0,0,0,0);
-	-webkit-transition: background-color 0.5s cubic-bezier(0.25,1,0.5,2);
-	-o-transition: background-color 0.5s cubic-bezier(0.25,1,0.5,2);
-	transition: background-color 0.5s cubic-bezier(0.25,1,0.5,2);
 }
 
 #voting ul li input:checked + label {
-	background-color: rgba(255,255,255,0.25);
+	background-image:
+		-webkit-linear-gradient(rgba(255,255,0,0.5) 0px, transparent 4px, transparent 14px, rgba(255,255,0,0.5) 18px),
+		-webkit-linear-gradient(0, transparent 0px, transparent 80px, rgba(255,255,0,0.5) 160px);
+	background-image:
+		-moz-linear-gradient(rgba(255,255,0,0.5) 0px, transparent 4px, transparent 14px, rgba(255,255,0,0.5) 18px),
+		-moz-linear-gradient(0, transparent 0px, transparent 80px, rgba(255,255,0,0.5) 160px);
+	background-image: 
+		linear-gradient(rgba(255,255,0,0.5) 0px, transparent 4px, transparent 14px, rgba(255,255,0,0.5) 18px),
+		linear-gradient(90deg0, transparent 0px, transparent 80px, rgba(255,255,0,0.5) 160px);
+	background-position: 0 1px;
 }
 
 #voting ul li.hidden {
