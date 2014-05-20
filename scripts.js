@@ -76,8 +76,11 @@ API_URL: (function(prefix, suffix){
 ,tags_create: (function(tagname){
 	return document['createElement'](tagname);
 })
-,tags_find: (function(selector){
-	return document['querySelectorAll'](selector);
+,tags_find: (function(selector, parent){
+	if (parent === undefined) {
+		parent = document;
+	}
+	return parent['querySelectorAll'](selector);
 })
 ,tags_attribute_has: (function(tag, attribute){
 	return tag['hasAttribute'](attribute);
@@ -163,7 +166,7 @@ API_URL: (function(prefix, suffix){
 		}
 
 		setTimeout($.checkstream, delay);
-		$.tags_attribute_set(tag, 'title', title);
+		tag['title'] = title;
 		operation(tag, 'online');
 	});
 })
@@ -477,7 +480,7 @@ API_URL: (function(prefix, suffix){
 ,voting_buttons_castvote: (function() {
 	if ($.classes_has(this, 'processing')
 	 || ($.tags_find('#voting')[0].maxchoices === undefined)) {
-		event['stopPropegation']();
+		event['stopPropagation']();
 		return;
 	}
 	var votes = [];
@@ -516,76 +519,67 @@ API_URL: (function(prefix, suffix){
 
 ,inits: {
 	'article': (function() {
-		var header = $.tags_find('header')[0];
 		var outline = $.tags_create('div');
-		$.tags_attribute_set(outline, 'id', 'outline');
-		$.tags_append_child(header, outline);
-		$.events_add(outline, 'click', (function(event){
+		outline['id'] = 'outline';
+
+		$.events_add(outline, 'click', (function(event) {
+			/* Assemble list of elements to expand, if any. */
+			var newtags = [];
 			for (var tag = event.toElement;
-			     tag && $.tags_attribute_get(tag, 'id') !== 'outline';
+			     tag && (tag['id'] !== 'outline');
 			     tag = tag.parentNode) {
-				if ($.classes_has(tag, 'leaf')
-				 || $.classes_has(tag, 'expanded')) {
-					return true;
+				if ((tag.tagName === 'LI')
+				 && (!($.classes_has(tag, 'leaf')))) {
+					newtags.push(tag);
 				}
 			}
-			var tags = $.tags_find('.expanded');
-			for (var tag = 0;
-			     tag < tags['length'];
-			     tag++) {
-				$.classes_remove(tags[tag], 'expanded');
-			};
-			for (var tag = event.toElement;
-			     tag && $.tags_attribute_get(tag, 'id') !== 'outline';
-			     tag = tag.parentNode) {
-				$.classes_add(tag, 'expanded');
+
+			/* Drop the 'last' item as it will be one of the H1 tags. */
+			newtags.pop();
+
+			/* No valid tags to mark expanded? Bail! */
+			if (newtags.length < 1) {
+				return;
 			}
-			event['stopPropegation']();
-			return false;
+
+			var oldtags = $.tags_find('.expanded');
+			for (var i = 0; i < oldtags.length; i++) {
+				$.classes_remove(oldtags[i], 'expanded');
+			}
+
+			for (var i = 0; i < newtags.length; i++) {
+				$.classes_add(newtags[i], 'expanded');
+			}
 		}));
 
-		(function(outline) {
-			var headings = '';
-			var depth = 0;
-			for (var tag = $.tags_find('#content')[0].firstChild;
-			     tag;
-			     tag = tag.nextSibling) {
-				var isheader = /^[Hh]([1-6])$/.exec(tag.nodeName);
-				if (isheader === null) {
-					continue;
-				}
-				var newdepth = parseInt(isheader[1], 10);
-				if (depth === newdepth) {
-					headings += '</li><li>';
-				} else {
-					headings += new Array(Math.abs(depth - newdepth) + 1).join((depth < newdepth) ? '<ol><li>' : '</li></ol></li><li>');
-					depth = newdepth;
-				}
-				if ($.tags_attribute_has(tag, 'id')) {
-					headings += '<a href="#' + $.tags_attribute_get(tag, 'id') + '">' + tag.innerHTML + '</a>';
-				} else {
-					headings += tag.innerHTML;
-				}
+		var tags = $.tags_find('#content h1,#content h2,#content h3,#content h4,#content h5,#content h6');
+		var headings = '';
+		var depth = 0;
+		for (var i = 0; i < tags.length; i++) {
+			var newdepth = parseInt(tags[i]['tagName']['substr'](1));
+			if (depth === newdepth) {
+				headings += '</li><li>';
+			} else {
+				headings += new Array(Math.abs(depth - newdepth) + 1).join((depth < newdepth) ? '<ol><li>' : '</li></ol></li><li>');
+				depth = newdepth;
 			}
-			headings += new Array(depth + 1).join('</li></ol>');
-			headings = headings.split('<ol');
-			for (var index = 1;
-			     index < headings.length;
-			     index++) {
-				if (headings[index].indexOf('</ol>') !== -1) {
-					headings[index] = ' class="leaf"' + headings[index];
-				}
+			if ($.tags_attribute_has(tags[i], 'id')) {
+				headings += '<a href="#' + tags[i]['id'] + '">' + tags[i]['innerHTML'] + '</a>';
+			} else {
+				headings += tags[i]['innerHTML'];
 			}
-			headings = headings.join('<ol').split('<li');
-			for (var index = 1;
-			     index < headings.length;
-			     index++) {
-				if (headings[index].indexOf('<ol') === -1) {
-					headings[index] = ' class="leaf"' + headings[index];
-				}
+		}
+		headings += new Array(depth + 1).join('</li></ol>');
+
+		headings = headings.split('<li');
+		for (var i = 1; i < headings.length; i++) {
+			if (headings[i].indexOf('<ol') === -1) {
+				headings[i] = ' class="leaf"' + headings[i];
 			}
-			outline.innerHTML = headings.join('<li');
-		})(outline);
+		}
+		outline.innerHTML = headings.join('<li');
+
+		$.tags_append_child($.tags_find('header')[0], outline);
 	})
 
 	,'twitter': (function() {
