@@ -25,7 +25,7 @@ API_URL: (function(prefix, suffix){
 ,URL: (function(base, parameters){
 	var URI = base.toString();
 	var packaged = [];
-	for (var param in parameters) { if (parameters['hasOwnProperty'](param)) {
+	for (var param in parameters) { if ($.property_exists(parameters, param)) {
 		packaged.push(param + '=' + parameters[param].toString());
 	} }
 	if (packaged.length > 0) {
@@ -38,6 +38,10 @@ API_URL: (function(prefix, suffix){
  *
  * Yes, it's UGLY as sin to any normal coder, but saves quite a bit of space! =O.o=
  */
+
+,property_exists: (function(object, property) {
+	return object['hasOwnProperty'](property);
+})
 
 ,classes_match: (function(theClass){
 	return new RegExp('(?:^|\\s)' + theClass + '(?!\\S)', 'g');
@@ -174,7 +178,7 @@ API_URL: (function(prefix, suffix){
 })
 
 ,cachebuster: (function() {
-	return (new Date().getTime()).toString(36);
+	return (Math.random() + 1).toString(36).substring(2) + (new Date().getTime()).toString(36);
 })
 
 ,banner_init: (function(){
@@ -293,29 +297,29 @@ API_URL: (function(prefix, suffix){
 })
 
 ,voting_form_update: (function(oneshot) {
-	$.JSON('/voting/tally.php?' + $.cachebuster(), function(response) {
+	$.JSON('/voting/tally.php?cachebuster=' + $.cachebuster(), function(response) {
 		if (oneshot !== true) {
-			if (response.hasOwnProperty('rapid') &&
-			    response['rapid'] === true) {
+			if ($.property_exists(response, 'rapid')
+			 && response['rapid'] === true) {
 				setTimeout($.voting_form_update, 5000);
 			} else {
 				setTimeout($.voting_form_update, 60000);
 			}
 		}
 
-		if (response.hasOwnProperty('title')) {
+		if ($.property_exists(response, 'title')) {
 			$.tags_find('#voting ul lh')[0].innerHTML = response['title'];
 		}
 
 		var voting_button_type = 'checkbox';
-		if (response.hasOwnProperty('maxchoices')) {
+		if ($.property_exists(response, 'maxchoices')) {
 			$.tags_find('#voting')[0].maxchoices = response['maxchoices'];
 			if (response['maxchoices'] === 0) {
 				voting_button_type = 'radio';
 			}
 		}
 
-		for (var i = (response.hasOwnProperty('choices') ? response['choices'].length : 0); i < 36; i++) {
+		for (var i = ($.property_exists(response, 'choices') ? response['choices'].length : 0); i < 36; i++) {
 			$.classes_add($.tags_find('#choice_' + i.toString(36))[0], 'hidden');
 			var input = $.tags_find('#vote_' + i.toString(36))[0];
 			input['checked'] = false;
@@ -323,7 +327,7 @@ API_URL: (function(prefix, suffix){
 			input['type'] = voting_button_type;
 		}
 
-		if (!response.hasOwnProperty('choices')) {
+		if (!$.property_exists(response, 'choices')) {
 			return;
 		}
 
@@ -341,7 +345,7 @@ API_URL: (function(prefix, suffix){
 
 		var offsets = [];
 		if ((max > min)
-		 && response.hasOwnProperty('ballots')
+		 && $.property_exists(response, 'ballots')
 		 && (response['ballots'] > 0)) {
 			for (var i = 0; i < response['choices'].length; i++) {
 				var per = (((response['choices'][i]['votes'] - min) * 80) / (max - min));
@@ -367,7 +371,7 @@ API_URL: (function(prefix, suffix){
 	connect_button.id = 'connectTwitch';
 	$.classes_add(connect_button, 'hidden');
 	$.events_add(connect_button, 'click', function(){
-		localStorage['setItem']('twitch_secret', Math.floor((1+Math.random())*0x19A100).toString(36).substring(1));
+		localStorage['setItem']('twitch_secret', $.cachebuster());
 		var popup = window.open($.URL('https://api.twitch.tv/kraken/oauth2/authorize',
 			{'response_type': 'token'
 			,'scope':         'user_subscriptions'
@@ -447,8 +451,8 @@ API_URL: (function(prefix, suffix){
 	$.JSONP($.URL('https://api.twitch.tv/kraken'
 	             , {'oauth_token':localStorage['getItem']('twitch_oauth')})
 	       , (function(response) {
-		if ((!response['hasOwnProperty']('token'))
-		 || (!response['token']['hasOwnProperty']('valid'))
+		if ((!$.property_exists(response, 'token'))
+		 || (!$.property_exists(response['token'], 'valid'))
 		 || (response['token']['valid'] !== true)) {
 			/* Nope, invalid. WIPE! */
 			oauth_invalid();
@@ -460,14 +464,14 @@ API_URL: (function(prefix, suffix){
 		castvote['disabled'] = true;
 		$.JSON('/voting/votedyet.php?oauth=' + localStorage['getItem']('twitch_oauth') + '&cachebuster=' + $.cachebuster(), function(response) {
 
-			if ((response['hasOwnProperty']('invalid_oauth'))
+			if (($.property_exists(response, 'invalid_oauth'))
 			 && (response['invalid_oauth'] === true)) {
 				/* Nope, invalid. WIPE! */
 				oauth_invalid();
 				return;
 			}
 
-			if ((response['hasOwnProperty']('user_voted'))
+			if (($.property_exists(response, 'user_voted'))
 			 && (response['user_voted'] === true)) {
 				$.classes_add(castvote, 'hidden');
 				$.tags_attribute_set(castvote, {
@@ -518,7 +522,7 @@ API_URL: (function(prefix, suffix){
 		setTimeout($.voting_buttons_update, 0);
 		$.voting_form_update(true);
 
-		if ((response['hasOwnProperty']('not_subscriber'))
+		if (($.property_exists(response, 'not_subscriber'))
 		 && (response['not_subscriber'] === true)) {
 			$.classes_remove($.tags_find('#error_not_subscriber')[0], 'hidden');
 			return;
