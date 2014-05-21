@@ -88,8 +88,10 @@ API_URL: (function(prefix, suffix){
 ,tags_attribute_get: (function(tag, attribute){
 	return tag['getAttribute'](attribute);
 })
-,tags_attribute_set: (function(tag, attribute, value){
-	tag['setAttribute'](attribute, value);
+,tags_attribute_set: (function(tag, properties){
+	for (var key in properties) {
+		tag['setAttribute'](key, properties[key]);
+	}
 })
 ,tags_append_child: (function(parent, child, before){
 	parent['insertBefore'](child, before);
@@ -394,11 +396,13 @@ API_URL: (function(prefix, suffix){
 	$.tags_append_child($.tags_find('header')[0], connect_button /* , $.tags_find('#tail')[0] */ );
 
 	var voting_button = $.tags_create('button');
-	voting_button['id'] = 'castvote';
-	voting_button['type'] = 'button';
-	voting_button['disabled'] = true;
-	voting_button['innerHTML'] = 'Cast Vote';
-	voting_button['title'] = 'Initializing... please wait!';
+	$.tags_attribute_set(voting_button, {
+		'id': 'castvote'
+	,	'type': 'button'
+	,	'disabled': true
+	,	'innerHTML': 'Cast Vote'
+	,	'title': 'Initializing... please wait!'
+	});
 	$.classes_add(voting_button, 'hidden');
 	$.events_add(voting_button, 'click', $.voting_buttons_castvote);
 	$.tags_append_child($.tags_find('header')[0], voting_button /* , $.tags_find('#tail')[0] */ );
@@ -413,8 +417,10 @@ API_URL: (function(prefix, suffix){
 	/* Commonly triggered case, hoisted out into it's own sub-function. */
 	var oauth_invalid = (function() {
 		localStorage['removeItem']('twitch_oauth');
-		castvote['disabled'] = true;
-		castvote['title'] = 'No "Connect w/ Twitch" credentials available.';
+		$.tags_attribute_set(castvote, {
+			'disabled': true
+		,	'title': 'No "Connect w/ Twitch" credentials available.'
+		});
 		$.classes_add(castvote, 'hidden');
 		$.classes_remove(connectTwitch, 'hidden');
 	});
@@ -464,13 +470,17 @@ API_URL: (function(prefix, suffix){
 			if ((response['hasOwnProperty']('user_voted'))
 			 && (response['user_voted'] === true)) {
 				$.classes_add(castvote, 'hidden');
-				castvote['disabled'] = true;
-				castvote['title'] = 'You have already voted in this poll!';
+				$.tags_attribute_set(castvote, {
+					'disabled': true
+				,	'title': 'You have already voted in this poll!'
+				});
 				return;
 			}
 
-			castvote['title'] = 'Click here to cast your vote!';
-			castvote['disabled'] = false;
+			$.tags_attribute_set(castvote, {
+				'disabled': false
+			,	'title': 'Click here to cast your vote!'
+			});
 			$.classes_remove(castvote, 'hidden');
 
 		});
@@ -584,9 +594,11 @@ API_URL: (function(prefix, suffix){
 
 	,'twitter': (function() {
 		var script = $.tags_create('script');
-		script['id'] = 'twitter-wjs';
-		script['src'] = '//platform.twitter.com/widgets.js';
-		script['async'] = true;
+		$.tags_attribute_set(script, {
+			'id': 'twitter-wjs'
+		,	'src': '//platform.twitter.com/widgets.js'
+		,	'async': true
+		});
 		$.tags_append_child($.tags_find('head')[0], script);
 	})
 
@@ -637,9 +649,7 @@ API_URL: (function(prefix, suffix){
 				,'bgcolor': '#000'
 				,'data': 'http://www.twitch.tv/widgets/live_embed_player.swf?channel=ferretbomb'
 			};
-			for (var attrib in attribs) {
-				$.tags_attribute_set(embed, attrib, attribs[attrib]);
-			}
+			$.tags_attribute_set(embed, attribs);
 			var params = {
 				'allowFullScreen': 'true'
 				,'allowScriptAccess': 'true'
@@ -650,8 +660,10 @@ API_URL: (function(prefix, suffix){
 			};
 			for (var param in params) {
 				var tag = $.tags_create('param');
-				$.tags_attribute_set(tag, 'name', param);
-				$.tags_attribute_set(tag, 'value', params[param]);
+				$.tags_attribute_set(tag, {
+					'name': param
+				,	'value': params[param]
+				});
 				$.tags_append_child(embed, tag);
 			}
 			$.tags_append_child(stream, embed);
@@ -699,10 +711,10 @@ API_URL: (function(prefix, suffix){
 
 };
 
+setTimeout($.inits[init], 0);
+
+setTimeout($.banner_init, 0);
+
 setTimeout($.checkstream, 0);
-
-$.banner_init();
-
-$.inits[init]();
 
 }());
