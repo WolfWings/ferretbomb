@@ -1,0 +1,18 @@
+DROP FUNCTION IF EXISTS poll_find_poll_item;
+DELIMITER ~
+CREATE FUNCTION poll_find_poll_item (
+	name VARCHAR(255)
+)
+	RETURNS INT UNSIGNED
+	NOT DETERMINISTIC
+	READS SQL DATA
+BEGIN
+	DECLARE id INT UNSIGNED DEFAULT NULL;
+	SELECT p_i_id
+	  INTO id
+	  FROM poll_items
+	 WHERE p_i_name = name;
+	RETURN id;
+END;
+~
+DELIMITER ;

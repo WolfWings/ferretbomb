@@ -1,0 +1,22 @@
+DROP FUNCTION IF EXISTS user_find;
+DELIMITER ~
+CREATE FUNCTION user_find (
+	oauth VARCHAR(255)
+)
+	RETURNS INT UNSIGNED
+	NOT DETERMINISTIC
+	READS SQL DATA
+BEGIN
+	DECLARE user INT UNSIGNED DEFAULT NULL;
+
+	SELECT u_id
+	  INTO user
+	  FROM users
+	 WHERE __H_oauth = UNHEX(SHA2(oauth, 256))
+	   AND u_oauth = oauth
+	 LIMIT 1;
+
+	RETURN user;
+END;
+~
+DELIMITER ;

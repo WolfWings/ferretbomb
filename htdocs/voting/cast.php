@@ -1,38 +1,5 @@
 <?php
 
-define('QUERY_USER_FIND', <<<'SQL'
-SELECT u_id
-     , u_sub
-  FROM users
- WHERE __H_oauth = UNHEX(?)
-   AND u_oauth = ?
-SQL
-);
-
-define('QUERY_POLL_ACTIVE', <<<'SQL'
-SELECT p_id
-     , p_maxchoices
-     , p_subonly
-     , p_open
-  FROM polls
- WHERE p_id =
-	(SELECT CAST(value AS UNSIGNED INTEGER)
-	   FROM config
-	  WHERE OPTION = "poll_active")
-SQL
-);
-
-define('QUERY_POLL_CHOICES', <<<'SQL'
-SELECT c_bit
-     , _p_i_id
-  FROM choices
- WHERE _p_id =
-	(SELECT CAST(value AS UNSIGNED INTEGER)
-	   FROM config
-	  WHERE OPTION = "poll_active")
-SQL
-);
-
 $response = [
 	  'status_code' => 400
 	, 'status_message' => 'Unknown error!'
@@ -81,8 +48,8 @@ function process() {
 	$oauth = $post['oauth'][0];
 	$oauthhash = hash('sha256', $oauth);
 
-	$query = $db->prepare(QUERY_USER_FIND);
-	$query->bind_param('ss', $oauthhash, $oauth);
+	$query = $db->prepare('SELECT user_find(?)');
+	$query->bind_param('s', $oauth);
 	$query->execute();
 	$res = $query->get_result();
 	if (($res === false)
@@ -93,13 +60,15 @@ function process() {
 	}
 	$user = $res->fetch_assoc();
 
-	$res = $db->query(QUERY_POLL_ACTIVE);
+	$res = $db->query('CALL poll_get_active_poll');
 	if (($res === false)
 	 || ($res->num_rows === 0)) {
 		$response['status_message'] = 'No poll active.';
 		return;
 	}
 	$poll = $res->fetch_assoc();
+	$res->free();
+	$db->next_result();
 
 	if ((!is_null($poll['p_subonly']))
 	 && (is_null($user['u_sub']))) {
@@ -118,7 +87,7 @@ function process() {
 		return;
 	}
 
-	$res = $db->query(QUERY_POLL_CHOICES);
+	$res = $db->query('CALL poll_get_active_choices');
 	if (($res === false)
 	 || ($res->num_rows === 0)) {
 		$response['status_message'] = 'No choices in active poll.';
@@ -128,6 +97,8 @@ function process() {
 	while ($choice = $res->fetch_assoc()) {
 		$choices[base_convert($choice['_p_i_id'], 10, 36)] = $choice['c_bit'];
 	}
+	$res->free();
+	$db->next_result();
 
 	$votes = array_fill(0, 40, false);
 	foreach ($post['votes'] as $vote) {
@@ -156,7 +127,7 @@ function process() {
 		$votes[37] = 'IPv4=UNHEX(' . substr($ip, 16, 16) . ')';
 	} else {
 		$votes[36] = 'IPv6=NULL';
-		$votes[37] = 'IPv4=UNHEX(0000000000000000)';
+		$votes[37] = 'IPv4=UNHEX(FFFFFFFF00000000)';
 	}
 
 	$votes[38] = '_u_id=' . $user['u_id'];

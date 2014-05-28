@@ -1,46 +1,5 @@
 <?php
 
-define('QUERY_USER_FIND', <<<'SQL'
-SELECT u_id
-  FROM users
- WHERE __H_oauth = UNHEX(?)
-   AND u_oauth = ?
-SQL
-);
-
-define('QUERY_USER_INSERT', <<<'SQL'
-INSERT INTO users
-SET __H_oauth=UNHEX(?),
-      u_oauth=?,
-    __H_name=UNHEX(?),
-      u_name=?,
-      u_sub=IF(? = 0, NULL, ""),
-      u_follows=IF(? = 0, NULL, "")
-SQL
-);
-
-define('QUERY_USER_UPDATE', <<<'SQL'
-UPDATE users
-SET __H_oauth=UNHEX(?),
-      u_oauth=?,
-      u_sub=IF(? = 0, NULL, ""),
-      u_follows=IF(? = 0, NULL, "")
-WHERE __H_name=UNHEX(?)
-  AND u_name=?
-SQL
-);
-
-define('QUERY_VOTE_COUNT', <<<'SQL'
-SELECT v_id
-  FROM votes
- WHERE _u_id = ?
-   AND _p_id =
-	(SELECT CAST(value AS UNSIGNED INTEGER)
-	   FROM config
-	  WHERE option = "poll_active")
-SQL
-);
-
 $response = [
 	  'status_code' => 400
 	, 'status_message' => 'Unknown error!'
@@ -67,12 +26,15 @@ function checkifvoted() {
 		return;
 	}
 
-	$query = $db->prepare(QUERY_USER_FIND);
-	$query->bind_param('ss', $oauthhash, $oauth);
+	$query = $db->prepare('SELECT user_find(?)');
+	$query->bind_param('s', $oauth);
 	$query->execute();
 	$res = $query->get_result();
 	if (($res === false)
 	 || ($res->num_rows === 0)) {
+		$res->free();
+		$query->close();
+		$db->next_result();
 
 		$twitch = json_decode(http_parse_message(http_get('https://api.twitch.tv/kraken?oauth_token=' . $oauth))->body, true);
 
@@ -104,23 +66,18 @@ function checkifvoted() {
 			$follow = 1;
 		}
 
-		// Can't use 'INSERT ... ON DUPLICATE KEY UPDATE' due to MySQL bug #30915
-		$query = $db->prepare(QUERY_USER_INSERT);
-		$query->bind_param('ssssii', $oauthhash, $oauth, $usernamehash, $username, $sub, $follow);
+		$query = $db->prepare('CALL user_update(?, ?, ?, ?)');
+		$query->bind_param('ssii', $username, $oauth, $sub, $follow);
 		if (!$query->execute()) {
-			$query->close();
-			$query = $db->prepare(QUERY_USER_UPDATE);
-			$query->bind_param('ssiiss', $oauthhash, $oauth, $sub, $follow, $usernamehash, $username);
-			if (!$query->execute()) {
-				$response['status_code'] = 500;
-				$response['status_message'] = 'Unable to update pre-existing user record.';
-				return;
-			}
+			$response['status_code'] = 500;
+			$response['status_message'] = 'Unable to update pre-existing user record.';
+			return;
 		}
 		$query->close();
+		$db->next_result();
 
-		$query = $db->prepare(QUERY_USER_FIND);
-		$query->bind_param('ss', $oauthhash, $oauth);
+		$query = $db->prepare('SELECT user_find(?)');
+		$query->bind_param('s', $oauth);
 		$query->execute();
 		$res = $query->get_result();
 	}
@@ -136,7 +93,7 @@ function checkifvoted() {
 	$res->free();
 	$query->close();
 
-	$query = $db->prepare(QUERY_VOTE_COUNT);
+	$query = $db->prepare('CALL check_user_voted(?)');
 	$query->bind_param('i', $user['u_id']);
 	$query->execute();
 	$res = $query->get_result();
