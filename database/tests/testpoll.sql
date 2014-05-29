@@ -5,5 +5,6 @@ INSERT INTO choices (_p_id,_p_i_id,c_bit) SELECT MAX(p_id),MAX(p_i_id)-3,0 FROM 
 INSERT INTO choices (_p_id,_p_i_id,c_bit) SELECT MAX(p_id),MAX(p_i_id)-2,1 FROM polls,poll_items;
 INSERT INTO choices (_p_id,_p_i_id,c_bit) SELECT MAX(p_id),MAX(p_i_id)-1,2 FROM polls,poll_items;
 INSERT INTO choices (_p_id,_p_i_id,c_bit) SELECT MAX(p_id),MAX(p_i_id),3 FROM polls,poll_items;
-INSERT INTO config (option,value) SELECT 'poll_active',MAX(p_id) FROM polls;
+INSERT IGNORE INTO config (option,value) SELECT 'poll_active','';
+UPDATE config SET value = (SELECT MAX(p_id) FROM polls) WHERE option = 'poll_actve';
 COMMIT;
