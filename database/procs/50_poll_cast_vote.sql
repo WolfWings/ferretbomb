@@ -1,6 +1,7 @@
 DROP PROCEDURE IF EXISTS poll_cast_vote;
 DELIMITER ~
-CREATE PROCEDURE poll_cast_vote (
+CREATE DEFINER = 'ferretadmin'@'localhost'
+PROCEDURE poll_cast_vote (
 	IN oauth VARCHAR(255)
 ,	IN votes VARCHAR(255)
 ,	IN fromIP VARCHAR(32)
@@ -8,6 +9,7 @@ CREATE PROCEDURE poll_cast_vote (
 )
 	NOT DETERMINISTIC
 	MODIFIES SQL DATA
+	SQL SECURITY DEFINER
 proc:BEGIN
 	DECLARE user INT UNSIGNED;
 	DECLARE vote TINYINT UNSIGNED;
@@ -15,6 +17,8 @@ proc:BEGIN
 	DECLARE choices INT UNSIGNED DEFAULT 0;
 	DECLARE IPv6 BIGINT UNSIGNED;
 	DECLARE IPv4 BIGINT UNSIGNED;
+	DECLARE u_sub CHAR(0) DEFAULT NULL;
+	DECLARE p_sub CHAR(0) DEFAULT NULL;
 
 	IF ((LENGTH(fromIP) != 8) &&
 	    (LENGTH(fromIP) != 32)) THEN
@@ -32,8 +36,8 @@ proc:BEGIN
 		LEAVE proc;
 	END IF;
 
-	SELECT p_id
-	  INTO poll
+	SELECT p_id,p_subonly
+	  INTO poll,p_sub
 	  FROM polls
 	 WHERE p_id =
 		(SELECT CAST(value AS UNSIGNED INTEGER)
@@ -48,6 +52,16 @@ proc:BEGIN
 	IF (user IS NULL) THEN
 		SET response = 'User not found via OAuth.';
 		LEAVE proc;
+	END IF;
+
+	SELECT u_sub
+	  INTO u_sub
+	  FROM users
+	 WHERE u_id = user;
+	IF ((p_sub IS NOT NULL)
+	AND (u_sub IS NULL)) THEN
+		SET response = 'Poll is sub-only, user is not a sub.';
+		LEAVE PROC;
 	END IF;
 
 	SELECT COUNT(*)

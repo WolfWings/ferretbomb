@@ -1,12 +1,14 @@
 DROP PROCEDURE IF EXISTS poll_add_poll_choice;
 DELIMITER ~
-CREATE PROCEDURE poll_add_poll_choice (
+CREATE DEFINER = 'ferretadmin'@'localhost'
+PROCEDURE poll_add_poll_choice (
 	IN oauth VARCHAR(255)
 ,	IN p_id INT UNSIGNED
 ,	IN p_i_id INT UNSIGNED
 )
 	NOT DETERMINISTIC
 	MODIFIES SQL DATA
+	SQL SECURITY DEFINER
 proc:BEGIN
 	DECLARE perm CHAR(0) DEFAULT NULL;
 	SELECT poll_create

@@ -1,9 +1,11 @@
 DROP PROCEDURE IF EXISTS poll_get_active_vote_totals;
 DELIMITER ~
-CREATE PROCEDURE poll_get_active_vote_totals (
+CREATE DEFINER = 'ferretadmin'@'localhost'
+PROCEDURE poll_get_active_vote_totals (
 )
 	NOT DETERMINISTIC
 	READS SQL DATA
+	SQL SECURITY DEFINER
 BEGIN
 	SELECT COUNT(v_choice_0) AS `0`
 	     , COUNT(v_choice_1) AS `1`

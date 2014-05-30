@@ -32,9 +32,10 @@ function checkifvoted() {
 	$res = $query->get_result();
 	if (($res === false)
 	 || ($res->num_rows === 0)) {
-		$res->free();
+		if ($res !== false) {
+			$res->free();
+		}
 		$query->close();
-		$db->next_result();
 
 		$twitch = json_decode(http_parse_message(http_get('https://api.twitch.tv/kraken?oauth_token=' . $oauth))->body, true);
 
@@ -80,18 +81,22 @@ function checkifvoted() {
 		$query->bind_param('s', $oauth);
 		$query->execute();
 		$res = $query->get_result();
-	}
 
-	if (($res === false)
-	 || ($res->num_rows === 0)) {
-		$response['status_code'] = 500;
-		$response['status_message'] = 'Unable to find user record after creation/update.';
-		return;
+		if (($res === false)
+		 || ($res->num_rows === 0)) {
+			$response['status_code'] = 500;
+			$response['status_message'] = 'Unable to find user record after creation/update.';
+			return;
+		}
 	}
 
 	$user = $res->fetch_assoc();
 	$res->free();
 	$query->close();
+
+	$response['status_code'] = 200;
+
+	$response['status_message'] = 'User has not voted.';
 
 	$query = $db->prepare('CALL check_user_voted(?)');
 	$query->bind_param('i', $user['u_id']);
@@ -99,12 +104,14 @@ function checkifvoted() {
 	$res = $query->get_result();
 	if (($res === false)
 	 || ($res->num_rows === 0)) {
-		$response['status_message'] = 'User has not voted.';
 		return;
 	}
-
-	$response['user_voted'] = true;
-	$response['status_message'] = 'User HAS voted.';
+	$status = $res->fetch_assoc();
+	$response['user_voted'] = ($status['voted'] === 1);
+	$response['poll_active'] = ($status['polls'] === 1);
+	if ($response['user_voted']) {
+		$response['status_message'] = 'User HAS voted.';
+	}
 }
 
 checkifvoted();

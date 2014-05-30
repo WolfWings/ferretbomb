@@ -298,6 +298,8 @@ API_URL: (function(prefix, suffix){
 
 ,voting_form_update: (function(oneshot) {
 	$.JSON('/voting/tally.php?cachebuster=' + $.cachebuster(), function(response) {
+		var update_buttons = false;
+
 		if (oneshot !== true) {
 			if ($.property_exists(response, 'rapid')
 			 && response['rapid'] === true) {
@@ -322,6 +324,9 @@ API_URL: (function(prefix, suffix){
 		for (var i = ($.property_exists(response, 'choices') ? response['choices'].length : 0); i < 36; i++) {
 			$.classes_add($.tags_find('#choice_' + i.toString(36))[0], 'hidden');
 			var input = $.tags_find('#vote_' + i.toString(36))[0];
+			if (input['disabled'] !== true) {
+				update_buttons = true;
+			}
 			input['checked'] = false;
 			input['disabled'] = true;
 			input['type'] = voting_button_type;
@@ -336,6 +341,9 @@ API_URL: (function(prefix, suffix){
 		for (var i = 0; i < response['choices'].length; i++) {
 			$.tags_find('#label_' + i.toString(36))[0]['innerHTML'] = response['choices'][i]['title'];
 			var input = $.tags_find('#vote_' + i.toString(36))[0];
+			if (input['disabled'] !== false) {
+				update_buttons = true;
+			}
 			input['value'] = response['choices'][i]['box'];
 			input['disabled'] = false;
 			input['type'] = voting_button_type;
@@ -361,6 +369,10 @@ API_URL: (function(prefix, suffix){
 			var choice = $.tags_find('#choice_' + i.toString(36))[0];
 			choice['style']['backgroundPosition'] = '' + offsets[i] + 'px 1px,' + offsets[i] + 'px 1px';
 			$.classes_remove(choice, 'hidden');
+		}
+
+		if (update_buttons === true) {
+			$.voting_buttons_update(true);
 		}
 	});
 })
@@ -414,7 +426,7 @@ API_URL: (function(prefix, suffix){
 	$.voting_buttons_update();
 })
 
-,voting_buttons_update: (function() {
+,voting_buttons_update: (function(internalonly) {
 	var castvote = $.tags_find('#castvote')[0];
 	var connectTwitch = $.tags_find('#connectTwitch')[0];
 
@@ -429,28 +441,7 @@ API_URL: (function(prefix, suffix){
 		$.classes_remove(connectTwitch, 'hidden');
 	});
 
-	/* No OAuth token? 'Connect with Twitch' and done. */
-	if (localStorage['getItem']('twitch_oauth') === null) {
-		oauth_invalid();
-		return;
-	}
-
-	/*
-	 * Now we need to verify if the OAuth token is valid.
-	 *
-	 * First, ping Twitch first. Two reasons:
-	 *   1) If they say it's invalid, once we re-auth we'll wipe our server's OAuth immediately.
-	 *   2) Only if Twitch says it's valid, THEN we poke our server which will either:
-	 *      a) Have the right one cached and return immediately.
-	 *      b) Update it's internal status, including pulling the subscriber info a'new.
-	 *
-	 * So this sequence avoids as much load as possible on things, and is needed because
-	 * we're checking w/ Twitch directly to avoid hitting the cached OAuth hash we store
-	 * on our own database for rapid vote handling.
-	 */
-	$.JSONP($.URL('https://api.twitch.tv/kraken'
-	             , {'oauth_token':localStorage['getItem']('twitch_oauth')})
-	       , (function(response) {
+	var internal_check = (function() {
 		if ((!$.property_exists(response, 'token'))
 		 || (!$.property_exists(response['token'], 'valid'))
 		 || (response['token']['valid'] !== true)) {
@@ -462,6 +453,7 @@ API_URL: (function(prefix, suffix){
 		/* Yay, valid OAuth token, now to update our site! */
 		$.classes_add(connectTwitch, 'hidden');
 		castvote['disabled'] = true;
+
 		$.JSON('/voting/votedyet.php?oauth=' + localStorage['getItem']('twitch_oauth') + '&cachebuster=' + $.cachebuster(), function(response) {
 
 			if (($.property_exists(response, 'invalid_oauth'))
@@ -485,9 +477,46 @@ API_URL: (function(prefix, suffix){
 				'disabled': false
 			,	'title': 'Click here to cast your vote!'
 			});
-			$.classes_remove(castvote, 'hidden');
-
+			if (($.property_exists(response, 'poll_active'))
+			 && (response['poll_active'] === true)) {
+				$.classes_remove(castvote, 'hidden');
+			} else {
+				$.classes_add(castvote, 'hidden');
+			}
 		});
+	});
+
+	/* No OAuth token? 'Connect with Twitch' and done. */
+	if (localStorage['getItem']('twitch_oauth') === null) {
+		oauth_invalid();
+		return;
+	}
+
+	/*
+	 * Now we need to verify if the OAuth token is valid.
+	 *
+	 * First, ping Twitch first. Two reasons:
+	 *   1) If they say it's invalid, once we re-auth we'll wipe our server's OAuth immediately.
+	 *   2) Only if Twitch says it's valid, THEN we poke our server which will either:
+	 *      a) Have the right one cached and return immediately.
+	 *      b) Update it's internal status, including pulling the subscriber info a'new.
+	 *
+	 * So this sequence avoids as much load as possible on things, and is needed because
+	 * we're checking w/ Twitch directly to avoid hitting the cached OAuth hash we store
+	 * on our own database for rapid vote handling.
+	 *
+	 * Note that we have an override parameter to force us to only ping the local server,
+	 * which is safe to call during voting-choice-total updates.
+	 */
+	if (internal_only === true) {
+		internal_check();
+		return;
+	}
+
+	$.JSONP($.URL('https://api.twitch.tv/kraken'
+	             , {'oauth_token':localStorage['getItem']('twitch_oauth')})
+	       , (function(response) {
+		internal_check();
 	}));
 })
 
