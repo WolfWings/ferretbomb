@@ -12,7 +12,7 @@ function votes() {
 		return;
 	}
 
-	$res = $db->query('CALL poll_get_active_poll');
+	$res = $db->query('CALL active_poll_find_poll');
 	if (($res === false)
 	 || ($res->num_rows === 0)) {
 		$results['debug'] = 'No active poll!';
@@ -29,7 +29,7 @@ function votes() {
 		return;
 	}
 
-	$res = $db->query('CALL poll_get_active_choices');
+	$res = $db->query('CALL active_poll_find_choices');
 	if (($res === false)
 	 || ($res->num_rows === 0)) {
 		$results['debug'] = 'No choices in poll!';
@@ -56,7 +56,7 @@ function votes() {
 	$res->free();
 	$db->next_result();
 
-	$res = $db->query('CALL poll_get_active_vote_totals');
+	$res = $db->query('CALL active_poll_find_vote_totals');
 	if (($res === false)
 	 || ($res->num_rows === 0)) {
 		$results['debug'] = 'No votes to tally!';

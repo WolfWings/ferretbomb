@@ -1,7 +1,8 @@
 DROP PROCEDURE IF EXISTS poll_get_active_poll;
+DROP PROCEDURE IF EXISTS active_poll_find_poll;
 DELIMITER ~
 CREATE DEFINER = 'ferretadmin'@'localhost'
-PROCEDURE poll_get_active_poll (
+PROCEDURE active_poll_find_poll (
 )
 	NOT DETERMINISTIC
 	READS SQL DATA

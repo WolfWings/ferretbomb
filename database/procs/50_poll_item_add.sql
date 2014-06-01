@@ -1,28 +1,28 @@
 DROP PROCEDURE IF EXISTS poll_create_poll_item;
+DROP PROCEDURE IF EXISTS poll_item_add;
 DELIMITER ~
 CREATE DEFINER = 'ferretadmin'@'localhost'
-PROCEDURE poll_create_poll_item (
-	IN oauth VARCHAR(255)
-,	IN name VARCHAR(255)
-,	OUT p_i_id INT UNSIGNED
+PROCEDURE poll_item_add (
+	oauth VARCHAR(255)
+,	name VARCHAR(255)
 )
 	NOT DETERMINISTIC
 	MODIFIES SQL DATA
 	SQL SECURITY DEFINER
 proc:BEGIN
 	DECLARE perm CHAR(0) DEFAULT NULL;
-	SET p_i_id = 0;
 	SELECT poll_create
 	  INTO perm
 	  FROM permissions
 	 WHERE _u_id = user_find(oauth);
 	IF perm IS NULL THEN
+		SELECT NULL AS id;
 		LEAVE proc;
 	END IF;
 
 	INSERT IGNORE INTO poll_items
 	   SET p_i_name = name;
-	SET p_i_id = LAST_INSERT_ID();
+	SELECT LAST_INSERT_ID() AS id;
 END;
 ~
 DELIMITER ;

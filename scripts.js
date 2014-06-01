@@ -740,6 +740,10 @@ API_URL: (function(prefix, suffix){
 		$.voting_form_init();
 		$.voting_buttons_init();
 	})
+
+	,'admin_poll': (function() {
+		console.log('Poll Administration Page');
+	})
 }
 
 };

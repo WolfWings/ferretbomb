@@ -98,7 +98,7 @@ function checkifvoted() {
 
 	$response['status_message'] = 'User has not voted.';
 
-	$query = $db->prepare('CALL check_user_voted(?)');
+	$query = $db->prepare('CALL user_voted_check(?)');
 	$query->bind_param('i', $user['u_id']);
 	$query->execute();
 	$res = $query->get_result();

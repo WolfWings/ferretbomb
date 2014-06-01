@@ -1,7 +1,8 @@
 DROP PROCEDURE IF EXISTS check_user_voted;
+DROP PROCEDURE IF EXISTS user_voted_check;
 DELIMITER ~
 CREATE DEFINER = 'ferretadmin'@'localhost'
-PROCEDURE check_user_voted (
+PROCEDURE user_voted_check (
 	IN u_id INT UNSIGNED
 )
 	NOT DETERMINISTIC

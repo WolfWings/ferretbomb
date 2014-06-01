@@ -1,7 +1,8 @@
-DROP PROCEDURE IF EXISTS poll_add_poll_choice;
+DROP PROCEDURE IF EXISTS poll_delete_poll_choice;
+DROP PROCEDURE IF EXISTS choice_remove;
 DELIMITER ~
 CREATE DEFINER = 'ferretadmin'@'localhost'
-PROCEDURE poll_add_poll_choice (
+PROCEDURE choice_remove (
 	IN oauth VARCHAR(255)
 ,	IN p_id INT UNSIGNED
 ,	IN p_i_id INT UNSIGNED
@@ -19,17 +20,9 @@ proc:BEGIN
 		LEAVE proc;
 	END IF;
 
-	INSERT IGNORE INTO choices
-	   SET _p_id = p_id
-	     , _p_i_id = p_i_id
-	     , c_bit =
-		(SELECT value
-		   FROM sequence
-		  WHERE value BETWEEN 0 AND 35
-		    AND value NOT IN
-			(SELECT c_bit
-			   FROM choices
-			  WHERE _p_id = p_id) );
+	DELETE IGNORE FROM choices
+	 WHERE _p_id = p_id
+	   AND _p_i_id = p_i_id;
 END;
 ~
 DELIMITER ;
