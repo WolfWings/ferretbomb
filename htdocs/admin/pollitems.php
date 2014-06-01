@@ -37,14 +37,19 @@ function searchpollitems() {
 	$query->execute();
 	$res = $query->get_result();
 
+	$response['status_code'] = 200;
+
 	if (($res === false)
 	 || ($res->num_rows === 0)) {
-		$response['status_code'] = 200;
 		$response['status_message'] = 'No poll items found.';
 		return;
 	}
 
-	$response['status_code'] = 200;
+	if ($res->num_rows > 10) {
+		$response['status_message'] = 'Too many poll items found.';
+		return;
+	}
+
 	$response['status_message'] = 'Poll items found.';
 
 	while ($poll_item = $res->fetch_assoc()) {

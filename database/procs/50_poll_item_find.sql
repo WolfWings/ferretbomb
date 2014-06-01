@@ -12,6 +12,13 @@ PROCEDURE poll_item_find (
 proc:BEGIN
 	DECLARE perm CHAR(0) DEFAULT NULL;
 
+	IF LENGTH(TRIM(name)) < 1 THEN
+		SELECT p_i_id AS id,p_i_name AS name
+		  FROM poll_items
+		 WHERE p_i_id IS NULL;
+		LEAVE PROC;
+	END IF;
+
 	SELECT poll_create
 	  INTO perm
 	  FROM permissions
@@ -26,7 +33,8 @@ proc:BEGIN
 
 	SELECT p_i_id AS id,p_i_name AS name
 	  FROM poll_items
-	 WHERE p_i_name LIKE CONCAT('%', name, '%');
+	 WHERE p_i_name LIKE CONCAT('%', name, '%')
+	 LIMIT 11;
 END;
 ~
 DELIMITER ;

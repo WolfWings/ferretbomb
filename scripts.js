@@ -8,6 +8,21 @@
 
 (function(){ "use strict";
 
+if (!Array['prototype']['indexOf']) {
+	Array['prototype']['indexOf'] = (function (obj, fromIndex) {
+		if (fromIndex == null) {
+			fromIndex = 0;
+		} else if (fromIndex < 0) {
+			fromIndex = Math.max(0, this.length + fromIndex);
+		}
+		for (var i = fromIndex, j = this.length; i < j; i++) {
+			if (this[i] === obj)
+				return i;
+		}
+		return -1;
+	});
+}
+
 /* 'Callback' trigger for OAuth logins. */
 window['$'] = {
 
@@ -26,7 +41,7 @@ API_URL: (function(prefix, suffix){
 	var URI = base.toString();
 	var packaged = [];
 	for (var param in parameters) { if ($.property_exists(parameters, param)) {
-		packaged.push(param + '=' + parameters[param].toString());
+		packaged.push(param + '=' + encodeURIComponent(parameters[param].toString()));
 	} }
 	if (packaged.length > 0) {
 		URI = URI + "?" + packaged.join('&');
@@ -560,6 +575,79 @@ API_URL: (function(prefix, suffix){
 	}), votes);
 })
 
+,autocomplete_init: (function(inputTag, selectTag, url) {
+	/*
+	 * Uses a two-tier system to reduce memory bloat:
+	 *
+	 * First, results are pushed onto the 'options' array.
+	 * Second, the 'lookup' object provides direct indexing
+	 * from the search string to the 'options' array items.
+	 *
+	 * The value 'undefined' is used to indicate a WIP
+	 * request to avoid spamming the server.
+	 *
+	 * A page reload currently flushes the data. Persistant
+	 * storage perhaps w/ localStorage? Down the road maybe.
+	 */
+	var lookup = {};
+	var options = [];
+
+	var search = $.tags_find(inputTag)[0];
+	var select = $.tags_find(selectTag)[0];
+
+	var update_options = (function(options) {
+		if (options['length'] < 1) {
+			select['disabled'] = true;
+			select['innerHTML'] = "";
+			return;
+		}
+		select['disabled'] = false;
+		select['innerHTML'] = "";
+		for (var i = 0; i < options['length']; i++) {
+			var option = $.tags_create('option');
+			option['value'] = options[i]['id'];
+			option['label'] = options[i]['name'];
+			$.tags_append_child(select, option);
+		}
+	});
+
+	var autocomplete = (function(event) {
+		if ($.property_exists(lookup, search['value'])) {
+			if (lookup[search['value']] === undefined) {
+				return;
+			}
+			update_options(options[lookup[search['value']]]);
+			return;
+		}
+
+		console.log(search['value']);
+
+		lookup[search['value']] = undefined;
+
+		if (localStorage['getItem']('twitch_oauth') === null) {
+			return;
+		}
+
+		$.JSON($.URL(url, {
+			'oauth': localStorage['getItem']('twitch_oauth')
+		,	'search': search['value']
+		}), (function(results) {
+			var index = options['indexOf'](results);
+			if (index === -1) {
+				index = options['length'];
+				options['push'](results['poll_items']);
+			}
+			lookup[search['value']] = index;
+			update_options(results['poll_items']);
+		}));
+	});
+
+	update_options([]);
+
+	$.events_add(search, 'input', autocomplete);
+	$.events_add(search, 'keyup', autocomplete);
+})
+
 ,inits: {
 	'article': (function() {
 		var outline = $.tags_create('div');
@@ -743,6 +831,8 @@ API_URL: (function(prefix, suffix){
 
 	,'admin_poll': (function() {
 		console.log('Poll Administration Page');
+
+		$.autocomplete_init('#search', '#choices', '/admin/pollitems.php');
 	})
 }
 
