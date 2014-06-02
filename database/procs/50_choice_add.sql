@@ -11,12 +11,7 @@ PROCEDURE choice_add (
 	MODIFIES SQL DATA
 	SQL SECURITY DEFINER
 proc:BEGIN
-	DECLARE perm CHAR(0) DEFAULT NULL;
-	SELECT poll_create
-	  INTO perm
-	  FROM permissions
-	 WHERE _u_id = user_find(oauth);
-	IF perm IS NULL THEN
+	IF NOT permission_poll_create(oauth) THEN
 		LEAVE proc;
 	END IF;
 

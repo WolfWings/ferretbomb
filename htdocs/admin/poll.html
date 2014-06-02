@@ -1,7 +1,25 @@
 <p>Poll Administration Page</p>
-<input id="search" type="text" name="search" value="" placeholder="Choice to Search For" autocomplete="off">
-<button id="additem" type="button" disabled">Add</button>
-<button id="deleteitem" type="button" disabled">Delete</button>
+<center>Poll Settings</center>
+<input id="poll_subonly" type="checkbox" name="poll_subonly" disabled>
+<label for="poll_subonly">Subscribers Only</label>
 <br>
+<input id="poll_open" type="checkbox" name="poll_open" disabled>
+<label for="poll_open">Open for Voting</label>
+<br>
+<input id="poll_maxchoices" type="text" size="2" value="36" name="poll_maxchoices" disabled>
+<label for="poll_maxchoices">Maximum number of Choices</label>
+<hr>
+<center>Polls</center>
+<select id="polls" size="10" disabled></select>
+<br>
+<label for="poll_search">Search:</label>
+<input id="poll_search" type="text" name="poll_search" value="" placeholder="Poll to Search For" autocomplete="off" disabled>
+<button id="poll_new" type="button" disabled>Create New</button>
+<hr>
+<center>Poll Choices</center>
 <select id="choices" size="10" disabled></select>
+<br>
+<label for="choice_search">Search:</label>
+<input id="choice_search" type="text" name="choice_search" value="" placeholder="Choice to Search For" autocomplete="off" disabled>
+<button id="choice_new" type="button" disabled>Create New</button>
 <script type="text/javascript">var init='admin_poll';</script>

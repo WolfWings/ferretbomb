@@ -751,7 +751,11 @@ footer {
 	height: 100%;
 }
 
-select#choices {
+select#choices,
+select#polls {
+	border: 1px inset #303030;
+	background: transparent;
 	width: 100%;
 	overflow: hidden;
+	color: #ddd;
 }

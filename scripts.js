@@ -583,44 +583,54 @@ API_URL: (function(prefix, suffix){
 	 * Second, the 'lookup' object provides direct indexing
 	 * from the search string to the 'options' array items.
 	 *
-	 * The value 'undefined' is used to indicate a WIP
-	 * request to avoid spamming the server.
+	 * The value 'undefined' indicates a lookup in progress
+	 * to avoid spamming the server.
 	 *
 	 * A page reload currently flushes the data. Persistant
-	 * storage perhaps w/ localStorage? Down the road maybe.
+	 * storage perhaps w/ localStorage down the road maybe?
 	 */
-	var lookup = {};
-	var options = [];
+	var lookup = {'':1};
+	var options = [false,[]];
 
 	var search = $.tags_find(inputTag)[0];
 	var select = $.tags_find(selectTag)[0];
 
-	var update_options = (function(options) {
-		if (options['length'] < 1) {
-			select['disabled'] = true;
-			select['innerHTML'] = "";
+	var update_options = (function() {
+		if ((!$.property_exists(lookup, search['value']))
+		 || (lookup[search['value']] === undefined)
+		 || (!$.property_exists(options, lookup[search['value']]))) {
 			return;
 		}
+
+		var items = options[lookup[search['value']]];
+
+		if (items === false) {
+			select['disabled'] = true;
+			select['innerHTML'] = '<optgroup label="Too may results..." disabled></optgroup>';
+			return;
+		}
+
+		if (items['length'] < 1) {
+			select['disabled'] = true;
+			select['innerHTML'] = '<optgroup label="No results found." disabled></optgroup>';
+			return;
+		}
+
 		select['disabled'] = false;
 		select['innerHTML'] = "";
-		for (var i = 0; i < options['length']; i++) {
+		for (var i = 0; i < items['length']; i++) {
 			var option = $.tags_create('option');
-			option['value'] = options[i]['id'];
-			option['label'] = options[i]['name'];
+			option['value'] = items[i]['id'];
+			option['label'] = items[i]['name'];
 			$.tags_append_child(select, option);
 		}
 	});
 
 	var autocomplete = (function(event) {
 		if ($.property_exists(lookup, search['value'])) {
-			if (lookup[search['value']] === undefined) {
-				return;
-			}
-			update_options(options[lookup[search['value']]]);
+			update_options();
 			return;
 		}
-
-		console.log(search['value']);
 
 		lookup[search['value']] = undefined;
 
@@ -631,21 +641,23 @@ API_URL: (function(prefix, suffix){
 		$.JSON($.URL(url, {
 			'oauth': localStorage['getItem']('twitch_oauth')
 		,	'search': search['value']
+		,	'cachebuster': $.cachebuster()
 		}), (function(results) {
-			var index = options['indexOf'](results);
+			var index = options['indexOf'](results['items']);
 			if (index === -1) {
 				index = options['length'];
-				options['push'](results['poll_items']);
+				options['push'](results['items']);
 			}
 			lookup[search['value']] = index;
-			update_options(results['poll_items']);
+			update_options();
 		}));
 	});
 
-	update_options([]);
+	update_options();
 
 	$.events_add(search, 'input', autocomplete);
 	$.events_add(search, 'keyup', autocomplete);
+	search['disabled'] = false;
 })
 
 ,inits: {
@@ -830,9 +842,8 @@ API_URL: (function(prefix, suffix){
 	})
 
 	,'admin_poll': (function() {
-		console.log('Poll Administration Page');
-
-		$.autocomplete_init('#search', '#choices', '/admin/pollitems.php');
+		$.autocomplete_init('#poll_search',   '#polls',   '/admin/polls.php');
+		$.autocomplete_init('#choice_search', '#choices', '/admin/pollitems.php');
 	})
 }
 

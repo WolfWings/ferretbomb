@@ -6,7 +6,7 @@ $response = [
 	, 'items' => []
 ];
 
-function searchpollitems() {
+function searchpolls() {
 	global $response;
 
 	if (!isset($_GET['oauth'])
@@ -32,7 +32,7 @@ function searchpollitems() {
 		return;
 	}
 
-	$query = $db->prepare('CALL poll_item_find(?,?)');
+	$query = $db->prepare('CALL poll_find(?,?)');
 	$query->bind_param('ss', $oauth, $search);
 	$query->execute();
 	$res = $query->get_result();
@@ -41,28 +41,28 @@ function searchpollitems() {
 
 	if (($res === false)
 	 || ($res->num_rows === 0)) {
-		$response['status_message'] = 'No poll items found.';
+		$response['status_message'] = 'No polls found.';
 		return;
 	}
 
 	if ($res->num_rows > 10) {
 		$response['too_many_found'] = true;
-		$response['status_message'] = 'Too many poll items found.';
+		$response['status_message'] = 'Too many polls found.';
 		$response['items'] = false;
 		return;
 	}
 
-	$response['status_message'] = 'Poll items found.';
+	$response['status_message'] = 'Polls found.';
 
-	while ($poll_item = $res->fetch_assoc()) {
-		array_push($response['items'], $poll_item);
+	while ($poll = $res->fetch_assoc()) {
+		array_push($response['items'], $poll);
 		unset($response['status_message']);
 	}
 	$res->free();
 	$db->next_result();
 }
 
-searchpollitems();
+searchpolls();
 
 http_response_code($response['status_code']);
 
